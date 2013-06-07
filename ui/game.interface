@@ -347,7 +347,7 @@
 			</panel>
 <!--  			<image width="9.0h" height="9.0h" align="center" valign="center" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
 			<!-- mana cost -->
-			<panel x="0" y="5.0h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" >
+			<panel x="-1.6h" y="5.1h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" >
 <!-- 				<image width="8.9h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
 				<label y="0.2h" fity="1" font="dyn_10" color="white" outline="1" textalign="center"
 					watch="ActiveInventoryDescription{slot}"
@@ -376,7 +376,7 @@
 	<template name="ability_frame_single_plus_one">
 		<!-- SINGLE plus ONE-->
 		<panel
-			width="10.5h"
+			width="10.0h"
 			height="100%"
 			valign="center"
 			color="invisible"
@@ -386,22 +386,21 @@
 			stickytoinvis="false"
 			visible="false"
 		>
-			<panel y="0.8h" noclick="1">
-				<panel x="1.5h" y="1.1h" height="4.25h" width="4.25h" noclick="1">
+			<panel x="0.5h" y="0" noclick="1">
+				<panel x="0h" y="1.2h" height="5.5h" width="5.5h" noclick="1">
 					<instance name="ability_button" slot="{slot_a}"/>
 				</panel>
 
-				<panel x="6.4h" y="2.85h" height="2.5h" width="2.5h" noclick="1">
+				<panel x="5.5h" y="1.2h" height="3.5h" width="3.5h" noclick="1">
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
-
 <!-- 				<image width="14.9h" height="7.45h" texture="/ui/common/ability_frame_1.tga" noclick="1" /> -->
 			</panel>
 			<!-- mana cost -->
-			<panel x="0" y="4.5h" align="center" height="4.9h" width="5.5h" color="invisible" noclick="1">
+			<panel x="0h" y="5.1h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1">
 <!-- 				<image x="2.2h" width="14.9h" align="center" valign="bottom" texture="/ui/common/mana_frame2.tga" noclick="1"/> -->
-				<panel y="0.3h" x="0.3h" float="right" padding="0.6h" noclick="1">
-					<label width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
+				<panel y="0.2h" float="right" padding="0.6h" noclick="1">
+					<label x="-2.1h" width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
 						watch="ActiveInventoryDescription{slot_a}"
 						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_a}"
@@ -420,7 +419,7 @@
 						"
 						onhidelua="self:UnregisterWatch('ActiveMana')"
 					/>
-					<label width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
+					<label x="3.4h" width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
 						watch="ActiveInventoryDescription{slot_b}"
 						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_b}"
@@ -447,7 +446,7 @@
 	<template name="ability_frame_double">
 		<!-- double-->
 		<panel
-			width="7h"
+			width="8.0h"
 			height="100%"
 			valign="center"
 			color="invisible"
@@ -457,25 +456,22 @@
 			stickytoinvis="false"
 			visible="false"
 		>
-			<panel y="0.7h">
-				<panel x="0.5h" y="1.0h" height="3.00h" width="3.00h" >
+			<panel y="0.5h">
+				<panel x="0.0h" y="0.7h" height="4.00h" width="4.00h" >
 					<instance name="ability_button_small" slot="{slot_a}"/>
 				</panel>
-
-				<panel x="3.5h" y="1.0h" height="3.00h" width="3.00h">
+				<panel x="4.0h" y="0.7h" height="4.00h" width="4.00h">
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
-
 <!-- 				<image x="0h" y="0.5h" width="3.90h" height="3.90h" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
 <!-- 				<image x="3.25h" y="0.5h" width="3.90h" height="3.90h" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
-
-
 			</panel>
+
 			<!-- mana cost -->
-			<panel x="0" y="4.6h" align="center" height="9.0h" width="5.5h" color="invisible" noclick="1">
+			<panel x="0" y="5.1h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1">
 <!-- 				<image width="7.8h" align="center" valign="bottom" texture="/ui/common/mana_frame3.tga" noclick="1" visible="1"/> -->
 				<panel y="0.2h" float="right" noclick="1">
-					<label width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
+					<label x="-1.5h" width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
 						watch="ActiveInventoryDescription{slot_a}"
 						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_a}"
@@ -494,7 +490,7 @@
 						"
 						onhidelua="self:UnregisterWatch('ActiveMana')"
 					/>
-					<label width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
+					<label x="2.4h" width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
 						watch="ActiveInventoryDescription{slot_b}"
 						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_b}"
@@ -554,7 +550,7 @@
 	<template name="ability_frame_triple">
 		<!-- Triple-->
 		<panel
-			width="7h"
+			width="7.0h"
 			height="100%"
 			valign="center"
 			color="invisible"
@@ -564,21 +560,21 @@
 			stickytoinvis="false"
 			visible="false"
 		>
-			<panel y="1.7h">
-				<panel x="0" y="-.265h" height="2.5h" width="2.5h" align="center">
+			<panel y="1.2h">
+				<panel x="1.0h" y="0.0h" height="2.75h" width="2.75h">
 					<instance name="ability_button_small" slot="{slot_a}"/>
 				</panel>
 
-				<panel x=".63h" y="2.6h" height="2.4h" width="2.4h">
+				<panel x="3.75h" y="0.0h" height="2.75h" width="2.75h">
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
 
-				<panel x="4.0h" y="2.6h" height="2.4h" width="2.4h">
+				<panel x="3.75h" y="2.75h" height="2.75h" width="2.75h">
 					<instance name="ability_button_small" slot="{slot_c}"/>
 				</panel>
 <!-- 				<image align="center" y="-1.5h" height="8h" width="8h" texture="/ui/common/ability_frame_3.tga" noclick="1" /> -->
 			</panel>
-			<panel x="0" y="5.0h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" watch="ActiveInventoryDescription{slot}" ontriggerlua="self:SetVisible(tonumber(param2) > 0.0)">
+			<panel x="-1.6h" y="5.0h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" watch="ActiveInventoryDescription{slot}" ontriggerlua="self:SetVisible(tonumber(param2) > 0.0)">
 <!-- 				<image width="9.4h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
 				<label y="0.2h" fity="1" font="dyn_10" color="white" outline="1" textalign="center"
 					watch="ActiveInventoryDescription{slot}"
@@ -3292,7 +3288,7 @@
 		</panel>
 
 		<!-- Hero Name -->
-		<panel x="-27.0h" y="-11.4h" width="19.0h" height="2.2h" align="center" valign="bottom" color="0 0 0 1" noclick="true" passivechildren="true">
+		<panel x="-27.1h" y="-11.4h" width="19.0h" height="2.2h" align="center" valign="bottom" color="0 0 0 1" noclick="true" passivechildren="true">
 			<label name="game_center_name_label" x="0.5h" font="dyn_12" color="white" height="100%" textalign="left" textvalign="center" />
 		</panel>
 
@@ -3381,7 +3377,7 @@
 			<panel x="71.73%" y="27.34%" width="4.00%" height="32.03%">
 				<instance name="inventory_button" slot="37"/>
 			</panel>
-			<panel x="76.32%" y="27.34%" width="4.00%" height="32.03%">
+			<panel x="76.31%" y="27.34%" width="4.00%" height="32.03%">
 				<instance name="inventory_button" slot="38"/>
 			</panel>
 
@@ -3391,7 +3387,7 @@
 			<panel x="71.73%" y="63.67%" width="4.00%" height="32.03%">
 				<instance name="inventory_button" slot="40"/>
 			</panel>
-			<panel x="76.32%" y="63.67%" width="4.00%" height="32.03%">
+			<panel x="76.31%" y="63.67%" width="4.00%" height="32.03%">
 				<instance name="inventory_button" slot="41"/>
 			</panel>
 		</panel>
@@ -3534,7 +3530,7 @@
 		</panel>
 
 		<!-- Abilities -->
-		<panel x="3.9h" y="-5.0h" width="33.0h" height="8.0h" align="center" valign="bottom" noclick="1" >
+		<panel x="3.9h" y="-5.3h" width="33.0h" height="8.0h" align="center" valign="bottom" noclick="1" >
 
 			<panel name="panel_abilities" align="center" padding="0" noclick="0">
 
