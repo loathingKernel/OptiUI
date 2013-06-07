@@ -3320,13 +3320,14 @@
 		<!-- Shop Indicator -->
 		<panel name="item_shop_sign" visible="true" x="32.2h" y="3h" width="8h" height="16h" valign="bottom" align="center" >
 			<image texture="/ui/common/item_shop_sign.tga" noclick="1" />
-			<animatedimage name="animated_shop_sign" onshow="StartAnim();" height="4.5h" width="4.5h" y="1.3h" valign="top" align="center" fps="25" loop="true" loopbackframe="-1" texture="common/sign/sign.tga" />
+			<image height="4.5h" width="4.5h" y="1.3h" valign="top" align="center" texture="common/loathk_sign.tga" />
+<!-- 			<animatedimage name="animated_shop_sign" onshow="StartAnim();" height="4.5h" width="4.5h" y="1.3h" valign="top" align="center" fps="25" loop="true" loopbackframe="-1" texture="common/sign/sign.tga" /> -->
 			<!-- UIScript -->
 			<button
 				color="invisible"
 				onmouseoverlua="GetWidget('shop_tooltip', 'game'):SetVisible(1)"
 				onmouseoutlua="GetWidget('shop_tooltip', 'game'):SetVisible(0)"
-				onclick="Call('animated_shop_sign', 'StartAnim();'); PlaySound('/shared/sounds/ui/shop.wav'); If(ItemCursorVisible and PlayerCanShop, Sell(), ToggleShop());"
+				onclick="PlaySound('/shared/sounds/ui/shop.wav'); If(ItemCursorVisible and PlayerCanShop, Sell(), ToggleShop());"
 				interactive="false"
 			/>
 		</panel>
