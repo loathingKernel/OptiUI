@@ -345,10 +345,10 @@
 			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="5.5h">
 				<instance name="ability_button" slot="{slot}"/>
 			</panel>
-<!-- 			<image width="9.0h" height="9.0h" align="center" valign="center" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
+<!--  			<image width="9.0h" height="9.0h" align="center" valign="center" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
 			<!-- mana cost -->
-			<panel x="0" y="6.8h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" >
-				<image width="8.9h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" />
+			<panel x="0" y="5.0h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" >
+<!-- 				<image width="8.9h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
 				<label y="0.2h" fity="1" font="dyn_10" color="white" outline="1" textalign="center"
 					watch="ActiveInventoryDescription{slot}"
 					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
@@ -395,11 +395,11 @@
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
 
-<!--				<image width="14.9h" height="7.45h" texture="/ui/common/ability_frame_1.tga" noclick="1" />-->
+<!-- 				<image width="14.9h" height="7.45h" texture="/ui/common/ability_frame_1.tga" noclick="1" /> -->
 			</panel>
 			<!-- mana cost -->
-			<panel x="0" y="6.2h" align="center" height="4.9h" width="5.5h" color="invisible" noclick="1">
-				<image x="2.2h" width="14.9h" align="center" valign="bottom" texture="/ui/common/mana_frame2.tga" noclick="1"/>
+			<panel x="0" y="4.5h" align="center" height="4.9h" width="5.5h" color="invisible" noclick="1">
+<!-- 				<image x="2.2h" width="14.9h" align="center" valign="bottom" texture="/ui/common/mana_frame2.tga" noclick="1"/> -->
 				<panel y="0.3h" x="0.3h" float="right" padding="0.6h" noclick="1">
 					<label width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
 						watch="ActiveInventoryDescription{slot_a}"
@@ -457,7 +457,7 @@
 			stickytoinvis="false"
 			visible="false"
 		>
-			<panel y="1.7h">
+			<panel y="0.7h">
 				<panel x="0.5h" y="1.0h" height="3.00h" width="3.00h" >
 					<instance name="ability_button_small" slot="{slot_a}"/>
 				</panel>
@@ -465,13 +465,15 @@
 				<panel x="3.5h" y="1.0h" height="3.00h" width="3.00h">
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
-			<!--	<image x="0h" y="0.5h" width="3.75h" height="3.75h" texture="/ui/common/ability_frame.tga" noclick="1" />
-				<image x="3.25h" y="0.5h" width="3.75h" height="3.75h" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
+
+<!-- 				<image x="0h" y="0.5h" width="3.90h" height="3.90h" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
+<!-- 				<image x="3.25h" y="0.5h" width="3.90h" height="3.90h" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
+
 
 			</panel>
 			<!-- mana cost -->
-			<panel x="0" y="5.6h" align="center" height="9.0h" width="5.5h" color="invisible" noclick="1">
-				<image width="7.8h" align="center" valign="bottom" texture="/ui/common/mana_frame3.tga" noclick="1" visible="1"/>
+			<panel x="0" y="4.6h" align="center" height="9.0h" width="5.5h" color="invisible" noclick="1">
+<!-- 				<image width="7.8h" align="center" valign="bottom" texture="/ui/common/mana_frame3.tga" noclick="1" visible="1"/> -->
 				<panel y="0.2h" float="right" noclick="1">
 					<label width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
 						watch="ActiveInventoryDescription{slot_a}"
@@ -542,7 +544,7 @@
 				<panel x="3.62h" y="3.44h" height="1.9h" width="1.9h" noclick="1">
 					<instance name="ability_button_small" slot="{slot_c}"/>
 				</panel>
-<!--				<image height="14h" width="7h" y="-4.5h" texture="/ui/common/ability_frame_2.tga" noclick="1" />-->
+				<image height="14h" width="7h" y="-4.5h" texture="/ui/common/ability_frame_2.tga" noclick="1" />
 			</panel>
 
 			<!-- I DONT HAVE A MANA COST THING BECAUSE I AM NEVER USED LOLWUT -->
@@ -576,8 +578,8 @@
 				</panel>
 <!-- 				<image align="center" y="-1.5h" height="8h" width="8h" texture="/ui/common/ability_frame_3.tga" noclick="1" /> -->
 			</panel>
-			<panel x="0" y="6.8h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" watch="ActiveInventoryDescription{slot}" ontriggerlua="self:SetVisible(tonumber(param2) > 0.0)">
-				<image width="9.4h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" />
+			<panel x="0" y="5.0h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" watch="ActiveInventoryDescription{slot}" ontriggerlua="self:SetVisible(tonumber(param2) > 0.0)">
+<!-- 				<image width="9.4h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
 				<label y="0.2h" fity="1" font="dyn_10" color="white" outline="1" textalign="center"
 					watch="ActiveInventoryDescription{slot}"
 					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
@@ -607,7 +609,7 @@
 				watch="ActiveInventoryExists{slot}"
 				ontriggerlua="self:SetVisible(not AtoB(param))"
 			>
-<!-- 				<image texture="/ui/legion/ability_coverup.tga"/> -->
+				<image texture="/ui/legion/ability_coverup.tga"/>
 			</panel>
 			<!-- UIScript -->
 			<panel
@@ -2562,7 +2564,7 @@
 
 		<image name="game_clock_texture" texture="/ui/common/clockframe.tga" noclick="1" />
 
-		<!-- Clock Day/Night Glow Effect
+   <!-- Clock Day/Night Glow Effect
 		<panel y="-7.6h" x="-0.05h" width="20.0h" height="20.0h" align="center" noclick="1">
 			<modelpanel name="game_clock_effect"
 				noclick="true"
@@ -2575,7 +2577,7 @@
 				depthcompress="true"
 			/>
 		</panel>
-		 -->
+	-->
 
 		<!-- Hero K/D/A -->
 		<panel x="-9.8h" y="-0.1h" width="11.0h" height="1.4h" align="center" color="invisible" noclick="1">
@@ -3092,7 +3094,7 @@
 				<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
 				<panel color="0 0 0 .5" align="right" width=".2h" x=".15h"/>
 			</panel>
-<!-- 			<image align="center" texture="/ui/elements/bar_highlight.tga"/> -->
+			<image align="center" texture="/ui/elements/bar_highlight.tga"/>
 			<label name="game_center_health_label" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
 			<label name="game_center_health_regen_label" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
 		</panel>
@@ -3120,7 +3122,7 @@
 				<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
 				<panel color="0 0 0 .6" align="right" width=".2h" x=".10h"/>
 			</panel>
-<!-- 			<image align="center" texture="/ui/elements/bar_highlight.tga"/> -->
+			<image align="center" texture="/ui/elements/bar_highlight.tga"/>
 			<label name="game_center_mana_label" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
 			<label name="game_center_mana_regen_label" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
 		</panel>
@@ -3177,7 +3179,8 @@
 				interactive="false"
 			/>
 			<panel color="black" noclick="1" />
-			<modelpanel name="game_center_portrait_model"
+			<image name="game_center_portrait_icon" hmargin="0.25h" vmargin="0.25h" />
+<!--			<modelpanel name="game_center_portrait_model"
 				visible="1"
 				noclick="true"
 				model=""
@@ -3193,9 +3196,10 @@
 				sunaltitude="50"
 				suncolor="0.9 0.9 0.9"
 				ambientcolor="0.6 0.7 0.7"
-				onshow="SetAnim('portrait');"
+				onshow="SetTexture(param2);"
 				lookupresource="true"
 			/>
+-->
 
 <!-- 			<image texture="/ui/common/portrait_gloss_up.tga" color="1 1 1 .8" rendermode="additive" noclick="true" /> -->
 			<panel name="game_center_portrait_glow" noclick="1" visible="0"
@@ -3258,10 +3262,10 @@
 		</panel>
 
 		<!-- Detailed Stats Background -->
-<!-- 		<panel x="-28.7h" y="4.7h" width="15.65h" height="15.65h" align="center" valign="bottom" color="1 1 1 1" float="bottom" padding="0.3h" texture="/ui/common/stat_background.tga" noclick="1"/> -->
+		<panel x="-28.7h" y="4.7h" width="15.65h" height="15.65h" align="center" valign="bottom" color="1 1 1 1" float="bottom" padding="0.3h" texture="/ui/common/stat_background.tga" noclick="1"/>
 
 		<!-- Large Gear -->
-<!-- 		<image name="game_center_large_gear" x="-20.23h" y="5.3h" width="23.8h" height="23.8h" align="center" valign="bottom" texture="/ui/common/gear_large.tga" rotation="30" noclick="true"/> -->
+		<image name="game_center_large_gear" x="-20.23h" y="5.3h" width="23.8h" height="23.8h" align="center" valign="bottom" texture="/ui/common/gear_large.tga" rotation="30" noclick="true"/>
 
 		<!-- Detail Stats -->
 		<panel x="-28.8h" y="4.7h" width="15.65h" height="15.65h" align="center" valign="bottom" color="invisible" float="bottom" padding="0.3h" noclick="1">
@@ -3398,7 +3402,8 @@
 		<image height="50%" texture="/ui/common/loathk_bot_center.tga" noclick="1" valign="bottom" />
 
 		<!-- UIScript -->
-		<animatedimage watch="EventPlayerGold" ontrigger="StartAnim();" name="animated_gold"  onshow="StartAnim();" height="6h" width="3h" y="13.3h" x="21.2h" valign="top" align="center" fps="30" loop="true" startframe="5" numframes="-1" loopbackframe="-1" texture="common/gold/gold.tga" noclick="true" />
+		<image height="6h" width="3h" y="13.3h" x="21.2h" valign="top" align="center" texture="common/loathk_gold.tga" noclick="true" />
+<!-- 		<animatedimage watch="EventPlayerGold" ontrigger="StartAnim();" name="animated_gold"  onshow="StartAnim();" height="6h" width="3h" y="13.3h" x="21.2h" valign="top" align="center" fps="30" loop="true" startframe="5" numframes="-1" loopbackframe="-1" texture="common/gold/gold.tga" noclick="true" /> -->
 
 		<!-- Inventory Cover -->
 		<panel x="35.0h" y="3.8h" width="29.8h" height="14.9h" align="center" valign="bottom" noclick="true" watch="ActiveHasInventory" ontriggerlua="self:SetVisible(not AtoB(param))">
@@ -3529,7 +3534,7 @@
 		</panel>
 
 		<!-- Abilities -->
-		<panel x="3.9h" y="-6.9h" width="33.0h" height="8.0h" align="center" valign="bottom" noclick="1" >
+		<panel x="3.9h" y="-5.0h" width="33.0h" height="8.0h" align="center" valign="bottom" noclick="1" >
 
 			<panel name="panel_abilities" align="center" padding="0" noclick="0">
 
