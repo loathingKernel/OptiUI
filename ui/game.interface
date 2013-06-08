@@ -3320,7 +3320,7 @@
 		<!-- Shop Indicator -->
 		<panel name="item_shop_sign" visible="true" x="32.2h" y="3h" width="8h" height="16h" valign="bottom" align="center" >
 			<image texture="/ui/common/item_shop_sign.tga" noclick="1" />
-			<image height="4.5h" width="4.5h" y="1.3h" valign="top" align="center" texture="common/loathk_sign.tga" />
+			<image height="4.5h" width="4.5h" y="1.3h" valign="top" align="center" texture="common/optiui_sign.tga" />
 <!-- 			<animatedimage name="animated_shop_sign" onshow="StartAnim();" height="4.5h" width="4.5h" y="1.3h" valign="top" align="center" fps="25" loop="true" loopbackframe="-1" texture="common/sign/sign.tga" /> -->
 			<!-- UIScript -->
 			<button
@@ -3396,10 +3396,10 @@
 		<!-- Center Framing -->
 <!-- 		<image height="50%" x="25%" align="right" width="25%" texture="/ui/common/bot_center_cap.tga" noclick="1" valign="bottom" /> -->
 <!-- 		<image height="50%" x="-25%" align="left" width="25%" texture="/ui/common/bot_center_cap.tga" noclick="1" valign="bottom" /> -->
-		<image height="50%" texture="/ui/common/loathk_bot_center.tga" noclick="1" valign="bottom" />
+		<image height="50%" texture="/ui/common/optiui_bot_center.tga" noclick="1" valign="bottom" />
 
 		<!-- UIScript -->
-		<image height="6h" width="3h" y="13.3h" x="21.2h" valign="top" align="center" texture="common/loathk_gold.tga" noclick="true" />
+		<image height="6h" width="3h" y="13.3h" x="21.2h" valign="top" align="center" texture="common/optiui_gold.tga" noclick="true" />
 <!-- 		<animatedimage watch="EventPlayerGold" ontrigger="StartAnim();" name="animated_gold"  onshow="StartAnim();" height="6h" width="3h" y="13.3h" x="21.2h" valign="top" align="center" fps="30" loop="true" startframe="5" numframes="-1" loopbackframe="-1" texture="common/gold/gold.tga" noclick="true" /> -->
 
 		<!-- Inventory Cover -->
