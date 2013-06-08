@@ -347,9 +347,9 @@
 			</panel>
 <!--  			<image width="9.0h" height="9.0h" align="center" valign="center" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
 			<!-- mana cost -->
-			<panel x="-1.6h" y="5.1h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" >
+			<panel x="-1.375h" y="2.0h" align="center" valign="center" height="1.5h" width="2.75h" color="0 0 0 0.7" noclick="1" >
 <!-- 				<image width="8.9h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
-				<label y="0.2h" fity="1" font="dyn_10" color="white" outline="1" textalign="center"
+				<label y="0h" fity="1" font="dyn_10" color="white" outline="1" textalign="left"
 					watch="ActiveInventoryDescription{slot}"
 					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
 					watch2="ActiveInventoryExists{slot}"
@@ -397,10 +397,10 @@
 <!-- 				<image width="14.9h" height="7.45h" texture="/ui/common/ability_frame_1.tga" noclick="1" /> -->
 			</panel>
 			<!-- mana cost -->
-			<panel x="0h" y="5.1h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1">
+			<panel x="0h" y="2.0h" align="center" valign="center" height="1.5h" width="9h" color="0 0 0 0.5" noclick="1">
 <!-- 				<image x="2.2h" width="14.9h" align="center" valign="bottom" texture="/ui/common/mana_frame2.tga" noclick="1"/> -->
-				<panel y="0.2h" float="right" padding="0.6h" noclick="1">
-					<label x="-2.1h" width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
+				<panel y="0h" float="right" padding="0.6h" noclick="1">
+					<label x="0h" width="50%" font="dyn_10" color="white" outline="1" textalign="left" noclick="1"
 						watch="ActiveInventoryDescription{slot_a}"
 						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_a}"
@@ -419,7 +419,7 @@
 						"
 						onhidelua="self:UnregisterWatch('ActiveMana')"
 					/>
-					<label x="3.4h" width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
+					<label x="5.5h" width="50%" font="dyn_10" color="white" outline="1" textalign="left" noclick="1"
 						watch="ActiveInventoryDescription{slot_b}"
 						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_b}"
@@ -468,10 +468,10 @@
 			</panel>
 
 			<!-- mana cost -->
-			<panel x="0" y="5.1h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1">
+			<panel x="0h" y="2.0h" align="center" valign="center" height="1.5h" width="8.0h" color="0 0 0 0.7" noclick="1">
 <!-- 				<image width="7.8h" align="center" valign="bottom" texture="/ui/common/mana_frame3.tga" noclick="1" visible="1"/> -->
-				<panel y="0.2h" float="right" noclick="1">
-					<label x="-1.5h" width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
+				<panel y="0h" float="right" noclick="1">
+					<label x="0h" width="50%" font="dyn_10" color="white" outline="1" textalign="left" noclick="1"
 						watch="ActiveInventoryDescription{slot_a}"
 						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_a}"
@@ -490,7 +490,7 @@
 						"
 						onhidelua="self:UnregisterWatch('ActiveMana')"
 					/>
-					<label x="2.4h" width="50%" font="dyn_10" color="white" outline="1" textalign="center" noclick="1"
+					<label x="4.0h" width="50%" font="dyn_10" color="white" outline="1" textalign="left" noclick="1"
 						watch="ActiveInventoryDescription{slot_b}"
 						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_b}"
@@ -574,9 +574,9 @@
 				</panel>
 <!-- 				<image align="center" y="-1.5h" height="8h" width="8h" texture="/ui/common/ability_frame_3.tga" noclick="1" /> -->
 			</panel>
-			<panel x="-1.6h" y="5.0h" align="center" height="5.5h" width="5.5h" color="invisible" noclick="1" watch="ActiveInventoryDescription{slot}" ontriggerlua="self:SetVisible(tonumber(param2) > 0.0)">
+			<panel x="-1.375h" y="2.0h" align="center" valign="center" height="1.5h" width="2.75h" color="0 0 0 0.7" noclick="1" watch="ActiveInventoryDescription{slot}" ontriggerlua="self:SetVisible(tonumber(param2) > 0.0)">
 <!-- 				<image width="9.4h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
-				<label y="0.2h" fity="1" font="dyn_10" color="white" outline="1" textalign="center"
+				<label y="0h" fity="1" font="dyn_10" color="white" outline="1" textalign="left"
 					watch="ActiveInventoryDescription{slot}"
 					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
 					watch2="ActiveInventoryExists{slot}"
