@@ -1886,7 +1886,8 @@
 	</template>
 
 	<template name="team_member_icon">
-		<panel y="{y}" name="game_top_left_ally_parent_{index}" width="7.45h" height="14.9h" noclick="1" sticky="true" stickytoinvis="false" color="invisible">
+		<!-- OptiUI: Added x position variable -->
+		<panel x="{x}" y="{y}" name="game_top_left_ally_parent_{index}" width="7.45h" height="14.9h" noclick="1" sticky="true" stickytoinvis="false" color="invisible">
 			<!-- Portrait Icon -->
 			<panel x="0.65h" y="0.75h" width="5.0h" height="5.0h" color="invisible">
 				<image name="game_top_left_ally_image_{index}"
@@ -1954,7 +1955,8 @@
 			</panel>
 
 			<!-- Health / Mana Bars -->
-			<panel x="0.6h" y="5.9h" width="5.8h" height="1.1h" color="black">
+			<!-- OptiUI: Fixed width to fully cover background -->
+			<panel x="0.6h" y="5.9h" width="5.9h" height="1.1h" color="black">
 				<panel y="0" height="50%" valign="top" color="black">
 					<panel name="game_top_left_ally_health_{index}" color="0 1 0 0" noclick="1">
 						<panel color="1 1 1 .1" align="right" width=".1h" rendermode="additive"/>
@@ -2084,6 +2086,254 @@
 
 			<!-- Ally Ability Status Lights -->
 			<panel name="game_top_left_ally_status_light_{index}" x="5.5h" y="2.1h" width="1.2h" height="3.8h" color="invisible" noclick="1" passivechildren="true" >
+				<instance name="ally_ability_status" y="0h" slot="0" index="{index}" />
+				<instance name="ally_ability_status" y="0.9h" slot="1" index="{index}" />
+				<instance name="ally_ability_status" y="1.8h" slot="2" index="{index}" />
+				<instance name="ally_ability_status" y="2.7h" slot="3" index="{index}" />
+			</panel>
+
+			<!-- Right Click Menu -->
+			<!-- UIScript -->
+			<menu
+				name="ally_right_click_menu_{index}"
+				width="0" height="0"
+				color="red"
+				listwidth="16.0h"
+				listpaddingy="1.0h"
+				itemoffsetx="0.5h"
+				itemoffsety="0.5h"
+				itemheight="2.2h"
+				itemwidth="94%"
+				highlight="under"
+				exteriorscrollbars="false"
+				onevent="	OpenMenu(true);
+							MoveToCursor();
+							UpdateMenuConditions();
+							BringToFront();"
+				onmouseoverlua="PlaySound('/shared/sounds/ui/ccpanel/button_over_02.wav')"
+				onloadlua="Set('right_click_ally_player_name_{index}', 'DefaultName', 'string');"
+				watch="AllyPlayerInfo{index}"
+				ontriggerlua="Set('right_click_ally_player_name_{index}', param0)"
+			>
+				<widgetstate statename="listbg">
+					<frame texture="/ui/frames/glass_header_big.tga" color="#233749" />
+					<frame color="invisible" bordercolor="#455166" borderthickness="3" />
+					<frame color="invisible" bordercolor="black" borderthickness="2" />
+				</widgetstate>
+				<widgetstate statename="itemhighlight">
+					<panel color="#263e51" />
+				</widgetstate>
+
+				<instance name="rightclick_menu_item2" index="0" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Trigger('show_rap_panel', GetCvarString('right_click_ally_player_name_{index}'))" label="game_menu_report_a_player" condition="ally_rap_available_{index}" />
+				<instance name="rightclick_menu_item2" index="1" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Game:ToggleIgnore(GetCvarString('right_click_ally_player_name_{index}'))" label="chat_opt_mute_player" condition="(!ChatIsIgnored(right_click_ally_player_name_{index}))" />
+				<instance name="rightclick_menu_item2" index="2" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Game:ToggleIgnore(GetCvarString('right_click_ally_player_name_{index}'))" label="chat_opt_unmute_player" condition="(ChatIsIgnored(right_click_ally_player_name_{index}))" />
+			</menu>
+		</panel>
+	</template>
+
+	<!-- OptiUI: Reverse ally icons for the right side of the bottom center section -->
+	<template name="team_member_icon_reverse">
+		<panel x="{x}" y="{y}" name="game_top_left_ally_parent_{index}" width="7.45h" height="14.9h" noclick="1" sticky="true" stickytoinvis="false" color="invisible" >
+			<!-- Portrait Icon -->
+			<panel x="-0.65h" y="0.75h" width="5.0h" height="5.0h" color="invisible" align="right">
+				<image name="game_top_left_ally_image_{index}"
+					hmargin="0.30h" vmargin="0.30h"
+				/>
+				<panel name="game_top_left_ally_image_bg_{index}" align="center" valign="center" noclick="true" width="155@" height="155%" texture="/ui/fe2/lobby/team_color.tga" color="1 1 1 1"/>
+
+				<panel name="game_top_left_ally_dead_{index}" y="0.2h" >
+					<image texture="/ui/legion/dead.tga" />
+					<label name="game_top_left_ally_respawn_{index}" font="dyn_10" color="yellow" shadow="true" textalign="center" textvalign="center" />
+				</panel>
+
+				<panel name="game_top_left_ally_afk_{index}" >
+					<label
+						width="100%" height="100%"
+						textalign="center" textvalign="center"
+						color="white" shadow="true"
+						font="dyn_14"
+						content="AFK"
+					/>
+				</panel>
+
+				<panel name="game_top_left_ally_dc_{index}" >
+					<panel color="0 0 0 .5"/>
+					<image x="0.2h" y="0.4h" width="90%" height="90@" texture="/ui/elements/disconnect.tga" />
+					<label name="game_top_left_ally_dc_label_{index}"
+						width="100%" height="100%"
+						textalign="center" textvalign="bottom"
+						color="white" shadow="true"
+						font="dyn_10"
+					/>
+				</panel>
+
+				<panel name="game_top_left_ally_load_{index}" >
+					<panel color="0 0 0 .5"/>
+					<image x="0.5h" width="90%" height="90@" texture="/ui/elements/lobby/icon_loading.tga" />
+					<label name="game_top_left_ally_load_label_{index}"
+						width="100%" height="100%"
+						textalign="center" textvalign="center"
+						color="white" outline="true"
+						font="dyn_10"
+					/>
+				</panel>
+				<!-- UIScript -->
+				<button name="ally_right_click_menu_button_{index}"
+					color="invisible"
+					onclick="SelectUnit(AllyIndex{index});"
+					onmouseoverlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(0)"
+					interactive="false"
+				/>
+
+				<!-- Item catcher -->
+				<!-- UIScript -->
+				<panel
+					color="invisible"
+					texture="/ui/info/drop.tga"
+					watch="ItemCursorVisible"
+					ontrigger="SetVisible(ItemCursorVisible); RefreshCursor();"
+					onmouseoverlua="self:SetColor('white')"
+					onmouseoutlua="self:SetColor('invisible')"
+					onclick="ItemPlaceEntity(AllyIndex{index});"
+					onrightclick="ItemPlaceEntity(AllyIndex{index});"
+				/>
+			</panel>
+
+			<!-- Health / Mana Bars -->
+			<panel x="-0.6h" y="5.9h" width="5.9h" height="1.1h" color="black" align="right">
+				<panel y="0" height="50%" valign="top" color="black">
+					<panel name="game_top_left_ally_health_{index}" color="0 1 0 0" noclick="1">
+						<panel color="1 1 1 .1" align="right" width=".1h" rendermode="additive"/>
+					</panel>
+				</panel>
+				<panel y="0.5h" height="50%" color="black">
+					<panel name="game_top_left_ally_mana_{index}" color="0 0.4 1 1" />
+				</panel>
+			</panel>
+
+			<!--  Voip Mic  -->
+			<panel x="0h" name="game_top_left_ally_voip_{index}" noclick="1" width="80%" height="50%" color="invisible" align="center" valign="top" visible="1">
+				<modelpanel
+					hflip="true"
+					visible="1"
+					width="100%"
+					height="100%"
+					noclick="true"
+					model="/ui/common/models/arcade_text/invis.mdf"
+					anim="idle"
+					camerapos="-5 200 25"
+					cameraangles="0 0 180"
+					camerafov="10"
+					cameranear="1"
+					carmerafar="5000"
+					depthclear="false"
+					depthcompress="true"
+					sunazimuth="-90"
+					sunaltitude="180"
+					suncolor="2 2 2"
+					onshow="SetAnim('idle'); SetEffect('/shared/effects/talking.effect');"
+				/>
+			</panel>
+
+			<image name="ally_rap_indicator_template_{index}"
+				texture="/ui/common/ally_frame.tga" noclick="1"
+				hflip="true"
+				onloadlua="if GetCvarBool('ui_rap_enabled') then
+							self:SetTexture('/ui/common/ally_frame_rap.tga')
+						else
+							self:SetTexture('/ui/common/ally_frame.tga')
+						end"
+			/>
+
+			<!-- Ally Share -->
+			<panel x="0" y="0.15h" width="1.86h" height="1.86h" color="invisible" align="right">
+				<image
+					watch="AllyControlSharing{index}"
+					ontriggerlua="
+						local partOne = 'none'
+						local partTwo = 'none'
+
+						if (tonumber(param1) == 1) then
+							partOne = 'courier'
+						elseif (tonumber(param1) == 3) then
+							partOne = 'full'
+						end
+
+						if (tonumber(param0) == 1) then
+							partTwo = 'courier'
+						elseif (tonumber(param0) == 3) then
+							partTwo = 'full'
+						end
+
+						self:SetTexture('/ui/common/share_'..partOne..'_'..partTwo..'.tga')
+					"
+				/>
+				<!-- UIScript -->
+				<button color="invisible" watch="AllyPlayerInfo{index}" ontrigger="SetOnclick('CycleSharedControl(' # param2 # ');');" interactive="false" onmouseoverlua="GetWidget('game_menu_tip_sharing', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('game_menu_tip_sharing', 'game'):SetVisible(0)" />
+			</panel>
+
+			<!-- No Help -->
+			<panel x="0.5h" y="2.2h" width="2.0h" height="2.0h" color="invisible" align="right">
+				<image texture="/ui/common/ally_ability_led.tga" watch="AllyNoHelp{index}" ontriggerlua="if AtoB(param) then self:SetColor('red') else self:SetColor('lime') end"/>
+				<!-- UIScript -->
+				<button color="invisible" watch="AllyPlayerInfo{index}" ontrigger="SetOnclick('ToggleNoHelp(' # param2 # ');');" interactive="false" onmouseoverlua="GetWidget('game_menu_tip_nohelp', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('game_menu_tip_nohelp', 'game'):SetVisible(0)" />
+			</panel>
+
+			<!-- Ally Level -->
+			<panel x="-5.25h" y="0.2h" width="1.5h" height="1.6h" color="invisible" align="right">
+				<label width="100%" height="100%" textalign="center" textvalign="center" font="dyn_8" color="yellow" watch="AllyHeroInfo{index}" ontriggerlua="self:SetText(param2)"/>
+			</panel>
+
+			<!-- Ally Chat -->
+			<panel x="0" y="4.0h" width="1.86h" height="1.86h" color="invisible" align="right">
+				<image name="game_top_left_ally_voip_indicator_{index}"
+					texture="/ui/common/chat.tga"
+				/>
+				<!-- UIScript -->
+				<button watch="AllyPlayerInfo{index}"
+					color="invisible"
+					interactive="false"
+					ontrigger="SetOnclick('ToggleVoiceMute(' # param2 # ');');"
+					onmouseoverlua="GetWidget('game_menu_tip_voice', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('game_menu_tip_voice', 'game'):SetVisible(0)"
+					/>
+			</panel>
+
+			<!-- RAP -->
+			<panel name="ally_rap_indicator_{index}" x="-4.2h" y="4.25h" width="1.5h" height="1.5h" color="invisible" visible="false"
+				watch="MenuSpectatorInfo{index}"
+				align="right"
+				ontriggerlua=
+				"
+					if (param0 ~= '-1') then
+						Game:AllySpectatorRapButtonSetVisFlag(param0, param9, param10, param1)
+					end
+				"
+			>
+				<image name="game_top_left_ally_rap_{index}"
+					texture="/ui/icons/ban_hammer.tga"
+
+				/>
+				<button	color="invisible"
+					interactive="false"
+					onmouseoverlua="GetWidget('game_menu_tip_RAP', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('game_menu_tip_RAP', 'game'):SetVisible(0)"
+					watch2="AllyPlayerInfo{index}"
+					ontrigger2lua="
+						local index = param0
+						local onClick = function()
+							Trigger('show_rap_panel', index)
+						end
+						self:SetCallback('onclick', onClick)
+						self:RefreshCallbacks()
+					"
+				/>
+
+			</panel>
+
+			<!-- Ally Ability Status Lights -->
+			<panel name="game_top_left_ally_status_light_{index}" x="-5.5h" y="2.1h" width="1.2h" height="3.8h" color="invisible" noclick="1" passivechildren="true" align="right">
 				<instance name="ally_ability_status" y="0h" slot="0" index="{index}" />
 				<instance name="ally_ability_status" y="0.9h" slot="1" index="{index}" />
 				<instance name="ally_ability_status" y="1.8h" slot="2" index="{index}" />
@@ -2339,13 +2589,7 @@
 	</panel>
 
 	<!-- TOP -->
-	<!-- Team Icons -->
-	<panel name="game_ally_display_holder" x="0" y="7.8h" width="7.45h" height="29.8h" color="invisible" noclick="1" reverse="true">
-		<instance name="team_member_icon" y="0" index="0"/>
-		<instance name="team_member_icon" y="7.4h" index="1"/>
-		<instance name="team_member_icon" y="14.8h" index="2"/>
-		<instance name="team_member_icon" y="22.2h" index="3"/>
-	</panel>
+	<!-- OptiUI: Moved ally icons from the top left side to the bottom center -->
 
 	<!-- Hero Info -->
 	<panel name="game_tl_hero_info" width="29.8h" height="14.9h" color="invisible" noclick="1">
@@ -2381,9 +2625,19 @@
 				shadow="true"
 			/>
 			<!-- UIScript -->
+			<!-- OptiUI: Removed gloss from the Hero portraits -->
+<!--			
 			<button
 				texture="/ui/common/portrait_gloss.tga"
 				color="#ffffffbb"
+				onclick="SelectHero();"
+				onmouseoverlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(1)"
+				onmouseoutlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(0)"
+				interactive="false"
+			/>
+-->
+			<button
+				color="invisible"
 				onclick="SelectHero();"
 				onmouseoverlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(1)"
 				onmouseoutlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(0)"
@@ -3061,7 +3315,8 @@
 	<!-- BOTTOM CENTER -->
 	<panel name="game_bottom_center" x="-0.4h" width="119.2h" height="29.8h" align="center" valign="bottom" color="invisible" noclick="1">
 
-		<panel height="11.8h" valign="bottom" color="black" noclick="1"/>
+		<!-- OptiUI: Removed the panel that covered a really small portion of the screen -->
+<!-- 		<panel height="11.8h" valign="bottom" color="invisible" noclick="1"/> -->
 
 		<!-- Health -->
 		<panel
@@ -3174,8 +3429,8 @@
 				onclick="SelectUnit(ActiveIndex);"
 				interactive="false"
 			/>
-			<panel color="black" noclick="1" />
-			<image name="game_center_portrait_icon" hmargin="0.25h" vmargin="0.25h" />
+			<!-- OptiUI: Removed Hero model in the bottom center section. -->
+<!--			<panel color="black" noclick="1" /> -->
 <!--			<modelpanel name="game_center_portrait_model"
 				visible="1"
 				noclick="true"
@@ -3192,7 +3447,7 @@
 				sunaltitude="50"
 				suncolor="0.9 0.9 0.9"
 				ambientcolor="0.6 0.7 0.7"
-				onshow="SetTexture(param2);"
+				onshow="SetAnim('portrait');"
 				lookupresource="true"
 			/>
 -->
@@ -3611,6 +3866,15 @@
 			<image texture="/ui/common/ability_toggle.tga" noclick="1" />
 		</panel>
 
+		<!-- OptiUI: Moved top left ally icons to the bottom center. Better for widescreen -->
+		<!-- Team Icons -->
+		<panel name="game_ally_display_holder" x="0" y="0h" width="90h" height="14.9h" align="center" valign="bottom" color="invisible" noclick="1" reverse="true">
+			<instance name="team_member_icon" index="0" x="0h" y="0h"/>
+			<instance name="team_member_icon" index="1" x="0h" y="7.4h"/>
+			<instance name="team_member_icon_reverse" index="2" x="82.55h" y="0h"/>
+			<instance name="team_member_icon_reverse" index="3" x="82.55h" y="7.4h"/>
+		</panel>
+
 	</panel>
 	<!-- END BOTTOM CENTER -->
 
@@ -3867,8 +4131,11 @@
 				</panel>
 			</panel>
 			<!-- Framing -->
-			<image name="game_botright_orders_right" texture="/ui/common/bot_right_orders.tga" noclick="1" visible="1" />
-			<image name="game_botright_orders_left" hflip="1" texture="/ui/common/bot_right_orders.tga" noclick="1" visible="0" />
+			<!-- OptiUI: Removed texture from framing of the move, taunt etc commands box -->
+<!-- 			<image name="game_botright_orders_right" texture="/ui/common/bot_right_orders.tga" noclick="1" visible="1" /> -->
+			<image name="game_botright_orders_right" noclick="1" visible="1" color="invisible"/>
+<!-- 			<image name="game_botright_orders_left" hflip="1" texture="/ui/common/bot_right_orders.tga" noclick="1" visible="0" /> -->
+			<image name="game_botright_orders_left" hflip="1" noclick="1" visible="0" color="invisible" />
 		</panel>
 
 
