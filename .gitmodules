@@ -1,6 +1,0 @@
-[submodule "original"]
-	path = original
-	url = ./original/
-[submodule "unmodified"]
-	path = unmodified
-	url = ./unmodified/
