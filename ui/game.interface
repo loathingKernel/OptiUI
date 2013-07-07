@@ -2626,7 +2626,7 @@
 			/>
 			<!-- UIScript -->
 			<!-- OptiUI: Removed gloss from the Hero portraits -->
-<!--			
+<!--
 			<button
 				texture="/ui/common/portrait_gloss.tga"
 				color="#ffffffbb"
@@ -3316,7 +3316,7 @@
 	<panel name="game_bottom_center" x="-0.4h" width="119.2h" height="29.8h" align="center" valign="bottom" color="invisible" noclick="1">
 
 		<!-- OptiUI: Removed the panel that covered a really small portion of the screen -->
-<!-- 		<panel height="11.8h" valign="bottom" color="invisible" noclick="1"/> -->
+<!-- 		<panel height="11.8h" valign="bottom" color="black" noclick="1"/> -->
 
 		<!-- Health -->
 		<panel
@@ -3406,7 +3406,7 @@
 					<instance name="ability_button_lvlup" slot="3"/>
 				</panel>
 			</panel>
-			<image texture="/ui/common/pop_up.tga" noclick="true" />
+			<image texture="/ui/common/optiui_pop_up.tga" noclick="true" />
 
 			<!-- Popup Gears L/R -->
 <!-- 			<image x="-3.3h" y="1.75h" width="3.9h" height="3.9h" texture="/ui/common/pop_up_gear.tga" noclick="true" rotation="180" /> -->
@@ -3513,10 +3513,14 @@
 		</panel>
 
 		<!-- Detailed Stats Background -->
-		<panel x="-28.7h" y="4.7h" width="15.65h" height="15.65h" align="center" valign="bottom" color="1 1 1 1" float="bottom" padding="0.3h" texture="/ui/common/stat_background.tga" noclick="1"/>
+		<!-- OptiUI: Removed background from selected controllable unit in bottom center -->
+<!-- 		<panel x="-28.7h" y="4.7h" width="15.65h" height="15.65h" align="center" valign="bottom" color="1 1 1 1" float="bottom" padding="0.3h" texture="/ui/common/stat_background.tga" noclick="1"/> -->
 
 		<!-- Large Gear -->
-		<image name="game_center_large_gear" x="-20.23h" y="5.3h" width="23.8h" height="23.8h" align="center" valign="bottom" texture="/ui/common/gear_large.tga" rotation="30" noclick="true"/>
+		<!-- OptiUI: Removed gear from main portrait -->
+<!-- 		<image name="game_center_large_gear" x="-20.23h" y="5.3h" width="23.8h" height="23.8h" align="center" valign="bottom" texture="/ui/common/gear_large.tga" rotation="30" noclick="true"/> -->
+		<image name="game_center_large_gear" x="-20.23h" y="5.3h" width="23.8h" height="23.8h" align="center" valign="bottom" color="invisible" rotation="30" noclick="true"/>
+
 
 		<!-- Detail Stats -->
 		<panel x="-28.8h" y="4.7h" width="15.65h" height="15.65h" align="center" valign="bottom" color="invisible" float="bottom" padding="0.3h" noclick="1">
@@ -3786,7 +3790,7 @@
 		</panel>
 
 		<!-- Abilities -->
-		<panel x="3.9h" y="-5.3h" width="33.0h" height="8.0h" align="center" valign="bottom" noclick="1" >
+		<panel x="3.9h" y="-4.5h" width="33.0h" height="8.0h" align="center" valign="bottom" noclick="1" color="invisible" >
 
 			<panel name="panel_abilities" align="center" padding="0" noclick="0">
 
@@ -4106,27 +4110,27 @@
 		<panel name="game_selected_info_orders" color="invisible" visible="1" noclick="1" height="50%" valign="bottom" watch="SelectedVisible0" ontriggerlua="self:SetVisible(not AtoB(param))">
 			<panel name="game_selected_info_orders_pos" noclick="1" >
 				<!-- UIScript -->
-				<panel x="32.23%" y="28.52%" width="15.63%" height="31.25%">
+				<panel x="20.23%" y="28.52%" width="15.63%" height="31.25%">
 					<instance name="command_button" slot="1" texture="/shared/icons/move.tga" onclick="OrderMove();" trigger="CommandEnabledMove"/>
 				</panel>
 				<!-- UIScript -->
-				<panel x="50.89%" y="28.52%" width="15.63%" height="31.25%">
+				<panel x="38.89%" y="28.52%" width="15.63%" height="31.25%">
 					<instance name="command_button"  slot="2" texture="/shared/icons/attack.tga" onclick="OrderAttack();" trigger="CommandEnabledAttack"/>
 				</panel>
 				<!-- UIScript -->
-				<panel x="69.34%" y="28.52%" width="15.63%" height="31.25%">
+				<panel x="57.34%" y="28.52%" width="15.63%" height="31.25%">
 					<instance name="command_button"  slot="3" texture="/shared/icons/stop.tga" onclick="OrderStop();" trigger="CommandEnabledStop"/>
 				</panel>
 				<!-- UIScript -->
-				<panel x="32.23%" y="66.02%" width="15.63%" height="31.25%">
+				<panel x="20.23%" y="66.02%" width="15.63%" height="31.25%">
 					<instance name="command_button" slot="4" texture="/shared/icons/hold.tga" onclick="OrderHold();" trigger="CommandEnabledHold"/>
 				</panel>
 
-				<panel x="50.89%" y="66.02%" width="15.63%" height="31.25%">
+				<panel x="38.89%" y="66.02%" width="15.63%" height="31.25%">
 					<instance name="inventory_button" slot="33" simple_tooltip_interface="game_shop_shared"/>
 				</panel>
 
-				<panel x="69.34%" y="66.02%" width="15.63%" height="31.25%">
+				<panel x="57.34%" y="66.02%" width="15.63%" height="31.25%">
 					<instance name="inventory_button" slot="8" simple_tooltip_interface="game_shop_shared"/>
 				</panel>
 			</panel>
@@ -4157,7 +4161,8 @@
 					<piegraph name="game_botright_life_bar_ring" texture="/ui/common/exp_ring.tga" start="225" end="-49" square="1" color="#e5df2f" value=".2" noclick="true"/>
 					<label name="game_botright_life_bar_label" width="100%" height="100%" valign="center" textalign="center" textvalign="center" font="dyn_14" color="white" shadow="true" shadowoffset="2" />
 				</panel>
-				<image texture="/ui/common/portrait_gloss_up.tga" color="#ffffffbb" noclick="true" />
+				<!-- OptiUI: Remove portrait gloss from bottom right panel -->
+<!-- 				<image texture="/ui/common/portrait_gloss_up.tga" color="#ffffffbb" noclick="true" /> -->
 			</panel>
 
 			<!-- Item catcher -->
@@ -4333,7 +4338,8 @@
 					onmouseoutlua="GetWidget('unit_tooltip_info0', 'game'):SetVisible(0)"
 					onhidelua="Action('PortraitCenterInfo', 0.0)"
 				/>
-				<image texture="/ui/common/portrait_gloss_up.tga" color="#ffffffbb" noclick="true" />
+				<!-- OptiUI: Remove portrait gloss from bottom right panel -->
+<!-- 				<image texture="/ui/common/portrait_gloss_up.tga" color="#ffffffbb" noclick="true" /> -->
 			</panel>
 
 			<!-- Item catcher -->
