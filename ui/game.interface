@@ -1538,6 +1538,8 @@
 
 	<template name="ability_button_lvlup">
 		<panel>
+			<!-- OptiUI: New effect is silly and it lags. Remove it -->
+<!-- 			
 			<panel y="1.5h" width="7h" height="7h" valign="bottom" align="center" noclick="1">
 				<modelpanel name="level_up_effect_{slot}"
 					noclick="true"
@@ -1550,7 +1552,8 @@
 					depthcompress="true"
 				/>
 			</panel>	
-			<image texture="/ui/legion/empty_pack.tga"/>
+-->			
+ 			<image texture="/ui/legion/empty_pack.tga"/>
 			<panel name="ability_lvlup_button_{slot}">
 				<image name="ability_lvlup_button_icon_{slot}" noclick="1" />
 				<button  name="ability_lvlup_button_button_{slot}"
@@ -3354,19 +3357,19 @@
 			</panel>
 			<panel name="game_center_health_bar_backer" color="0 0 0 0">
 				<instance name="statusbar_overlay"/>
-				<image name="game_center_health_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" color=".1 1 .1 1" noclick="1" uspeed="-.2" />
+				<image name="game_center_health_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" color=".2 1 .2 1" noclick="1" uspeed="-.2" />
 				<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
-				<panel color="0 0 0 .5" align="right" width=".2h" x=".15h"/>
+				<panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/>
 			</panel>
-			<image align="center" texture="/ui/elements/bar_highlight.tga"/>
-			<label name="game_center_health_label" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-			<label name="game_center_health_regen_label" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
+			<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+			<label name="game_center_health_label" x="-1" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+			<label name="game_center_health_regen_label" x="-1" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
 		</panel>
 
 		<!-- Mana -->
 		<panel
 			x="3.9h"
-			y="-0.5h"
+			y="-1h"
 			width="26.6h"
 			height="1.9h"
 			align="center"
@@ -3382,13 +3385,13 @@
 				<image align="center" texture="/ui/elements/bar_highlight.tga" rendermode="additive"/>
 			</panel>
 			<panel name="game_center_manabar_backer" >
-				<image name="game_center_mana_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" color="0 .2 1 1" noclick="1" uspeed="-.2" />
+				<image name="game_center_mana_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" color=".2 .2 1 1" noclick="1" uspeed="-.2" />
 				<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
-				<panel color="0 0 0 .6" align="right" width=".2h" x=".10h"/>
+				<panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/>
 			</panel>
-			<image align="center" texture="/ui/elements/bar_highlight.tga"/>
-			<label name="game_center_mana_label" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-			<label name="game_center_mana_regen_label" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
+			<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+			<label name="game_center_mana_label" x="-1" y="-1" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+			<label name="game_center_mana_regen_label" x="-1" y="-1" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
 		</panel>
 
 
@@ -3536,25 +3539,49 @@
 
 
 		<!-- Detail Stats -->
+		<!-- OptiUI: Made panels smaller to add a little more information to the UI -->
 		<panel x="-28.8h" y="4.7h" width="15.65h" height="15.65h" align="center" valign="bottom" color="invisible" float="bottom" padding="0.3h" noclick="1">
 			<!-- Damage -->
-			<panel name="game_center_damage" y="0.9h" x="0.4h" height="2.0h" width="10.0h" onmouseoverlua="GetWidget('attack_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attack_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-				<image width="2.0h" height="2.0h" texture="/ui/common/damage_icon.tga"/>
-				<label name="game_center_damage_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center" />
+			<!-- OptiUI: Added attack cooldown value -->
+			<panel name="game_center_damage" y="0.9h" x="0.4h" height="2.6h" width="10.0h" color="1 0 0 0.1" onmouseoverlua="GetWidget('attack_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attack_tooltip', 'game'):SetVisible(0)" passivechildren="true">
+				<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/damage_icon.tga"/>
+				<label name="game_center_damage_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
+				<label width="-2.0h" height="100%" align="right" font="dyn_9" color="gray" outline="1" textalign="left" textvalign="bottom"
+					watch="ActiveAttackCooldown"
+					ontriggerlua="self:SetText(' ' .. round(param1/1000,2) .. 's')"
+ 				/>
 			</panel>
 			<!-- Movement Speed -->
-			<panel height="2.0h" width="10.0h" onmouseoverlua="GetWidget('movement_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('movement_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-				<image width="2.0h" height="2.0h" texture="/ui/common/move_speed_icon.tga"/>
+			<panel height="1.5h" width="10.0h" color="0 1 0 0.1" onmouseoverlua="GetWidget('movement_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('movement_tooltip', 'game'):SetVisible(0)" passivechildren="true">
+				<image width="1.5h" height="1.5h" texture="/ui/common/move_speed_icon.tga"/>
 				<label name="game_center_speed_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center" />
 			</panel>
 			<!-- Armor -->
-			<panel height="2.0h" width="10.0h" onmouseoverlua="GetWidget('defense_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('defense_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-				<image width="2.0h" height="2.0h" texture="/ui/common/armor_icon.tga"/>
-				<label name="game_center_armor_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center" />
+			<!-- OptiUI: Added physical and magic armor reduction values. Idea taken from xUI -->
+			<panel height="2.6h" width="10.0h" color="1 0 0 0.1" onmouseoverlua="GetWidget('defense_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('defense_tooltip', 'game'):SetVisible(0)" passivechildren="true">
+				<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/armor_icon.tga"/>
+				<label name="game_center_armor_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top"/>
+				<label width="-2.0h" height="100%" align="right" font="dyn_9" color="gray" outline="1" textalign="left" textvalign="bottom"
+					oninstantiatelua="
+						OptiUI_ActiveArmorReduction = 0
+						OptiUI_ActiveMagicArmorReduction = 0
+					"
+					watch="ActiveArmor"
+					ontriggerlua="
+						OptiUI_ActiveArmorReduction = param2
+						self:DoEvent()
+					"
+					watch1="ActiveMagicArmor"
+					ontrigger1lua="
+						OptiUI_ActiveMagicArmorReduction = param2
+						self:DoEvent()
+					"
+					oneventlua="self:SetText(' ' .. FtoA(tonumber(OptiUI_ActiveArmorReduction) * 100, 1) .. ' / ' .. FtoA(tonumber(OptiUI_ActiveMagicArmorReduction) * 100, 1))"
+				/>
 			</panel>
 			<!-- Attributes -->
-			<panel name="game_center_att_parent" height="2.0h" width="10.0h" color="invisible" float="right" onmouseoverlua="GetWidget('attribute_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attribute_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-				<image width="2.0h" height="2.0h" texture="/ui/common/plus_icon.tga"/>
+			<panel name="game_center_att_parent" color="0 1 0 0.1" height="1.5h" width="10.0h" float="right" onmouseoverlua="GetWidget('attribute_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attribute_tooltip', 'game'):SetVisible(0)" passivechildren="true">
+				<image width="1.5h" height="1.5h" texture="/ui/common/plus_icon.tga"/>
 				<label name="game_center_att_label" width="-2.0h" height="100%" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center" />
 			</panel>
 		</panel>
