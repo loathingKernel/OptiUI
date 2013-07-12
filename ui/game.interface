@@ -1,3 +1,4 @@
+<!-- Game version: v3.1.6 -->
 <?xml version="1.0" encoding="UTF-8"?>
 <interface name="game" onshowlua="Cmd('Trigger movf_interfacegame 1')" onhidelua="Cmd('Trigger movf_interfacegame 0')" scenex="0" sceney="0" scenewidth="100%" sceneheight="88h" luatable="true"
 	onloadlua="
@@ -1537,6 +1538,18 @@
 
 	<template name="ability_button_lvlup">
 		<panel>
+			<panel y="1.5h" width="7h" height="7h" valign="bottom" align="center" noclick="1">
+				<modelpanel name="level_up_effect_{slot}"
+					noclick="true"
+					model="/shared/models/invis.mdf"
+					effect="effects/level_up_ability.effect"
+					camerapos="0 10 0"
+					cameraangles="0 0 180"
+					camerafov="55"
+					depthclear="false"
+					depthcompress="true"
+				/>
+			</panel>	
 			<image texture="/ui/legion/empty_pack.tga"/>
 			<panel name="ability_lvlup_button_{slot}">
 				<image name="ability_lvlup_button_icon_{slot}" noclick="1" />
