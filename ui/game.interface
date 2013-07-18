@@ -348,19 +348,24 @@
 			</panel>
 <!--  			<image width="9.0h" height="9.0h" align="center" valign="center" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
 			<!-- mana cost -->
-			<panel x="-1.375h" y="2.0h" align="center" valign="center" height="1.5h" width="2.75h" color="0 0 0 0.7" noclick="1" >
+			<panel x="0h" y="2h" align="center" valign="center" height="1.5h" width="5.5h" color="0 0 0 0.6" noclick="1" >
 <!-- 				<image width="8.9h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
-				<label y="0h" fity="1" font="dyn_10" color="white" outline="1" textalign="left"
+				<!-- OptiUI: Added ability lvl label next to mana cost -->
+				<label x="0.5h" y="0h" fity="1" textalign="left" textvalign="center" color="yellow" font="dyn_9" outline="1"
+					watch="ActiveInventoryStatus{slot}"
+					ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetVisible(1) self:SetText(AtoN(param5)) else self:SetVisible(0) end"
+				/>
+				<label x="-0.5h" y="0h" fity="1" textalign="right" textvalign="center" color="cyan" font="dyn_9" outline="1"
 					watch="ActiveInventoryDescription{slot}"
-					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
+					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetVisible(1) self:SetColor('cyan') self:SetText(round(param2)) else self:SetVisible(0) self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
 					watch2="ActiveInventoryExists{slot}"
-					ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot} ~= nil) and (Game.manaCost{slot} > 0.0)) then self:SetColor('white') self:SetText(round(Game.manaCost{slot})) end"
+					ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot} ~= nil) and (Game.manaCost{slot} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot})) end"
 					onshowlua="
 						local widget = self
-						widget:SetColor('white')
+						widget:SetColor('cyan')
 						local f = function(_, mana)
 							if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-								widget:SetColor('white')
+								widget:SetColor('cyan')
 							else
 								widget:SetColor('gray')
 							end
@@ -377,7 +382,7 @@
 	<template name="ability_frame_single_plus_one">
 		<!-- SINGLE plus ONE-->
 		<panel
-			width="10.0h"
+			width="9.0h"
 			height="100%"
 			valign="center"
 			color="invisible"
@@ -387,31 +392,35 @@
 			stickytoinvis="false"
 			visible="false"
 		>
-			<panel x="0.5h" y="0" noclick="1">
-				<panel x="0h" y="1.2h" height="5.5h" width="5.5h" noclick="1">
+			<panel x="0h" y="0" noclick="1">
+				<panel x="0h" y="0h" valign="center" height="5.5h" width="5.5h" noclick="1">
 					<instance name="ability_button" slot="{slot_a}"/>
 				</panel>
 
-				<panel x="5.5h" y="1.2h" height="3.5h" width="3.5h" noclick="1">
+				<panel x="5.5h" y="-1.0h" valign="center" height="3.5h" width="3.5h" noclick="1">
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
 <!-- 				<image width="14.9h" height="7.45h" texture="/ui/common/ability_frame_1.tga" noclick="1" /> -->
 			</panel>
 			<!-- mana cost -->
-			<panel x="0h" y="2.0h" align="center" valign="center" height="1.5h" width="9h" color="0 0 0 0.5" noclick="1">
+			<panel x="0h" y="2.0h" align="center" valign="center" height="1.5h" width="9h" color="0 0 0 0.6" noclick="1">
 <!-- 				<image x="2.2h" width="14.9h" align="center" valign="bottom" texture="/ui/common/mana_frame2.tga" noclick="1"/> -->
-				<panel y="0h" float="right" padding="0.6h" noclick="1">
-					<label x="0h" width="50%" font="dyn_10" color="white" outline="1" textalign="left" noclick="1"
+					<!-- OptiUI: Added ability lvl label next to mana cost -->
+					<label x="0.5h" y="0h" fity="1" textalign="left" textvalign="center" color="yellow" font="dyn_9" outline="1"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetVisible(1) self:SetText(AtoN(param5)) else self:SetVisible(0) end"
+					/>
+					<label x="-0.5h" width="5.5h" font="dyn_9" color="white" outline="1" textalign="right" noclick="1"
 						watch="ActiveInventoryDescription{slot_a}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
+						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_a}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_a} ~= nil) and (Game.manaCost{slot_a} > 0.0)) then self:SetColor('white') self:SetText(round(Game.manaCost{slot_a})) end"
+						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_a} ~= nil) and (Game.manaCost{slot_a} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot_a})) end"
 						onshowlua="
 							local widget = self
 							widget:SetColor('white')
 							local f = function(_, mana)
 								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('white')
+									widget:SetColor('cyan')
 								else
 									widget:SetColor('gray')
 								end
@@ -420,17 +429,17 @@
 						"
 						onhidelua="self:UnregisterWatch('ActiveMana')"
 					/>
-					<label x="5.5h" width="50%" font="dyn_10" color="white" outline="1" textalign="left" noclick="1"
+					<label x="5.25h" width="3.5h" font="dyn_9" color="white" outline="1" textalign="right" noclick="1"
 						watch="ActiveInventoryDescription{slot_b}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
+						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
 						watch2="ActiveInventoryExists{slot_b}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_b} ~= nil) and (Game.manaCost{slot_b} > 0.0)) then self:SetColor('white') self:SetText(round(Game.manaCost{slot_b})) end"
+						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_b} ~= nil) and (Game.manaCost{slot_b} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot_b})) end"
 						onshowlua="
 							local widget = self
 							widget:SetColor('white')
 							local f = function(_, mana)
 								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('white')
+									widget:SetColor('cyan')
 								else
 									widget:SetColor('gray')
 								end
@@ -440,7 +449,6 @@
 						onhidelua="self:UnregisterWatch('ActiveMana')"
 					/>
 				</panel>
-			</panel>
 		</panel>
 	</template>
 
@@ -469,48 +477,50 @@
 			</panel>
 
 			<!-- mana cost -->
-			<panel x="0h" y="2.0h" align="center" valign="center" height="1.5h" width="8.0h" color="0 0 0 0.7" noclick="1">
+			<panel x="0h" y="2.0h" align="center" valign="center" height="1.5h" width="8.0h" color="0 0 0 0.6" noclick="1">
 <!-- 				<image width="7.8h" align="center" valign="bottom" texture="/ui/common/mana_frame3.tga" noclick="1" visible="1"/> -->
-				<panel y="0h" float="right" noclick="1">
-					<label x="0h" width="50%" font="dyn_10" color="white" outline="1" textalign="left" noclick="1"
-						watch="ActiveInventoryDescription{slot_a}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
-						watch2="ActiveInventoryExists{slot_a}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_a} ~= nil) and (Game.manaCost{slot_a} > 0.0)) then self:SetColor('white') self:SetText(round(Game.manaCost{slot_a})) end"
-						onshowlua="
-							local widget = self
-							widget:SetColor('white')
-							local f = function(_, mana)
-								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('white')
-								else
-									widget:SetColor('gray')
-								end
+				<label x="0.5h" y="0h" fity="1" textalign="left" textvalign="center" color="yellow" font="dyn_9" outline="1"
+					watch="ActiveInventoryStatus{slot}"
+					ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetVisible(1) self:SetText(AtoN(param5)) else self:SetVisible(0) end"
+				/>
+				<label x="-0.25h" width="4.0h" font="dyn_9" color="cyan" outline="1" textalign="right" noclick="1"
+					watch="ActiveInventoryDescription{slot_a}"
+					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
+					watch2="ActiveInventoryExists{slot_a}"
+					ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_a} ~= nil) and (Game.manaCost{slot_a} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot_a})) end"
+					onshowlua="
+						local widget = self
+						widget:SetColor('cyan')
+						local f = function(_, mana)
+							if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
+								widget:SetColor('cyan')
+							else
+								widget:SetColor('gray')
 							end
-							self:RegisterWatch('ActiveMana', f)
-						"
-						onhidelua="self:UnregisterWatch('ActiveMana')"
-					/>
-					<label x="4.0h" width="50%" font="dyn_10" color="white" outline="1" textalign="left" noclick="1"
-						watch="ActiveInventoryDescription{slot_b}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
-						watch2="ActiveInventoryExists{slot_b}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_b} ~= nil) and (Game.manaCost{slot_b} > 0.0)) then self:SetColor('white') self:SetText(round(Game.manaCost{slot_b})) end"
-						onshowlua="
-							local widget = self
-							widget:SetColor('white')
-							local f = function(_, mana)
-								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('white')
-								else
-									widget:SetColor('gray')
-								end
+						end
+						self:RegisterWatch('ActiveMana', f)
+					"
+					onhidelua="self:UnregisterWatch('ActiveMana')"
+				/>
+				<label x="3.75h" width="4.0h" font="dyn_9" color="cyan" outline="1" textalign="right" noclick="1"
+					watch="ActiveInventoryDescription{slot_b}"
+					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
+					watch2="ActiveInventoryExists{slot_b}"
+					ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_b} ~= nil) and (Game.manaCost{slot_b} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot_b})) end"
+					onshowlua="
+						local widget = self
+						widget:SetColor('cyan')
+						local f = function(_, mana)
+							if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
+								widget:SetColor('cyan')
+							else
+								widget:SetColor('gray')
 							end
-							self:RegisterWatch('ActiveMana', f)
-						"
-						onhidelua="self:UnregisterWatch('ActiveMana')"
-					/>
-				</panel>
+						end
+						self:RegisterWatch('ActiveMana', f)
+					"
+					onhidelua="self:UnregisterWatch('ActiveMana')"
+				/>
 			</panel>
 		</panel>
 	</template>
@@ -551,7 +561,7 @@
 	<template name="ability_frame_triple">
 		<!-- Triple-->
 		<panel
-			width="7.0h"
+			width="9.0h"
 			height="100%"
 			valign="center"
 			color="invisible"
@@ -562,32 +572,36 @@
 			visible="false"
 		>
 			<panel y="1.2h">
-				<panel x="1.0h" y="0.0h" height="2.75h" width="2.75h">
+				<panel x="0.0h" y="0.0h" height="3.0h" width="3.0h">
 					<instance name="ability_button_small" slot="{slot_a}"/>
 				</panel>
 
-				<panel x="3.75h" y="0.0h" height="2.75h" width="2.75h">
+				<panel x="3.0h" y="0.0h" height="3.0h" width="3.0h">
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
 
-				<panel x="3.75h" y="2.75h" height="2.75h" width="2.75h">
+				<panel x="6.0h" y="0.0h" height="3.0h" width="3.0h">
 					<instance name="ability_button_small" slot="{slot_c}"/>
 				</panel>
 <!-- 				<image align="center" y="-1.5h" height="8h" width="8h" texture="/ui/common/ability_frame_3.tga" noclick="1" /> -->
 			</panel>
-			<panel x="-1.375h" y="2.0h" align="center" valign="center" height="1.5h" width="2.75h" color="0 0 0 0.7" noclick="1" watch="ActiveInventoryDescription{slot}" ontriggerlua="self:SetVisible(tonumber(param2) > 0.0)">
+			<panel x="0h" y="2.0h" align="center" valign="center" height="1.5h" width="9.0h" color="0 0 0 0.6" noclick="1" watch="ActiveInventoryDescription{slot}" ontriggerlua="self:SetVisible(tonumber(param2) > 0.0)">
 <!-- 				<image width="9.4h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
-				<label y="0h" fity="1" font="dyn_10" color="white" outline="1" textalign="left"
+				<label x="0.5h" y="0h" fity="1" textalign="left" textvalign="center" color="yellow" font="dyn_9" outline="1"
+					watch="ActiveInventoryStatus{slot}"
+					ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetVisible(1) self:SetText(AtoN(param5)) else self:SetVisible(0) end"
+				/>
+				<label x="-0.5h" y="0h" fity="1" font="dyn_9" color="cyan" outline="1" textalign="right"
 					watch="ActiveInventoryDescription{slot}"
-					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('white') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
+					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
 					watch2="ActiveInventoryExists{slot}"
-					ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot} ~= nil) and (Game.manaCost{slot} > 0.0)) then self:SetColor('white') self:SetText(round(Game.manaCost{slot})) end"
+					ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot} ~= nil) and (Game.manaCost{slot} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot})) end"
 					onshowlua="
 						local widget = self
-						widget:SetColor('white')
+						widget:SetColor('cyan')
 						local f = function(_, mana)
 							if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-								widget:SetColor('white')
+								widget:SetColor('cyan')
 							else
 								widget:SetColor('gray')
 							end
@@ -738,11 +752,12 @@
 				<!--  silenced intentory section... can move or add a timer later -->
 				<image align="center" valign="center" width="90%" height="90%" texture="elements/silence.tga" watch="Silenced" ontriggerlua="self:SetVisible(AtoB(param))" color="1 1 1 1" noclick="1" visible="0"/>
 
+				<!-- OptiUI: Move charges indicator to top right corner to not interfere with the mana panel -->
 				<panel
 					width="38.5%"
 					height="38.5%"
 					align="right"
-					valign="bottom"
+					valign="top"
 					watch="ActiveInventoryCharges{slot}"
 					ontriggerlua="self:SetVisible(tonumber(param) > 0)"
 					noclick="true"
@@ -1156,7 +1171,7 @@
 					width="38.5%"
 					height="38.5%"
 					align="right"
-					valign="bottom"
+					valign="top"
 					noclick="true"
 					passivechildren="true"
 					color="invisible"
@@ -1237,6 +1252,32 @@
 
 				<!-- Numeric cooldown timer -->
 				<label name="inventory_button_cooldown_label_{slot}" noclick="1" valign="center" align="center" textvalign="center" textalign="center" color="#87CEEB" outline="1" font="dyn_12" />
+				<!-- OptiUI: Level and Mana labels for items -->
+				<panel x="0h" y="0h" align="center" valign="bottom" height="1.5h" width="100%" color="0 0 0 0.6" noclick="1" >
+					<label x="0.5h" y="0h" fity="1" textalign="left" textvalign="center" color="yellow" font="dyn_9" outline="1"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetVisible(1) self:SetText(AtoN(param5)) else self:SetVisible(0) end"
+					/>
+					<label x="-0.5h" y="0h" fity="1" textalign="right" textvalign="center" color="cyan" font="dyn_9" outline="1"
+						watch="ActiveInventoryDescription{slot}"
+						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetVisible(1) self:SetColor('cyan') self:SetText(round(param2)) else self:SetVisible(0) self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
+						watch2="ActiveInventoryExists{slot}"
+						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot} ~= nil) and (Game.manaCost{slot} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot})) end"
+						onshowlua="
+							local widget = self
+							widget:SetColor('cyan')
+							local f = function(_, mana)
+								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
+									widget:SetColor('cyan')
+								else
+									widget:SetColor('gray')
+								end
+							end
+							self:RegisterWatch('ActiveMana', f)
+						"
+						onhidelua="self:UnregisterWatch('ActiveMana')"
+					/>
+				</panel>
 			</panel>
 			<!-- UIScript -->
 			<panel name="inventory_button_item_cursor_{slot}" visible="0"
@@ -1539,7 +1580,7 @@
 	<template name="ability_button_lvlup">
 		<panel>
 			<!-- OptiUI: New effect is silly and it lags. Remove it -->
-<!-- 			
+			<!-- 			
 			<panel y="1.5h" width="7h" height="7h" valign="bottom" align="center" noclick="1">
 				<modelpanel name="level_up_effect_{slot}"
 					noclick="true"
@@ -1552,7 +1593,7 @@
 					depthcompress="true"
 				/>
 			</panel>	
--->			
+			-->			
  			<image texture="/ui/legion/empty_pack.tga"/>
 			<panel name="ability_lvlup_button_{slot}">
 				<image name="ability_lvlup_button_icon_{slot}" noclick="1" />
@@ -3830,6 +3871,7 @@
 		</panel>
 
 		<!-- Abilities -->
+		<!-- OptiUI: Adjustments to ability buttons panel size -->
 		<panel x="3.9h" y="-4.5h" width="33.0h" height="8.0h" align="center" valign="bottom" noclick="1" color="invisible" >
 
 			<panel name="panel_abilities" align="center" padding="0" noclick="0">
