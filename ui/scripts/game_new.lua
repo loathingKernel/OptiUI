@@ -1,7 +1,7 @@
 ---------------------------------------------------------- 
 --	Name: 		Game Interface Script            		--				
 --  Copyright 2012 S2 Games								--
---  Game version: v3.1.6								--
+--  Game version: v3.2.0								--
 ----------------------------------------------------------
 
 local _G = getfenv(0)
@@ -1100,7 +1100,8 @@ local function InitBottomCenterPanel()
 		else
 			GetWidget('game_center_health_label'):SetText('')
 		end
-		GetWidget('game_center_health_regen_label'):SetVisible((health/maxHealth) <= 0.99)
+		-- OptiUI: Health regen label always visible
+		--GetWidget('game_center_health_regen_label'):SetVisible((health/maxHealth) <= 0.99)
 	end
 	interface:RegisterWatch('ActiveHealth', ActiveHealth)
 
@@ -1114,7 +1115,8 @@ local function InitBottomCenterPanel()
 	local function ActiveMana(sourceWidget, mana, maxMana, manaPercent, manaShadow)
 		local mana, maxMana, tempManaPercent, tempManaShadow = AtoN(mana), AtoN(maxMana), ToPercent(AtoN(manaPercent)), ToPercent(AtoN(manaPercent))
 		if (maxMana > 0) then		
-			GetWidget('game_center_manabar_backer'):SetVisible(true)
+			-- OptiUI: Small rename to keep things clean
+			GetWidget('game_center_mana_bar_backer'):SetVisible(true)
 			GetWidget('game_center_mana_label'):SetVisible(true)
 			GetWidget('game_center_mana_regen_label'):SetVisible(true)	
 			if GetCvarBoolMem('cg_showHeroHealthLerp') and (Game.lastManaEntity == GetSelectedEntity()) then
@@ -1124,15 +1126,22 @@ local function InitBottomCenterPanel()
 				GetWidget('game_center_mana_lerp'):ScaleWidth(0, 0, -1)
 				Game.lastManaEntity = GetSelectedEntity()
 			end
-			GetWidget('game_center_manabar_backer'):SetWidth(tempManaPercent)		
+			-- OptiUI: Small rename to keep things clean
+			GetWidget('game_center_mana_bar_backer'):SetWidth(tempManaPercent)		
 			GetWidget('game_center_mana_bar'):UICmd("SetUScale(GetHeight() * 32 # 'p')")
 			GetWidget('game_center_mana_label'):SetText(ceil(mana) .. '/' .. ceil(maxMana))
-			GetWidget('game_center_mana_regen_label'):SetVisible((mana/maxMana) <= 0.99)
+			-- OptiUI: Mana regen label always visible
+			--GetWidget('game_center_mana_regen_label'):SetVisible((mana/maxMana) <= 0.99)
+			-- OptiUI: Mana bar frame visible if unit has mana
+			GetWidget('game_center_mana_bar_frame'):SetVisible(true)
 		else
 			GetWidget('game_center_mana_lerp'):SetVisible(false)
-			GetWidget('game_center_manabar_backer'):SetVisible(false)
+			-- OptiUI: Small rename to keep things clean
+			GetWidget('game_center_mana_bar_backer'):SetVisible(false)
 			GetWidget('game_center_mana_label'):SetVisible(false)	
-			GetWidget('game_center_mana_regen_label'):SetVisible(false)	
+			GetWidget('game_center_mana_regen_label'):SetVisible(false)
+			-- OptiUI: Mana bar frame not visible if unit has mana
+			GetWidget('game_center_mana_bar_frame'):SetVisible(false)
 		end
 	end
 	interface:RegisterWatch('ActiveMana', ActiveMana)
@@ -1146,11 +1155,12 @@ local function InitBottomCenterPanel()
 	local function ActiveLevel(sourceWidget, currentLevel, skillPoints, showLevelup, _)
 		local currentLevel, skillPoints, showLevelup = ceil(AtoN(currentLevel)), AtoN(skillPoints), AtoB(showLevelup)
 		if (showLevelup or (skillPoints >= 1)) then
-			GetWidget('game_center_levelup_btn_holder'):SlideY('11.4h', 250)
-			GetWidget('game_center_large_gear'):Rotate(0, 250)
+			-- OptiUI: Disable gears and change location of lvlup buttons
+			GetWidget('game_center_levelup_btn_holder'):SlideY('14h', 150)
+			--GetWidget('game_center_large_gear'):Rotate(0, 250)
 		else
-			GetWidget('game_center_levelup_btn_holder'):SlideY('15.6h', 250)
-			GetWidget('game_center_large_gear'):Rotate(30, 250)
+			GetWidget('game_center_levelup_btn_holder'):SlideY('22.6h', 150)
+			--GetWidget('game_center_large_gear'):Rotate(30, 250)
 		end
 		GetWidget('game_center_portrait_glow'):SetVisible(skillPoints >= 1)
 		GetWidget('game_center_level_label'):SetText(currentLevel)
@@ -1182,8 +1192,9 @@ local function InitBottomCenterPanel()
 	local function ActiveStatus(sourceWidget, status)
 		local status = AtoB(status)
 		Game.ActiveStatus = status
-		UpdateGameCenterPortrait()	
-		GetWidget('game_center_portrait_icon'):SetVisible(status)
+		UpdateGameCenterPortrait()
+		-- OptiUI: Portrait icon always visible
+		--GetWidget('game_center_portrait_icon'):SetVisible(status)
 	end
 	interface:RegisterWatch('ActiveStatus', ActiveStatus)
 
@@ -1194,25 +1205,27 @@ local function InitBottomCenterPanel()
 	end
 	interface:RegisterWatch('ActiveIllusion', ActiveIllusion)
 
-	-- OptiUI: changed to 'icon' to fix console spam --
+	-- OptiUI: Removed to fix console spam --
 	local function ActiveModel(sourceWidget, model)
-		if (model) then
-			GetWidget('game_center_portrait_icon'):UICmd("SetModel('"..model.."')")
-		end
+		--if (model) then
+			--GetWidget('game_center_portrait_icon'):UICmd("SetModel('"..model.."')")
+		--end
 	end
 	interface:RegisterWatch('ActiveModel', ActiveModel)
 
-	-- OptiUI: changed to 'icon' to fix console spam --
 	local function ActivePlayerInfo(sourceWidget, playerName, playerColor)
-		GetWidget('game_center_portrait_icon'):UICmd("SetTeamColor('"..playerColor.."')")
+		-- OptiUI: Removed model and added frame color
+		--GetWidget('game_center_portrait_icon'):UICmd("SetTeamColor('"..playerColor.."')")
+		GetWidget('game_center_portrait_frame'):SetBorderColor(playerColor)
+		GetWidget('game_center_level_backer'):SetColor(playerColor)
 	end
 	interface:RegisterWatch('ActivePlayerInfo', ActivePlayerInfo)
 
-	-- OptiUI: changed to 'icon' to fix console spam --
 	local function ActiveEffect(sourceWidget, activeEffect)
-		if (activeEffect) then
-			GetWidget('game_center_portrait_icon'):UICmd("SetEffect('"..activeEffect.."')")
-		end
+		-- OptiUI: Removed to fix console spam --
+		--if (activeEffect) then
+			--GetWidget('game_center_portrait_icon'):UICmd("SetEffect('"..activeEffect.."')")
+		--end
 	end
 	interface:RegisterWatch('ActiveEffect', ActiveEffect)
 
@@ -1231,14 +1244,22 @@ local function InitBottomCenterPanel()
 		else
 			GetWidget('game_center_exp_bar_backer'):SetVisible(false)
 			GetWidget('game_center_life_bar_backer'):SetVisible(true)
-			GetWidget('game_center_life_bar_ring'):SetValue(remainingPercent)
+			-- OptiUI: Removed the widget from the interface
+			--GetWidget('game_center_life_bar_ring'):SetValue(remainingPercent)
+			-- OptiUI: Control lifetime bar width
+			GetWidget('game_center_life_bar'):SetWidth(remainingPercent * 100 .. '%')
 			GetWidget('game_center_life_bar_label'):SetText(ceil(remainingLifetime / 1000) .. ' s')
 		end
 	end
 	interface:RegisterWatch('ActiveLifetime', ActiveLifetime)
 
 	local function ActiveExperience(sourceWidget, exists, xp, xpOfNextLevel, percentNextLevel, xpThisLevel)
-		GetWidget('game_center_exp_bar_ring'):SetValue(percentNextLevel)
+		-- OptiUI: Removed the widget from the interface and added new functions
+		--GetWidget('game_center_exp_bar_ring'):SetValue(percentNextLevel)
+		GetWidget('game_center_exp_bar_parent'):SetVisible(AtoB(exists))
+		GetWidget('game_center_exp_bar_frame'):SetVisible(AtoB(xpThisLevel))
+		GetWidget('game_center_exp_bar'):SetWidth(percentNextLevel * 100 .. '%')
+		GetWidget('game_center_exp_bar_label'):SetText(math.floor(tonumber(xpThisLevel)) .. '/' .. math.floor(tonumber(xpOfNextLevel)))
 	end
 	interface:RegisterWatch('ActiveExperience', ActiveExperience)
 
@@ -1249,19 +1270,27 @@ local function InitBottomCenterPanel()
 	end
 	interface:RegisterWatch('ActiveDamage', ActiveDamage)
 
+	-- OptiUI: Added damage reduction label code
 	Game.playerArmor = 0
+	Game.playerDamageMitigation = 0
 	local function ActiveArmor(sourceWidget, baseArmor, armor, mitigation)
 		local baseArmor, armor, mitigation = AtoN(baseArmor), AtoN(armor), AtoN(mitigation)
 		GetWidget('game_center_armor_label'):SetText(' ' .. format("%.1f", armor) .. ' / ' .. format("%.1f", Game.playerMagicArmor) )
+		GetWidget('game_center_damage_mitigation_label'):SetText(' ' .. FtoA(tonumber(mitigation) * 100, 1) .. ' / ' .. FtoA(tonumber(Game.playerMagicDamageMitigation) * 100, 1))
 		Game.playerArmor = armor
+		Game.playerDamageMitigation = mitigation
 	end
 	interface:RegisterWatch('ActiveArmor', ActiveArmor)
 	
+	-- OptiUI: Added magic damage reduction label code
 	Game.playerMagicArmor = 0
+	Game.playerMagicDamageMitigation = 0
 	local function ActiveMagicArmor(sourceWidget, baseMagicArmor, magicArmor, mitigation)
 		local baseMagicArmor, magicArmor, mitigation = AtoN(baseMagicArmor), AtoN(magicArmor), AtoN(mitigation)
 		GetWidget('game_center_armor_label'):SetText(' ' .. format("%.1f", Game.playerArmor) .. ' ^777/^999 ' .. format("%.1f", magicArmor) )
+		GetWidget('game_center_damage_mitigation_label'):SetText(' ' .. FtoA(tonumber(Game.playerDamageMitigation) * 100, 1) .. ' / ' .. FtoA(tonumber(mitigation) * 100, 1))
 		Game.playerMagicArmor = magicArmor
+		Game.playerMagicDamageMitigation = mitigation
 	end
 	interface:RegisterWatch('ActiveMagicArmor', ActiveMagicArmor)	
 	
@@ -1691,6 +1720,13 @@ local function InitBackpack()
 		else
 			GetWidget('inventory_button_color_overlay_'..slotIndex):SetVisible(false)
 		end
+		-- OptiUI: Item mana label parent
+		GetWidget('inventory_button_level_label_'..slotIndex):SetText(AtoN(currentLevel))
+		if (maxLevel > 1) then
+			GetWidget('inventory_button_level_parent_'..slotIndex):SetVisible(true)
+		else
+			GetWidget('inventory_button_level_parent_'..slotIndex):SetVisible(false)
+		end
 		GetWidget('inventory_button_shared_'..slotIndex):SetVisible(AtoB(canShare) and AtoB(isBorrowed))
 		GetWidget('inventory_button_recent_'..slotIndex):SetVisible(AtoB(recentPurchase) and (not AtoB(isBorrowed)))
 		GetWidget('inventory_button_muted_'..slotIndex):SetVisible(AtoB(isBorrowed) and (not AtoB(canShare)))
@@ -1754,7 +1790,8 @@ local function InitBackpack()
 			GetWidget('inventory_button_charges_parent_'..slotIndex):SetVisible(true)
 			GetWidget('inventory_button_charges_label_'..slotIndex):SetText(charges)
 			if (charges < 10) then
-				GetWidget('inventory_button_charges_label_'..slotIndex):SetFont('dyn_10')
+				-- OptiUI: Smaller font size for single digit charges
+				GetWidget('inventory_button_charges_label_'..slotIndex):SetFont('dyn_9')
 			else
 				GetWidget('inventory_button_charges_label_'..slotIndex):SetFont('dyn_8')
 			end
