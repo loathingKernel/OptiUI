@@ -1092,6 +1092,8 @@ local function InitBottomCenterPanel()
 			Game.lastHealthEntity = GetSelectedEntity()
 			GetWidget('game_center_health_lerp'):ScaleWidth(0, 0, -1)
 		end
+		-- OptiUI: Fix for frame width = 0 graphic glitch
+		GetWidget('game_center_health_bar_backer'):SetVisible(health > 0)
 		GetWidget('game_center_health_bar_backer'):SetWidth(tempHealthPercent)
 		GetWidget('game_center_health_bar'):SetColor(GetHealthBarColor(healthPercent))
 		GetWidget('game_center_health_bar'):UICmd("SetUScale(GetHeight() * 32 # 'p')")	
@@ -1115,8 +1117,8 @@ local function InitBottomCenterPanel()
 	local function ActiveMana(sourceWidget, mana, maxMana, manaPercent, manaShadow)
 		local mana, maxMana, tempManaPercent, tempManaShadow = AtoN(mana), AtoN(maxMana), ToPercent(AtoN(manaPercent)), ToPercent(AtoN(manaPercent))
 		if (maxMana > 0) then		
-			-- OptiUI: Small rename to keep things clean
-			GetWidget('game_center_mana_bar_backer'):SetVisible(true)
+			-- OptiUI: Small rename to keep things clean and fix for frame width = 0 graphic glitch
+			GetWidget('game_center_mana_bar_backer'):SetVisible(mana > 0)
 			GetWidget('game_center_mana_label'):SetVisible(true)
 			GetWidget('game_center_mana_regen_label'):SetVisible(true)	
 			if GetCvarBoolMem('cg_showHeroHealthLerp') and (Game.lastManaEntity == GetSelectedEntity()) then
@@ -1140,7 +1142,7 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_mana_bar_backer'):SetVisible(false)
 			GetWidget('game_center_mana_label'):SetVisible(false)	
 			GetWidget('game_center_mana_regen_label'):SetVisible(false)
-			-- OptiUI: Mana bar frame not visible if unit has mana
+			-- OptiUI: Mana bar frame not visible if unit hasn't mana
 			GetWidget('game_center_mana_bar_frame'):SetVisible(false)
 		end
 	end
@@ -1156,11 +1158,18 @@ local function InitBottomCenterPanel()
 		local currentLevel, skillPoints, showLevelup = ceil(AtoN(currentLevel)), AtoN(skillPoints), AtoB(showLevelup)
 		if (showLevelup or (skillPoints >= 1)) then
 			-- OptiUI: Disable gears and change location of lvlup buttons
-			GetWidget('game_center_levelup_btn_holder'):SlideY('14h', 150)
+			GetWidget('game_center_levelup_btn_holder'):FadeIn(100)
+			--GetWidget('game_center_levelup_btn_holder'):SlideY('14h', 150)
 			--GetWidget('game_center_large_gear'):Rotate(0, 250)
 		else
-			GetWidget('game_center_levelup_btn_holder'):SlideY('22.6h', 150)
+			GetWidget('game_center_levelup_btn_holder'):FadeOut(100)
+			--GetWidget('game_center_levelup_btn_holder'):SlideY('22.6h', 150)
 			--GetWidget('game_center_large_gear'):Rotate(30, 250)
+		end
+		if (skillPoints >= 1) then
+			GetWidget('game_center_levelup_btn_holder'):SetBorderColor("yellow")
+		else
+			GetWidget('game_center_levelup_btn_holder'):SetBorderColor("gray")
 		end
 		GetWidget('game_center_portrait_glow'):SetVisible(skillPoints >= 1)
 		GetWidget('game_center_level_label'):SetText(currentLevel)
@@ -1257,7 +1266,7 @@ local function InitBottomCenterPanel()
 		-- OptiUI: Removed the widget from the interface and added new functions
 		--GetWidget('game_center_exp_bar_ring'):SetValue(percentNextLevel)
 		GetWidget('game_center_exp_bar_parent'):SetVisible(AtoB(exists))
-		GetWidget('game_center_exp_bar_frame'):SetVisible(AtoB(xpThisLevel))
+		GetWidget('game_center_exp_bar'):SetVisible(AtoB(xpThisLevel))
 		GetWidget('game_center_exp_bar'):SetWidth(percentNextLevel * 100 .. '%')
 		GetWidget('game_center_exp_bar_label'):SetText(math.floor(tonumber(xpThisLevel)) .. '/' .. math.floor(tonumber(xpOfNextLevel)))
 	end
@@ -1919,14 +1928,16 @@ local function InitActiveInventory()
 			GetWidget('ability_lvlup_button_button_'..slotIndex):SetCallback('onclick', function()	GetWidget('ability_lvlup_button_button_'..slotIndex):UICmd("PlaySound('/shared/sounds/ui/levelup_ability.wav'); LevelUpAbility("..slotIndex..");")end )
 			GetWidget('ability_lvlup_button_button_'..slotIndex):RefreshCallbacks()
 			-- OptiUI: Removed ability level up effect because it is heavy and distracting --
-			--GetWidget("level_up_effect_"..slotIndex):SetVisible(1)--
+			--GetWidget("level_up_effect_"..slotIndex):SetVisible(1)
+			GetWidget('level_up_effect_'..slotIndex):SetBorderColor("purple")
 		else
 			GetWidget('ability_lvlup_button_icon_'..slotIndex):UICmd("SetRenderMode('grayscale')")
 			GetWidget('ability_lvlup_button_icon_'..slotIndex):SetColor('#808080')
 			GetWidget('ability_lvlup_button_button_'..slotIndex):SetCallback('onclick', function() GetWidget('ability_lvlup_button_button_'..slotIndex):UICmd("PlaySound('/shared/sounds/ui/error.wav');") end )
 			GetWidget('ability_lvlup_button_button_'..slotIndex):RefreshCallbacks()
 			-- OptiUI: Removed ability level up effect because it is heavy and distracting --
-			--GetWidget("level_up_effect_"..slotIndex):SetVisible(0)--
+			--GetWidget("level_up_effect_"..slotIndex):SetVisible(0)
+			GetWidget('level_up_effect_'..slotIndex):SetBorderColor("gray")
 		end
 	end
 
