@@ -3,6 +3,9 @@
 filelist="ui"
 filelist="${filelist} README.md"
 
-archive="resourcesOptiUI.s2z"
+archive_name="resourcesOptiUI.zip"
+s2z_name="resourcesOptiUI.s2z"
 
-zip -r -0 ${archive} ${filelist}
+7z a ${archive_name} ${filelist}
+
+mv ${archive_name} ${s2z_name}
