@@ -52,6 +52,30 @@ local GetWidget = memoizeObject(GetWidgetGame)
 ----------------------------------------------------------
 -- 						General				            --
 ----------------------------------------------------------
+-- OptiUI: Aspect ratio detection code
+-- OptiUI = {}
+-- OptiUI.widescreen = 0
+-- local function detectAspectRatio()
+-- 	local width = 0
+-- 	local height = 0
+
+-- 	for word in GetCvarString('vid_resolution'):gmatch('%w+') do
+-- 		if ((width == 0)) then 
+-- 			width = word
+-- 		else 
+-- 			height = word
+-- 		end
+-- 	end
+
+-- 	if ((width / 16) == (height / 10)) then
+-- 		OptiUI.widescreen = true
+-- 	elseif ((width / 16) == (height / 9)) then
+-- 		OptiUI.widescreen = true
+-- 	else
+-- 		OptiUI.widescreen = false
+-- 	end
+-- end
+-- OptiUI: end
 
 local function NotABot(name)
 	if (GameChat) and (GameChat.bots) then
@@ -175,8 +199,8 @@ end
 ----------------------------------------------------------
 local function InitMidBar()
 	---[[ Team scores
-	interface:RegisterWatch('ScoreboardTeam1', function(_, _, _, totalDeaths) GetWidget('game_team_score_1'):SetText(round(totalDeaths)) end)
-	interface:RegisterWatch('ScoreboardTeam2', function(_, _, _, totalDeaths) GetWidget('game_team_score_2'):SetText(round(totalDeaths)) end)
+	interface:RegisterWatch('ScoreboardTeam1', function(_, _, _, totalDeaths) GetWidget('game_team_score_1'):SetText('H: ^r' .. round(totalDeaths)) end)
+	interface:RegisterWatch('ScoreboardTeam2', function(_, _, _, totalDeaths) GetWidget('game_team_score_2'):SetText('L: ^g' .. round(totalDeaths)) end)
 
 	---[[ Clock
 	Game.game_match_time_label = GetWidget('game_match_time_label')
@@ -197,7 +221,8 @@ local function InitMidBar()
 	Game.game_clock_face = GetWidget('game_clock_face')
 	local function TimeOfDay(sourceWidget, rotation, soundName)
 		if (soundName) and NotEmpty(soundName) then
-			GetWidget('game_clock_texture'):UICmd("PlaySound('/shared/sounds/"..soundName..".wav')")
+			-- OptiUI: Changed it to _face in order to play the sound
+			GetWidget('game_clock_face'):UICmd("PlaySound('/shared/sounds/"..soundName..".wav')")
 			--[[
 			if (soundName == 'good_morning') then
 				GetWidget('game_clock_effect'):UICmd([==[SetEffect('/ui/effects/clock_day.effect')]==])
@@ -472,7 +497,9 @@ local function InitPlayerTopLeftInfo()
 	interface:RegisterWatch('HeroStatus', HeroStatus)
 
 	local function PlayerInfo(sourceWidget, _, playerColor)
-		GetWidget('game_top_left_hero_icon_bg'):SetColor(playerColor)
+		-- OptiUI: Made icon_bg a frame and added level_bg color
+		GetWidget('game_top_left_hero_icon_bg'):SetBorderColor(playerColor)
+		GetWidget('game_top_left_hero_level_bg'):SetColor(playerColor)
 	end
 	interface:RegisterWatch('PlayerInfo', PlayerInfo)
 
@@ -499,9 +526,11 @@ local function InitPlayerTopLeftInfo()
 		else
 			GetWidget('game_top_left_health_lerp'):SetWidth(0)
 		end
+		-- OptiUI: Fixed the small glitch with 0 width on bar elements
+		GetWidget('game_top_left_health_bar'):SetVisible(AtoB(health))
 		GetWidget('game_top_left_health_bar'):SetWidth(tempHealthPercent)
 		GetWidget('game_top_left_health_bar'):SetColor(GetHealthBarColor(healthPercent))
-		GetWidget('game_top_left_health_bar'):UICmd("SetUScale(GetHeight() * 32 # 'p')")	
+		GetWidget('game_top_left_health_bar'):UICmd("SetUScale(GetHeight() * 32 # 'p')")
 		if (maxHealth > 0) then
 			GetWidget('game_top_left_health_label'):SetText(ceil(health) .. '/' .. ceil(maxHealth))
 		else
@@ -514,7 +543,8 @@ local function InitPlayerTopLeftInfo()
 		local mana, maxMana, tempManaPercent, tempManaShadow = AtoN(mana), AtoN(maxMana), ToPercent(AtoN(manaPercent)), ToPercent(AtoN(manaPercent))
 		if (maxMana > 0) then
 			GetWidget('game_top_left_mana_lerp'):SetVisible(true)
-			GetWidget('game_top_left_mana_bar'):SetVisible(true)
+			-- OptiUI: Fixed the small glitch with 0 width on bar elements
+			GetWidget('game_top_left_mana_bar'):SetVisible(AtoB(mana))
 			GetWidget('game_top_left_mana_label'):SetVisible(true)
 			if GetCvarBoolMem('cg_showHeroHealthLerp') then
 				GetWidget('game_top_left_mana_lerp'):ScaleWidth(tempManaShadow, 500, -1)
@@ -583,11 +613,12 @@ local function SetRapButtonVisible(visState, visible)
 		GetWidget('ally_rap_indicator_' .. visState.allyIndex):SetVisible(visible)		
 		Set('ally_rap_available_'..visState.allyIndex, visible, 'bool')
 
-		if(visible) then
-			GetWidget('ally_rap_indicator_template_' .. visState.allyIndex):SetTexture('/ui/common/ally_frame_rap.tga')
-		else
-			GetWidget('ally_rap_indicator_template_' .. visState.allyIndex):SetTexture('/ui/common/ally_frame.tga')
-		end
+		-- OptiUI: WE don't use the texture so comment this section out
+		--if(visible) then
+		--	GetWidget('ally_rap_indicator_template_' .. visState.allyIndex):SetTexture('/ui/common/ally_frame_rap.tga')
+		--else
+		--	GetWidget('ally_rap_indicator_template_' .. visState.allyIndex):SetTexture('/ui/common/ally_frame.tga')
+		--end
 	end
 end
 
@@ -688,12 +719,55 @@ end
 -- 						Ally Info						--
 ----------------------------------------------------------
 local function InitAllyInfo()
+	-- OptiUI: Detect screen aspect ratio at initialization of ally info and set position
+	-- detectAspectRatio()
+	-- -- OptiUI: end
+	-- -- OptiUI: Position ally icons based on aspect ratio
+	-- if (OptiUI.widescreen) then
+	-- 	GetWidget('game_ally_display_holder'):SetAlign("center")
+	-- 	GetWidget('game_ally_display_holder'):SetVAlign("bottom")
+	-- 	GetWidget('game_ally_display_holder'):SetX("0.0h")
+	-- 	GetWidget('game_ally_display_holder'):SetY("-0.5h")
+	-- 	GetWidget('game_ally_display_holder'):SetWidth("90.0h")
+	-- 	GetWidget('game_ally_display_holder'):SetHeight("14.4h")
+	-- else
+	-- 	GetWidget('game_ally_display_holder'):SetX("0.0h")
+	-- 	GetWidget('game_ally_display_holder'):SetY("6.1h")
+	-- 	GetWidget('game_ally_display_holder'):SetWidth("7.45h")
+	-- 	GetWidget('game_ally_display_holder'):SetHeight("28.6h")
+	-- end
+	-- OptiUI: end
 	local function AllyExists(allyIndex, sourceWidget, exists)
+		-- OptiUI: Position ally icons based on aspect ratio
+		-- if (OptiUI.widescreen) then
+		-- 	if (allyIndex < 2) then
+		-- 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetAlign("left")
+		-- 	else
+		-- 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetAlign("right")
+		-- 		GetWidget('game_top_left_ally_portrait_parent_'..allyIndex):SetAlign("right")
+		-- 		GetWidget('game_top_left_ally_portrait_parent_'..allyIndex):SetX("-1.75h")
+		-- 		GetWidget('game_top_left_ally_bar_parent_'..allyIndex):SetAlign("right")
+		-- 		GetWidget('game_top_left_ally_bar_parent_'..allyIndex):SetX("-1.75h")
+		-- 		GetWidget('game_top_left_ally_button_parent_'..allyIndex):SetAlign("right")
+		-- 		GetWidget('game_top_left_ally_status_light_'..allyIndex):SetAlign("right")
+		-- 		GetWidget('game_top_left_ally_status_light_'..allyIndex):SetX("-6.23h")
+		-- 	end
+		-- 	if (AtoB(allyIndex % 2)) then
+		-- 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetVAlign("bottom")
+		-- 	else
+		-- 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetVAlign("top")
+		-- 	end
+		-- else
+		-- 	local allyOffset = allyIndex * 25
+		-- 	GetWidget('game_top_left_ally_parent_'..allyIndex):SetY(allyOffset .. '%')
+		-- end
+		-- OptiUI: end
 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetVisible(AtoB(exists))
 	end
 
 	local function AllyHeroInfo(allyIndex, sourceWidget, displayName, iconPath, level)
 		GetWidget('game_top_left_ally_image_'..allyIndex):SetTexture(iconPath)
+		GetWidget('game_top_left_ally_level_label_'..allyIndex):SetText(level)
 		Game.PlayerIconPathsByIndex = Game.PlayerIconPathsByIndex or {}
 		Game.PlayerIconPathsByIndex[allyIndex] = iconPath
 	end
@@ -743,7 +817,9 @@ local function InitAllyInfo()
 	end
 
 	local function AllyPlayerInfo(allyIndex, sourceWidget, playerName, playerColor, playerClient)
-		GetWidget('game_top_left_ally_image_bg_'..allyIndex):SetColor(playerColor)
+		-- OptiUI: Set border color and bg color
+		GetWidget('game_top_left_ally_image_bg_'..allyIndex):SetBorderColor(playerColor)
+		GetWidget('game_top_left_ally_level_bg_'..allyIndex):SetColor(playerColor)
 		Game.PlayerColorsByIndex = Game.PlayerColorsByIndex or {}
 		Game.PlayerColorsByIndex[allyIndex] = playerColor
 		
@@ -819,6 +895,9 @@ local function InitAllyInfo()
 		else
 			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetColor('orange')
 		end	
+		-- OptiUI: Ally abilities level labels
+		--GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetText(abilityLevel)
+		-- OptiUI: end
 	end
 
 	for i=0,Game.MAX_ALLIES,1 do	
@@ -1103,7 +1182,7 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_health_label'):SetText('')
 		end
 		-- OptiUI: Health regen label always visible
-		--GetWidget('game_center_health_regen_label'):SetVisible((health/maxHealth) <= 0.99)
+		GetWidget('game_center_health_regen_label'):SetVisible((health/maxHealth) <= 0.99)
 	end
 	interface:RegisterWatch('ActiveHealth', ActiveHealth)
 
@@ -1133,7 +1212,7 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_mana_bar'):UICmd("SetUScale(GetHeight() * 32 # 'p')")
 			GetWidget('game_center_mana_label'):SetText(ceil(mana) .. '/' .. ceil(maxMana))
 			-- OptiUI: Mana regen label always visible
-			--GetWidget('game_center_mana_regen_label'):SetVisible((mana/maxMana) <= 0.99)
+			GetWidget('game_center_mana_regen_label'):SetVisible((mana/maxMana) <= 0.99)
 			-- OptiUI: Mana bar frame visible if unit has mana
 			GetWidget('game_center_mana_bar_frame'):SetVisible(true)
 		else
