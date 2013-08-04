@@ -5,7 +5,7 @@ Optimized UI for Heroes of Newerth
 
 Simple, static and less processor consuming UI
 
-[Download](https://bintray.com/loathingkernel/HoN/OptiUI)
+[Download](https://github.com/LoathingKernel/OptiUI/blob/master/resourcesOptiUI.s2z?raw=true)
 
 
 __TODO__
