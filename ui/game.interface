@@ -315,9 +315,10 @@
 	<!-- ability frame templates-->
 	<template name="ability_frame_shared">
 		<!-- SINGLE-->
-		<panel
+		<panel name="ability_frame_shared_{slot}"
 			width="4.0h"
 			height="100%"
+			align="{align}"
 			valign="center"
 			color="invisible"
 			watch="ActiveInventoryExists{slot}"
@@ -329,8 +330,9 @@
 		>
 			<panel x="0" y="0" align="center" valign="center" height="4.0h" width="4.0h" >
 				<instance name="shared_ability_button" slot="{slot}"/>
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
-			<image width="7.0h" height="7.0h" align="center" valign="center" texture="/ui/common/ability_frame.tga" noclick="1" />
+			<!-- <image width="7.0h" height="7.0h" align="center" valign="center" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
 		</panel>
 	</template>
 
@@ -1967,7 +1969,7 @@
 	<!-- Team Member Icon -->
 	<template name="ally_ability_status">
 		<panel y="{y}" width="70%" height="20%" align="center" >
-			<image name="ally_ability_status_dot_{index}_{slot}"/>
+			<panel name="ally_ability_status_dot_{index}_{slot}" color="invisible"/>
 			<!-- <label name="ally_ability_status_level_{index}_{slot}" textalign="center" textvalign="center" textcolor="white" font="dyn_10" /> -->
 			<!-- <image name="ally_ability_status_dot_{index}_{slot}"
 				width="100%" height="100@"
@@ -3263,78 +3265,491 @@
 	-->
 
 	<!-- BOTTOM CENTER -->
-	<panel name="game_bottom_center" x="0h" y="0h" width="119.2h" height="29.8h" align="center" valign="bottom" color="invisible" noclick="1">
+	<panel name="game_bottom_center" x="0h" y="0h" width="75.0h" height="29.8h" align="center" valign="bottom" color="invisible" noclick="1">
 
-		<panel height="11.0h" valign="bottom" color="black" noclick="1"/>
+		<!-- OptiUI: Container panel for middle screen elements. It includes mana/health bars, backpack, -->
+		<panel y="-0.5h" height="10.1h" valign="bottom" color="0 0 0 0.5" noclick="1">
 
-		<!-- Health -->
-		<panel
-			x="3.4h"
-			y="-8.7h"
-			width="33.0h"
-			height="1.9h"
-			align="center"
-			valign="bottom"
-			color="0 0 0 .7"
-			watch="ActiveHealth"
-			ontriggerlua="self:SetVisible(tonumber(param1) > 0)"
-			onmouseoverlua="GetWidget('health_tooltip', 'game'):SetVisible(1)"
-			onmouseoutlua="GetWidget('health_tooltip', 'game'):SetVisible(0)"
-			passivechildren="true"
-		>
-			<panel color="0 0 0 .5"/>
-			<image texture="/ui/legion/behind_bar.tga" rendermode="overlay" color="1 1 1 1"/>
-			<panel name="game_center_health_lerp" color="0 0 0 0">
-				<panel color="1 0 0 1" noclick="1" />
-				<instance name="statusbar_overlay"/>
-			</panel>
-			<panel name="game_center_health_bar_backer" color="0 0 0 0">
-				<instance name="statusbar_overlay"/>
-				<image name="game_center_health_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" color=".2 1 .3 1" noclick="1" uspeed="-.2" />
-				<!-- <panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/> -->
-				<!-- <panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/> -->
-				<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+			<!-- Health -->
+			<panel
+				x="2.6h"
+				y="-8.2h"
+				width="36.0h"
+				height="1.9h"
+				align="center"
+				valign="bottom"
+				color="0 0 0 .7"
+				watch="ActiveHealth"
+				ontriggerlua="self:SetVisible(tonumber(param1) > 0)"
+				onmouseoverlua="GetWidget('health_tooltip', 'game'):SetVisible(1)"
+				onmouseoutlua="GetWidget('health_tooltip', 'game'):SetVisible(0)"
+				passivechildren="true"
+			>
+				<panel color="0 0 0 .5"/>
+				<image texture="/ui/legion/behind_bar.tga" rendermode="overlay" color="1 1 1 1"/>
+				<panel name="game_center_health_lerp" color="0 0 0 0">
+					<panel color="1 0 0 1" noclick="1" />
+					<instance name="statusbar_overlay"/>
+				</panel>
+				<panel name="game_center_health_bar_backer" color="0 0 0 0">
+					<instance name="statusbar_overlay"/>
+					<image name="game_center_health_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" color=".2 1 .3 1" noclick="1" uspeed="-.2" />
+					<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
+				</panel>
+				<label name="game_center_health_label" x="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+				<label name="game_center_health_regen_label" x="-0.5h" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
 				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
-			<label name="game_center_health_label" x="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-			<label name="game_center_health_regen_label" x="-0.5h" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-		</panel>
 
-		<!-- Mana -->
-		<panel
-			x="3.4h"
-			y="-6.6h"
-			width="33.0h"
-			height="1.9h"
-			align="center"
-			valign="bottom"
-			color="0 0 0 .7"
-			onmouseoverlua="GetWidget('mana_tooltip', 'game'):SetVisible(1)"
-			onmouseoutlua="GetWidget('mana_tooltip', 'game'):SetVisible(0)"
-			passivechildren="true"
-		>
-			<image texture="/ui/legion/behind_bar.tga" color="0 .25 .4 1"/>
-			<panel name="game_center_mana_lerp" >
-				<instance name="statusbar_overlay" barimage="behind_bar2.tga" rendermode="" barcolor="0.75 0.75 0.75 1" />
-				<image align="center" texture="/ui/elements/bar_highlight.tga" rendermode="additive"/>
-			</panel>
-			<panel name="game_center_mana_bar_backer" >
-				<image name="game_center_mana_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" color=".2 .3 1 1" noclick="1" uspeed="-.2" />
-				<!-- <panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/> -->
-				<!-- <panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/> -->
-				<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-			</panel>
-			<label name="game_center_mana_label" x="-1" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-			<label name="game_center_mana_regen_label" x="-0.5h" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
-			<frame name="game_center_mana_bar_frame" borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-		</panel>
 
+			<!-- Mana -->
+			<panel
+				x="2.6h"
+				y="-6.1h"
+				width="36.0h"
+				height="1.9h"
+				align="center"
+				valign="bottom"
+				color="0 0 0 .7"
+				onmouseoverlua="GetWidget('mana_tooltip', 'game'):SetVisible(1)"
+				onmouseoutlua="GetWidget('mana_tooltip', 'game'):SetVisible(0)"
+				passivechildren="true"
+			>
+				<image texture="/ui/legion/behind_bar.tga" color="0 .25 .4 1"/>
+				<panel name="game_center_mana_lerp" >
+					<instance name="statusbar_overlay" barimage="behind_bar2.tga" rendermode="" barcolor="0.75 0.75 0.75 1" />
+				</panel>
+				<panel name="game_center_mana_bar_backer" >
+					<image name="game_center_mana_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" color=".2 .3 1 1" noclick="1" uspeed="-.2" />
+					<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
+				</panel>
+				<label name="game_center_mana_label" x="-1" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+				<label name="game_center_mana_regen_label" x="-0.5h" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
+				<frame name="game_center_mana_bar_frame" borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
+			</panel>
+
+
+			<!-- Abilities -->
+			<!-- OptiUI: Adjustments to ability buttons panel size -->
+			<panel x="2.6h" y="0.0h" width="36.0h" height="5.5h" align="center" valign="bottom" noclick="1" color="invisible" >
+
+				<panel name="panel_abilities" align="center" padding="0" noclick="0">
+
+					<panel float="right" width="11.0h" height="5.5h" grow="1" regrow="1" growinvis="0" align="center" >
+						<instance name="ability_frame_single" slot="0"/>
+						<instance name="ability_frame_single_plus_one" slot="0" slot_a="0" slot_b="5"/>
+						<instance name="ability_frame_single_plus_two" slot="0" slot_a="0" slot_b="5" slot_c="6"/>
+						<instance name="ability_frame_triple" slot="0" slot_a="5" slot_b="6" slot_c="7"/>
+						<instance name="ability_frame_double" slot="0" slot_a="5" slot_b="6" />
+
+						<instance name="ability_frame_single" slot="1"/>
+						<instance name="ability_frame_single_plus_one" slot="1" slot_a="1" slot_b="5"/>
+						<instance name="ability_frame_single_plus_two" slot="1" slot_a="1" slot_b="5" slot_c="6"/>
+						<instance name="ability_frame_triple" slot="1" slot_a="5" slot_b="6" slot_c="7"/>
+						<instance name="ability_frame_double" slot="1" slot_a="5" slot_b="6" />
+
+						<instance name="ability_frame_single" slot="2"/>
+						<instance name="ability_frame_single_plus_one" slot="2" slot_a="2" slot_b="5"/>
+						<instance name="ability_frame_single_plus_two" slot="2" slot_a="2" slot_b="5" slot_c="6"/>
+						<instance name="ability_frame_triple" slot="2" slot_a="5" slot_b="6" slot_c="7"/>
+						<instance name="ability_frame_double" slot="2" slot_a="5" slot_b="6" />
+
+						<instance name="ability_frame_single" slot="3"/>
+						<instance name="ability_frame_single_plus_one" slot="3" slot_a="3" slot_b="5"/>
+						<instance name="ability_frame_single_plus_two" slot="3" slot_a="3" slot_b="5" slot_c="6"/>
+						<instance name="ability_frame_triple" slot="3" slot_a="5" slot_b="6" slot_c="7"/>
+						<instance name="ability_frame_double" slot="3" slot_a="5" slot_b="6" />
+
+					</panel>
+
+				</panel>
+
+			</panel>
+
+
+			<!-- OptiUI: Container panel for left side elements -->
+			<panel x="0.0h" y="0.0h" width="21.2h" height="10.1h" align="left" valign="bottom" color="black" >
+				<!-- Portrait -->
+				<panel x="0h" y="0h" width="8.0h" height="8.0h" valign="bottom" align="right" color="black">
+					<image name="game_center_portrait_icon" width="90%" height="90@" align="center" valign="center"
+						onmouseldownlua="PlaySound('/shared/sounds/ui/center_view.wav') Action('PortraitCenter', 1.0)"
+						onmouseluplua="Action('PortraitCenter', 0.0)"
+						onmouseoverlua="GetWidget('unit_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('unit_tooltip', 'game'):SetVisible(0)"
+					/>
+					<!-- UIScript -->
+					<button name="game_center_portrait_button"
+						color="invisible"
+						onclick="SelectUnit(ActiveIndex);"
+						interactive="false"
+					/>
+
+					<!-- UIScript -->
+					<modelpanel
+						noclick="true"
+						model="common/models/lvlup/lvlup.mdf"
+						anim="idle"
+						effect="common/models/lvlup/lvlup.effect"
+						camerapos="0 1 0"
+						cameraangles="0 0 180"
+						cameranear="-20"
+						camerafar="100"
+						camerafov="19.5"
+						depthclear="false"
+						depthcompress="true"
+						visible="false"
+						watch="EventActiveLevelup"
+						ontrigger="SetVisible(true); SetAnim('idle'); SetEffect('/ui/common/models/lvlup/lvlup.effect'); SleepWidget(1000, 'SetVisible(false);');"
+					/>
+
+					<!-- OptiUI: Made levelup portrait glow a texture instead of a model -->
+					<panel name="game_center_portrait_glow" noclick="1" visible="0"
+						x="0"
+						y="0"
+						color="1 1 1 0.6"
+						texture="/ui/legion/optiui_lvl_up_glow.tga"
+						rendermode="additive"
+					>
+					</panel>
+
+					<!-- OptiUI: Player color frame -->
+					<frame name="game_center_portrait_frame" borderthickness="5%" bordercolor="black" color="invisible" noclick="1"/>
+					<!-- OptiUI: and Level Indicator -->
+					<panel name="game_center_level_backer" x="-5%" y="5%" height="20%" width="20%" valign="top" align="right" color="invisible" passivechildren="true"
+						onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)"
+					>
+						<label name="game_center_level_label" width="100%" height="100%" align="center" valign="center" textalign="center" textvalign="center" font="dyn_10" color="yellow" shadow="true" />
+					</panel>
+
+					<!-- Primary Icon -->
+					<panel
+						x="0h"
+						y="0h"
+						height="30%"
+						width="30%"
+						align="left"
+						valign="bottom"
+						color="invisible"
+						onmouseoverlua="GetWidget('attribute2_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('attribute2_tooltip', 'game'):SetVisible(0)"
+						passivechildren="true"
+					>
+						<image watch="ActiveAttributeInfo" ontriggerlua="self:SetTexture('/ui/common/optiui_primary_' .. param11 .. '.tga');" rendermode="normal" />
+					</panel>
+
+					<!-- primary icon cover, we use this so the below mouseover/out works nicely when swapping between things -->
+					<image
+						x="0h"
+						y="0h"
+						height="30%"
+						width="30%"
+						align="left"
+						valign="bottom"
+						color="invisible"
+						passivechildren="true"
+						watch="ActiveAttributeInfo"
+						ontriggerlua="
+							self:SetVisible(param11 == 'none')
+						"
+						texture="/ui/common/optiui_primary_none.tga"
+					/>
+
+					<!-- Alt Courier Button -->
+					<panel
+						x="0h"
+						y="0h"
+						height="30%"
+						width="30%"
+						align="left"
+						valign="bottom"
+						watch="AltCourierAccess"
+						ontriggerlua="self:SetVisible(AtoB(param1))"
+					>
+						<button
+							texture="/ui/common/optiui_alt_courier.tga"
+							onmouseoverlua="GetWidget('alt_courier_select_tip', 'game'):SetVisible(1)"
+							onmouseoutlua="GetWidget('alt_courier_select_tip', 'game'):SetVisible(0)"
+							onclicklua="GetWidget('altcourier_select', 'game'):SetVisible(1)"
+							interactive="false"
+							enabled="true"
+						/>
+						<animatedimage onshow="StartAnim();" x="-2%" height="42@" width="42%" valign="center" align="center" fps="30" loop="true" texture="common/alt_courier/AltCourier.tga" noclick="true" />
+					</panel>
+
+					<!-- Alt Courier Lock -->
+					<panel
+						x="0h"
+						y="0h"
+						height="30%"
+						width="30%"
+						align="right"
+						valign="bottom"
+						watch="AltCourierAccess"
+						ontriggerlua="self:SetVisible(AtoB(param3) and AtoB(param4))"
+					>
+						<!-- UIScript -->
+						<button
+							color="invisible"
+							onmouseoverlua="
+								if (self:GetButtonState() == 0) then
+									GetWidget('alt_courier_lock_tip', 'game'):SetVisible(1)
+								else
+									GetWidget('alt_courier_unlock_tip', 'game'):SetVisible(1)
+								end
+							"
+							onmouseoutlua="
+								GetWidget('alt_courier_unlock_tip', 'game'):SetVisible(0)
+								GetWidget('alt_courier_lock_tip', 'game'):SetVisible(0)
+							"
+							onclick="
+								RequestToggleDynamicAvatarLock();
+							"
+							interactive="false"
+							enabled="true"
+							numstates="2"
+							watch="AltCourierAccess"
+							ontriggerlua="	if (AtoB(param2)) then
+												self:SetButtonState(1)
+											else
+												self:SetButtonState(0)
+											end
+										"
+						>
+							<widgetstate statename="up">
+								<image texture="/ui/common/optiui_alt_courier_unlock_up.tga" noclick="true" />
+								<image texture="/ui/common/courier_unlock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
+							</widgetstate>
+							<widgetstate statename="over">
+								<image texture="/ui/common/optiui_alt_courier_unlock_over.tga" noclick="true" />
+								<image texture="/ui/common/courier_unlock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
+							</widgetstate>
+							<widgetstate statename="down">
+								<image texture="/ui/common/optiui_alt_courier_unlock_down.tga" noclick="true" />
+								<image texture="/ui/common/courier_unlock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
+							</widgetstate>
+							<widgetstate statename="up2">
+								<image texture="/ui/common/optiui_alt_courier_lock_up.tga" noclick="true" />
+								<image texture="/ui/common/courier_lock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
+							</widgetstate>
+							<widgetstate statename="over2">
+								<image texture="/ui/common/optiui_alt_courier_lock_over.tga" noclick="true" />
+								<image texture="/ui/common/courier_lock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
+							</widgetstate>
+							<widgetstate statename="down2">
+								<image texture="/ui/common/optiui_alt_courier_lock_down.tga" noclick="true" />
+								<image texture="/ui/common/courier_lock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
+							</widgetstate>
+						</button>
+					</panel>
+				</panel>
+
+
+				<!-- Detail Stats -->
+				<!-- OptiUI: Made panels smaller to add a little more information to the UI -->
+				<panel x="0h" y="0h" width="13.0h" height="8.0h" align="left" valign="bottom" color="invisible" noclick="1">
+					<!-- Damage -->
+					<!-- OptiUI: Added attack cooldown value -->
+					<panel name="game_center_damage" y="-6.5h" height="1.5h" valign="bottom" color="1 0 0 0.15" onmouseoverlua="GetWidget('attack_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attack_tooltip', 'game'):SetVisible(0)" passivechildren="true">
+						<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/damage_icon.tga"/>
+						<label name="game_center_damage_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
+						<label width="-2.0h" height="100%" align="right" font="dyn_9" color="gray" outline="1" textalign="right" textvalign="top"
+							watch="ActiveAttackCooldown"
+							ontriggerlua="self:SetText(' ' .. round(param1/1000,2) .. 's ')"
+		 				/>
+					</panel>
+					<!-- Movement Speed -->
+					<panel y="-4.7h" height="1.5h" valign="bottom" color="0 1 0 0.15" onmouseoverlua="GetWidget('movement_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('movement_tooltip', 'game'):SetVisible(0)" passivechildren="true">
+						<image width="1.5h" height="1.5h" texture="/ui/common/move_speed_icon.tga"/>
+						<label name="game_center_speed_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
+					</panel>
+					<!-- Armor -->
+					<panel y="-1.8h" height="2.5h" valign="bottom" color="1 0 0 0.15" onmouseoverlua="GetWidget('defense_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('defense_tooltip', 'game'):SetVisible(0)" passivechildren="true">
+						<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/armor_icon.tga"/>
+						<label name="game_center_armor_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top"/>
+						<!-- OptiUI: Added physical and magic armor reduction values. Idea taken from xUI -->
+						<label name="game_center_damage_mitigation_label" width="-2.0h" height="100%" align="right" font="dyn_8" color="gray" outline="1" textalign="left" textvalign="bottom"/>
+					</panel>
+					<!-- Attributes -->
+					<panel name="game_center_att_parent" y="0h" height="1.5h" valign="bottom" color="0 1 0 0.15" onmouseoverlua="GetWidget('attribute_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attribute_tooltip', 'game'):SetVisible(0)" passivechildren="true">
+						<image width="1.5h" height="1.5h" texture="/ui/common/plus_icon.tga"/>
+						<label name="game_center_att_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
+					</panel>
+				</panel>
+
+
+				<!-- Hero Name -->
+				<panel x="0h" y="0h" width="19.0h" height="1.9h" align="left" valign="top" color="black" noclick="false" passivechildren="true"
+						onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)"
+					>
+					<!-- OptiUI: Experience and lifetime bars in the Hero Name panel -->
+					<panel name="game_center_exp_bar_parent" visible="true" noclick="true" passivechildren="true">
+						<panel name="game_center_exp_bar_backer" visible="false" noclick="true" passivechildren="true" >
+							<panel color="0.1 0 0.3 1" noclick="1"/>
+							<panel name="game_center_exp_bar" color="0.7 0 1 1" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" noclick="1" uspeed="-.2">
+								<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
+								<panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/>
+								<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+								<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
+							</panel>
+							<label name="game_center_exp_bar_label" x="-0.5h" width="100%" height="100%" textalign="right" textvalign="center" font="dyn_9" color="white" outline="true" noclick="1"/>
+						</panel>
+					</panel>
+					<panel name="game_center_life_bar_backer" visible="false" noclick="true" passivechildren="true" >
+						<panel color="0.2 0.2 0.1 1" noclick="1"/>
+						<panel name="game_center_life_bar" color="#e5df2f" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" noclick="1" uspeed="-.2">
+							<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
+							<panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/>
+							<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+							<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
+						</panel>
+						<label name="game_center_life_bar_label" x="-0.5h" width="100%" height="100%" textalign="right" textvalign="center" font="dyn_9" color="white" outline="true" noclick="1" />
+					</panel>
+					<label name="game_center_name_label" x="0.5h" width="100%" height="100%" font="dyn_10" color="white" textalign="left" textvalign="bottom" outline="1" />
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
+				</panel>
+
+
+				<!-- Ability Selection Toggle -->
+				<panel x="0h" y="0h" width="1.9h" height="1.9h" align="right" valign="top">
+					<panel x="0h" y="0h" width="1.9h" height="1.9h" color="black">
+						<button
+							x="0h" y="0"
+							align="center"
+							valign="center"
+							width="1.4h"
+							height="1.4h"
+							color="invisible"
+							numstates="2"
+							cvar="cg_displayLevelup"
+							onclicklua="PlaySound('/shared/sounds/ui/popup.wav')"
+							interactive="false"
+						>
+
+							<widgetstate statename="up">
+								<image texture="/ui/common/ability_toggle_up.tga" />
+							</widgetstate>
+							<widgetstate statename="over">
+								<image texture="/ui/common/ability_toggle_up_over.tga" />
+							</widgetstate>
+							<widgetstate statename="down">
+								<image y="1" x="1" texture="/ui/common/ability_toggle_up_over.tga" />
+							</widgetstate>
+
+							<widgetstate statename="up2">
+								<image texture="/ui/common/ability_toggle_down.tga" />
+							</widgetstate>
+							<widgetstate statename="over2">
+								<image texture="/ui/common/ability_toggle_down_over.tga" />
+							</widgetstate>
+							<widgetstate statename="down2">
+								<image y="1" x="1" texture="/ui/common/ability_toggle_down_over.tga" />
+							</widgetstate>
+						</button>
+					</panel>
+					<panel x="0h" y="0h" width="1.9h" height="1.9h" color="black" watch="ActiveLevel" ontriggerlua="self:SetVisible(tonumber(param1) > 0);">
+						<label x="0h" y="0h" width="100%" height="100%" textalign="center" textvalign="center" font="dyn_10" watch="ActiveLevel" color="yellow" shadow="true" ontriggerlua="self:SetText(param1);" noclick="true"/>
+					</panel>
+					<image texture="/ui/common/optiui_ability_toggle.tga" noclick="1" />
+				</panel>
+			</panel>
+
+
+			<!-- Shop Indicator -->
+			<panel name="item_shop_sign" visible="true" x="0.0h" y="0.0h" width="4.5h" height="4.5h" valign="bottom" align="right" color="0 0 0 0.5" >
+				<!-- <image texture="/ui/common/item_shop_sign.tga" noclick="1" /> -->
+				<image height="4.5h" width="4.5h" y="0h" valign="top" align="center" texture="common/optiui_sign.tga" />
+				<!-- UIScript -->
+				<button
+					color="invisible"
+					onmouseoverlua="GetWidget('shop_tooltip', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('shop_tooltip', 'game'):SetVisible(0)"
+					onclick="PlaySound('/shared/sounds/ui/shop.wav'); If(ItemCursorVisible and PlayerCanShop, Sell(), ToggleShop());"
+					interactive="false"
+				/>
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+			</panel>
+
+
+			<!-- Backpack -->
+			<frame x="0.0h" y="0.0h" width="16.0h" height="10.1h" noclick="1" align="right" valign="bottom" color="black" bordercolor="gray" borderthickness="0">
+				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h">
+						<instance name="inventory_button" slot="36"/>
+					</panel>
+				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" align="center">
+						<instance name="inventory_button" slot="37"/>
+					</panel>
+				<panel x="-0.0h" y="0.0h" width="4.9h" height="4.9h" align="right">
+						<instance name="inventory_button" slot="38"/>
+					</panel>
+
+				<panel x="0.0h" y="-0.0h" width="4.9h" height="4.9h" valign="bottom">
+						<instance name="inventory_button" slot="39"/>
+					</panel>
+				<panel x="0.0h" y="-0.0h" width="4.9h" height="4.9h" valign="bottom" align="center">
+						<instance name="inventory_button" slot="40"/>
+					</panel>
+				<panel x="-0.0h" y="-0.0h" width="4.9h" height="4.9h" valign="bottom" align="right">
+						<instance name="inventory_button" slot="41"/>
+				</panel>
+			</frame>
+
+			<!-- Inventory Cover -->
+			<panel x="0.0h" y="0.0h" width="16.0h" height="10.1h" align="right" valign="bottom" color="black" noclick="true" watch="ActiveHasInventory" ontriggerlua="self:SetVisible(not AtoB(param))">
+				<image width="20.2h" texture="/ui/common/optiui_inventory_cover.tga" noclick="true"/>
+				<!-- <panel width="54%" height="70%" /> -->
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="0" />
+			</panel>
+
+			<!-- Inventory -->
+			<panel name="inventory" x="0.0h" y="0.0h" width="16.0h" height="13.4h" align="right" valign="bottom" color="invisible" noclick="1">
+				<!-- Gold Amt / Shop Button -->
+				<panel name="shop_button" width="8.4h" height="2.8h" color="0 0 0 0.5">
+					<!-- UIScript -->
+					<image height="2.2h" width="2.2h" y="0.0h" x="0.0h" valign="bottom" align="left" texture="common/optiui_gold.tga" noclick="true" />
+					<!-- <animatedimage watch="EventPlayerGold" ontrigger="StartAnim();" name="animated_gold"  onshow="StartAnim();" height="6h" width="3h" y="13.3h" x="21.2h" valign="top" align="center" fps="30" loop="true" startframe="5" numframes="-1" loopbackframe="-1" texture="common/gold/gold.tga" noclick="true" /> -->
+					<label name="game_center_gold_label" y="0.0h" x="2.3h" height="100%" align="left" textalign="left" textvalign="bottom" font="dyn_10" color="white" outline="1" noclick="true" />
+					<!-- UIScript -->
+					<button
+						color="invisible"
+						onmouseoverlua="GetWidget('shop_tooltip_gold_report', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('shop_tooltip_gold_report', 'game'):SetVisible(0)"
+						onclick="PlaySound('/shared/sounds/ui/shop.wav'); If(ItemCursorVisible and PlayerCanShop, Sell(), ToggleShop());"
+						interactive="false"
+					/>
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
+				</panel>
+
+
+				<!-- Gold Report -->
+				<floater name="shop_tooltip_gold_report" height="14h" width="38h" x="-4h" y="1.5h" align="left" valign="bottom" color="invisible" noclick="true" visible="false" onload="ForceToFront();">
+					<panel growinvis="false" color="0 0 0 .6" noclick="true">
+						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" noclick="false"/>
+						<panel valign="center" padding="1%" vpadding="1%">
+							<panel valign="center" height="100%" width="100%" >
+								<label x="0.75h" y="0.75h" font="dyn_10" content="" color=".8 .6 .0 1" outline="true" outlineoffset="1" outlinecolor="0 0 0 1" textalign="left" textvalign="center" align="left" valign="center"
+								onloadlua="self:SetText(Translate('game_gold_report'));"/>
+							</panel>
+							<panel valign="center" height="100%" width="100%" >
+								<label x="-0.25h" y="0.75h" font="dyn_10" content="" color=".8 .6 .0 1" outline="true" outlineoffset="1" outlinecolor="0 0 0 1" textalign="right" textvalign="center" align="right" valign="center" watch="GoldReport"
+								ontriggerlua="self:SetText(FormatStringNewline( '^870' .. param0 .. '\\n^870' .. param1 .. '\\n^870' .. param2 .. '\\n^870' .. param4 .. '\\n^r' .. param3 .. '\\n^v' .. param5 .. '\\n^v' .. param6 .. '\\n^w' .. param7 .. '\\n' ))"
+								onloadlua="self:SetText(FormatStringNewline( '^8700\\n ^8700\\n ^8700\\n ^8700\\n ^r0\\n ^v0\\n ^v0\\n ^w0\\n'))"/>
+							</panel>
+						</panel>
+					</panel>
+				</floater>
+
+				<instance name="simple_tooltip" tip_id="shop_tooltip" x="-4.2h" y="-3.8h" width="13.0h" height="2.8h" color="1 1 1 1" align="left" label="game_button_open_close_shop" visible="0"/>
+			</panel>
+
+		</panel>
 
 		<!-- Level Up Buttons -->
 		<!-- OptiUI: Moved ability level up button holder below everything else -->
-		<frame name="game_center_levelup_btn_holder" x="3.4h" y="-11.6h" width="22.0h" height="4.4h" align="center" valign="bottom" borderthickness="1" bordercolor="gray" color="0 0 0 0.3" noclick="1" >
+		<frame name="game_center_levelup_btn_holder" x="2.6h" y="-11.0h" width="22.0h" height="4.4h" align="center" valign="bottom" borderthickness="1" bordercolor="gray" color="0 0 0 0.5" noclick="1" >
 			<panel y="0h" x="-8.8h" height="4.4h" width="4.4h" align="center">
 				<panel valign="center" align="center" height="85%" width="85@">
 					<instance name="ability_button_lvlup" slot="0"/>
@@ -3361,458 +3776,11 @@
 				</panel>
 			</panel>
 
-			<!-- Popup Gears L/R -->
-			<!-- <image x="-3.3h" y="1.75h" width="3.9h" height="3.9h" texture="/ui/common/pop_up_gear.tga" noclick="true" rotation="180" /> -->
-			<!-- <image x="42.0h" y="1.75h" width="3.9h" height="3.9h" texture="/ui/common/pop_up_gear.tga" noclick="true" /> -->
-
 		</frame>
 		
-		<!-- OptiUI: Container panel for left side elements -->
-		<panel x="-24.2h" y="-0.5h" width="21.2h" height="10.1h" align="center" valign="bottom" color="black" >
-			<!-- Portrait -->
-			<panel x="0h" y="0h" width="8.0h" height="8.0h" valign="bottom" align="right" color="black">
-				<image name="game_center_portrait_icon" width="90%" height="90@" align="center" valign="center"
-					onmouseldownlua="PlaySound('/shared/sounds/ui/center_view.wav') Action('PortraitCenter', 1.0)"
-					onmouseluplua="Action('PortraitCenter', 0.0)"
-					onmouseoverlua="GetWidget('unit_tooltip', 'game'):SetVisible(1)"
-					onmouseoutlua="GetWidget('unit_tooltip', 'game'):SetVisible(0)"
-				/>
-				<!-- UIScript -->
-				<button name="game_center_portrait_button"
-					color="invisible"
-					onclick="SelectUnit(ActiveIndex);"
-					interactive="false"
-				/>
-				<!-- OptiUI: Removed Hero model in the bottom center section. -->
-				<!-- <panel color="black" noclick="1" />  -->
-				<!-- <modelpanel name="game_center_portrait_model"
-					visible="1"
-					noclick="true"
-					model=""
-					anim="portrait"
-					camerapos="0 1 26"
-					cameraangles="0 0 200"
-					camerafov="25"
-					cameranear="1"
-					carmerafar="100"
-					depthclear="false"
-					depthcompress="true"
-					sunazimuth="120"
-					sunaltitude="50"
-					suncolor="0.9 0.9 0.9"
-					ambientcolor="0.6 0.7 0.7"
-					onshow="SetAnim('portrait');"
-					lookupresource="true"
-				/> -->
-
-				<!-- UIScript -->
-				<modelpanel
-					noclick="true"
-					model="common/models/lvlup/lvlup.mdf"
-					anim="idle"
-					effect="common/models/lvlup/lvlup.effect"
-					camerapos="0 1 0"
-					cameraangles="0 0 180"
-					cameranear="-20"
-					camerafar="100"
-					camerafov="19.5"
-					depthclear="false"
-					depthcompress="true"
-					visible="false"
-					watch="EventActiveLevelup"
-					ontrigger="SetVisible(true); SetAnim('idle'); SetEffect('/ui/common/models/lvlup/lvlup.effect'); SleepWidget(1000, 'SetVisible(false);');"
-				/>
-
-				<!-- <image texture="/ui/common/portrait_gloss_up.tga" color="1 1 1 .8" rendermode="additive" noclick="true" /> -->
-				<!-- OptiUI: Made levelup portrait glow a texture instead of a model -->
-				<panel name="game_center_portrait_glow" noclick="1" visible="0"
-					x="0"
-					y="0"
-					color="1 1 1 0.6"
-					texture="/ui/legion/optiui_lvl_up_glow.tga"
-					rendermode="additive"
-				>
-					<!-- <modelpanel
-						noclick="true"
-						model="effects/portrait_lvlup/portrait_emitter.mdf"
-						anim="idle"
-						effect="effects/portrait_lvlup/portrait_lvlup.effect"
-						camerapos="-1 10 0"
-						cameraangles="0 0 180"
-						camerafov="45"
-						cameranear="1"
-						camerafar="1000"
-						depthclear="false"
-						depthcompress="true"
-						onshow="SetEffect('/ui/effects/portrait_lvlup/portrait_lvlup.effect');"
-					/> -->
-				</panel>
-				<!-- OptiUI: Decorations -->
-				<!-- <frame borderthickness="6%" bordercolor="gray" color="invisible" noclick="1" /> -->
-				<!-- <frame height="32%" width="32%" valign="bottom" align="right" borderthickness="1" bordercolor="gray" passivechildren="true"/> -->
-				<!-- OptiUI: Player color frame -->
-				<frame name="game_center_portrait_frame" borderthickness="5%" bordercolor="black" color="invisible" noclick="1"/>
-				<!-- OptiUI: and Level Indicator -->
-				<panel name="game_center_level_backer" x="-5%" y="5%" height="20%" width="20%" valign="top" align="right" color="invisible" passivechildren="true"
-					onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)"
-					onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)"
-				>
-					<label name="game_center_level_label" width="100%" height="100%" align="center" valign="center" textalign="center" textvalign="center" font="dyn_10" color="yellow" shadow="true" />
-				</panel>
-
-				<!-- Primary Icon -->
-				<panel
-					x="0h"
-					y="0h"
-					height="30%"
-					width="30%"
-					align="left"
-					valign="bottom"
-					color="invisible"
-					onmouseoverlua="GetWidget('attribute2_tooltip', 'game'):SetVisible(1)"
-					onmouseoutlua="GetWidget('attribute2_tooltip', 'game'):SetVisible(0)"
-					passivechildren="true"
-				>
-					<image watch="ActiveAttributeInfo" ontriggerlua="self:SetTexture('/ui/common/optiui_primary_' .. param11 .. '.tga');" rendermode="normal" />
-				</panel>
-
-				<!-- primary icon cover, we use this so the below mouseover/out works nicely when swapping between things -->
-				<image
-					x="0h"
-					y="0h"
-					height="30%"
-					width="30%"
-					align="left"
-					valign="bottom"
-					color="invisible"
-					passivechildren="true"
-					watch="ActiveAttributeInfo"
-					ontriggerlua="
-						self:SetVisible(param11 == 'none')
-					"
-					texture="/ui/common/optiui_primary_none.tga"
-				/>
-
-				<!-- Alt Courier Button -->
-				<panel
-					x="0h"
-					y="0h"
-					height="30%"
-					width="30%"
-					align="left"
-					valign="bottom"
-					watch="AltCourierAccess"
-					ontriggerlua="self:SetVisible(AtoB(param1))"
-				>
-					<button
-						texture="/ui/common/optiui_alt_courier.tga"
-						onmouseoverlua="GetWidget('alt_courier_select_tip', 'game'):SetVisible(1)"
-						onmouseoutlua="GetWidget('alt_courier_select_tip', 'game'):SetVisible(0)"
-						onclicklua="GetWidget('altcourier_select', 'game'):SetVisible(1)"
-						interactive="false"
-						enabled="true"
-					/>
-					<animatedimage onshow="StartAnim();" x="-2%" height="42@" width="42%" valign="center" align="center" fps="30" loop="true" texture="common/alt_courier/AltCourier.tga" noclick="true" />
-				</panel>
-
-				<!-- Alt Courier Lock -->
-				<panel
-					x="0h"
-					y="0h"
-					height="30%"
-					width="30%"
-					align="right"
-					valign="bottom"
-					watch="AltCourierAccess"
-					ontriggerlua="self:SetVisible(AtoB(param3) and AtoB(param4))"
-				>
-					<!-- UIScript -->
-					<button
-						color="invisible"
-						onmouseoverlua="
-							if (self:GetButtonState() == 0) then
-								GetWidget('alt_courier_lock_tip', 'game'):SetVisible(1)
-							else
-								GetWidget('alt_courier_unlock_tip', 'game'):SetVisible(1)
-							end
-						"
-						onmouseoutlua="
-							GetWidget('alt_courier_unlock_tip', 'game'):SetVisible(0)
-							GetWidget('alt_courier_lock_tip', 'game'):SetVisible(0)
-						"
-						onclick="
-							RequestToggleDynamicAvatarLock();
-						"
-						interactive="false"
-						enabled="true"
-						numstates="2"
-						watch="AltCourierAccess"
-						ontriggerlua="	if (AtoB(param2)) then
-											self:SetButtonState(1)
-										else
-											self:SetButtonState(0)
-										end
-									"
-					>
-						<widgetstate statename="up">
-							<image texture="/ui/common/optiui_alt_courier_unlock_up.tga" noclick="true" />
-							<image texture="/ui/common/courier_unlock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-						</widgetstate>
-						<widgetstate statename="over">
-							<image texture="/ui/common/optiui_alt_courier_unlock_over.tga" noclick="true" />
-							<image texture="/ui/common/courier_unlock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-						</widgetstate>
-						<widgetstate statename="down">
-							<image texture="/ui/common/optiui_alt_courier_unlock_down.tga" noclick="true" />
-							<image texture="/ui/common/courier_unlock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-						</widgetstate>
-						<widgetstate statename="up2">
-							<image texture="/ui/common/optiui_alt_courier_lock_up.tga" noclick="true" />
-							<image texture="/ui/common/courier_lock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-						</widgetstate>
-						<widgetstate statename="over2">
-							<image texture="/ui/common/optiui_alt_courier_lock_over.tga" noclick="true" />
-							<image texture="/ui/common/courier_lock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-						</widgetstate>
-						<widgetstate statename="down2">
-							<image texture="/ui/common/optiui_alt_courier_lock_down.tga" noclick="true" />
-							<image texture="/ui/common/courier_lock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-						</widgetstate>
-					</button>
-				</panel>
-
-			</panel>
-
-			<!-- Detail Stats -->
-			<!-- OptiUI: Made panels smaller to add a little more information to the UI -->
-			<panel x="0h" y="0h" width="13.0h" height="8.0h" align="left" valign="bottom" color="invisible" noclick="1">
-				<!-- Damage -->
-				<!-- OptiUI: Added attack cooldown value -->
-				<panel name="game_center_damage" y="-6.5h" height="1.5h" valign="bottom" color="1 0 0 0.15" onmouseoverlua="GetWidget('attack_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attack_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/damage_icon.tga"/>
-					<label name="game_center_damage_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
-					<label width="-2.0h" height="100%" align="right" font="dyn_9" color="gray" outline="1" textalign="right" textvalign="top"
-						watch="ActiveAttackCooldown"
-						ontriggerlua="self:SetText(' ' .. round(param1/1000,2) .. 's ')"
-	 				/>
-				</panel>
-				<!-- Movement Speed -->
-				<panel y="-4.7h" height="1.5h" valign="bottom" color="0 1 0 0.15" onmouseoverlua="GetWidget('movement_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('movement_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-					<image width="1.5h" height="1.5h" texture="/ui/common/move_speed_icon.tga"/>
-					<label name="game_center_speed_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
-				</panel>
-				<!-- Armor -->
-				<panel y="-1.8h" height="2.5h" valign="bottom" color="1 0 0 0.15" onmouseoverlua="GetWidget('defense_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('defense_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/armor_icon.tga"/>
-					<label name="game_center_armor_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top"/>
-					<!-- OptiUI: Added physical and magic armor reduction values. Idea taken from xUI -->
-					<label name="game_center_damage_mitigation_label" width="-2.0h" height="100%" align="right" font="dyn_8" color="gray" outline="1" textalign="left" textvalign="bottom"/>
-				</panel>
-				<!-- Attributes -->
-				<panel name="game_center_att_parent" y="0h" height="1.5h" valign="bottom" color="0 1 0 0.15" onmouseoverlua="GetWidget('attribute_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attribute_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-					<image width="1.5h" height="1.5h" texture="/ui/common/plus_icon.tga"/>
-					<label name="game_center_att_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
-				</panel>
-			</panel>
-
-			<!-- Hero Name -->
-			<panel x="0h" y="0h" width="19.0h" height="1.9h" align="left" valign="top" color="0 0 0 1" noclick="false" passivechildren="true"
-					onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)"
-					onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)"
-				>
-				<!-- OptiUI: Experience and lifetime bars in the Hero Name panel -->
-				<panel name="game_center_exp_bar_parent" visible="true" noclick="true" passivechildren="true">
-					<panel name="game_center_exp_bar_backer" visible="false" noclick="true" passivechildren="true" >
-						<panel color="0.1 0 0.3 1" noclick="1"/>
-						<panel name="game_center_exp_bar" color="0.7 0 1 1" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" noclick="1" uspeed="-.2">
-							<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
-							<panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/>
-							<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
-							<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-						</panel>
-						<label name="game_center_exp_bar_label" x="-0.5h" width="100%" height="100%" textalign="right" textvalign="center" font="dyn_9" color="white" outline="true" noclick="1"/>
-					</panel>
-				</panel>
-				<panel name="game_center_life_bar_backer" visible="false" noclick="true" passivechildren="true" >
-					<panel color="0.2 0.2 0.1 1" noclick="1"/>
-					<panel name="game_center_life_bar" color="#e5df2f" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" noclick="1" uspeed="-.2">
-						<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
-						<panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/>
-						<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
-						<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-					</panel>
-					<label name="game_center_life_bar_label" x="-0.5h" width="100%" height="100%" textalign="right" textvalign="center" font="dyn_9" color="white" outline="true" noclick="1" />
-				</panel>
-				<label name="game_center_name_label" x="0.5h" width="100%" height="100%" font="dyn_10" color="white" textalign="left" textvalign="bottom" outline="1" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-			</panel>
-
-			<!-- Ability Selection Toggle -->
-			<panel x="0h" y="0h" width="1.9h" height="1.9h" align="right" valign="top">
-				<panel x="0h" y="0h" width="1.9h" height="1.9h" color="black">
-					<button
-						x="0h" y="0"
-						align="center"
-						valign="center"
-						width="1.4h"
-						height="1.4h"
-						color="invisible"
-						numstates="2"
-						cvar="cg_displayLevelup"
-						onclicklua="PlaySound('/shared/sounds/ui/popup.wav')"
-						interactive="false"
-					>
-
-						<widgetstate statename="up">
-							<image texture="/ui/common/ability_toggle_up.tga" />
-						</widgetstate>
-						<widgetstate statename="over">
-							<image texture="/ui/common/ability_toggle_up_over.tga" />
-						</widgetstate>
-						<widgetstate statename="down">
-							<image y="1" x="1" texture="/ui/common/ability_toggle_up_over.tga" />
-						</widgetstate>
-
-						<widgetstate statename="up2">
-							<image texture="/ui/common/ability_toggle_down.tga" />
-						</widgetstate>
-						<widgetstate statename="over2">
-							<image texture="/ui/common/ability_toggle_down_over.tga" />
-						</widgetstate>
-						<widgetstate statename="down2">
-							<image y="1" x="1" texture="/ui/common/ability_toggle_down_over.tga" />
-						</widgetstate>
-
-
-					</button>
-				</panel>
-				<panel x="0h" y="0h" width="1.9h" height="1.9h" color="black" watch="ActiveLevel" ontriggerlua="self:SetVisible(tonumber(param1) > 0);">
-					<label x="0h" y="0h" width="100%" height="100%" textalign="center" textvalign="center" font="dyn_10" watch="ActiveLevel" color="yellow" shadow="true" ontriggerlua="self:SetText(param1);" noclick="true"/>
-				</panel>
-				<image texture="/ui/common/optiui_ability_toggle.tga" noclick="1" />
-			</panel>
-
-		</panel>
-
-		<!-- OptiUI: Exp and Lifetime bars have been incorporated in the Hero Name panel -->
-		<!-- EXP / Lifetime Bar -->
-		<!-- <panel x="-20.1h" y="-0.3h" width="12.5h" height="12.5h" valign="bottom" align="center" color="invisible" noclick="1"> -->
-
-			<!-- exp bar section-->
-			<!-- <panel name="game_center_exp_bar_backer" visible="false" noclick="true" passivechildren="true">
-				<piegraph texture="/ui/common/exp_ring.tga" start="225" end="-49" square="1" color=".1 0 .3 1" value="1" noclick="true"/>
-				<piegraph name="game_center_exp_bar_ring" texture="/ui/common/exp_ring.tga" start="225" end="-49" square="1" color="0.7 0 1 1" value=".2" noclick="true"/>
-			</panel> -->
-
-			<!-- UIScript -->
-			<!-- <modelpanel
-				noclick="true"
-				model="common/models/lvlup/lvlup.mdf"
-				anim="idle"
-				effect="common/models/lvlup/lvlup.effect"
-				camerapos="0 1 0"
-				cameraangles="0 0 180"
-				cameranear="-20"
-				camerafar="100"
-				camerafov="19.5"
-				depthclear="false"
-				depthcompress="true"
-				visible="false"
-				watch="EventActiveLevelup"
-				ontrigger="SetVisible(true); SetAnim('idle'); SetEffect('/ui/common/models/lvlup/lvlup.effect'); SleepWidget(1000, 'SetVisible(false);');"
-			/> -->
-
-			<!-- lifetime bar section-->
-			<!-- <panel name="game_center_life_bar_backer" visible="false" noclick="true" passivechildren="true">
-				<piegraph texture="/ui/common/exp_ring.tga" start="225" end="-49" square="1" color=".2 .2 .1 1" value="1" noclick="true"/>
-				<piegraph name="game_center_life_bar_ring" texture="/ui/common/exp_ring.tga" start="225" end="-49" square="1" color="#e5df2f" value=".2" noclick="true"/>
-				<label name="game_center_life_bar_label" width="100%" height="100%" valign="center" textalign="center" textvalign="center" font="dyn_14" color="white" outline="true" shadowoffset="2" />
-			</panel> -->
-		<!-- </panel> -->
-
-		<!-- Detailed Stats Background -->
-		<!-- OptiUI: Removed background from selected controllable unit in bottom center -->
-		<!-- <panel x="-28.7h" y="4.7h" width="15.65h" height="15.65h" align="center" valign="bottom" color="1 1 1 1" float="bottom" padding="0.3h" texture="/ui/common/stat_background.tga" noclick="1"/> -->
-
-		<!-- Large Gear -->
-		<!-- OptiUI: Removed gear from main portrait -->
-		<!-- <image name="game_center_large_gear" x="-20.23h" y="5.3h" width="23.8h" height="23.8h" align="center" valign="bottom" texture="/ui/common/gear_large.tga" rotation="30" noclick="true"/> -->
-		<!-- <image name="game_center_large_gear" x="-20.23h" y="5.3h" width="23.8h" height="23.8h" align="center" valign="bottom" color="invisible" rotation="30" noclick="true"/> -->
-
-
-		<!-- OptiUI: Moved inside a left side holder panel -->
-		<!-- Detail Stats -->
-		<!-- <panel x="-28.2h" y="-1.0h" width="13.0h" height="8.0h" align="center" valign="bottom" color="invisible" float="bottom" padding="0.3h" noclick="1"> -->
-			<!-- Damage -->
-			<!-- OptiUI: Added attack cooldown value -->
-			<!-- <panel name="game_center_damage" y="-6.5h" height="1.5h" valign="bottom" color="1 0 0 0.1" onmouseoverlua="GetWidget('attack_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attack_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-				<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/damage_icon.tga"/>
-				<label name="game_center_damage_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
-				<label width="-2.0h" height="100%" align="right" font="dyn_9" color="gray" outline="1" textalign="right" textvalign="top"
-					watch="ActiveAttackCooldown"
-					ontriggerlua="self:SetText(' ' .. round(param1/1000,2) .. 's ')"
- 				/>
- 				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-			</panel> -->
-			<!-- Movement Speed -->
-			<!-- <panel height="1.5h" valign="bottom" color="0 1 0 0.1" onmouseoverlua="GetWidget('movement_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('movement_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-				<image width="1.5h" height="1.5h" texture="/ui/common/move_speed_icon.tga"/>
-				<label name="game_center_speed_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-			</panel> -->
-			<!-- Armor -->
-			<!-- <panel height="2.6h" valign="bottom" color="1 0 0 0.1" onmouseoverlua="GetWidget('defense_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('defense_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-				<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/armor_icon.tga"/>
-				<label name="game_center_armor_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top"/> -->
-				<!-- OptiUI: Added physical and magic armor reduction values. Idea taken from xUI -->
-				<!-- <label name="game_center_damage_mitigation_label" width="-2.0h" height="100%" align="right" font="dyn_8" color="gray" outline="1" textalign="left" textvalign="bottom"/>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-			</panel> -->
-			<!-- Attributes -->
-			<!-- <panel name="game_center_att_parent" x="0h" y="0h" height="1.5h" valign="bottom" color="0 1 0 0.1" onmouseoverlua="GetWidget('attribute_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attribute_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-				<image width="1.5h" height="1.5h" texture="/ui/common/plus_icon.tga"/>
-				<label name="game_center_att_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-			</panel> -->
-
-		<!-- </panel> -->
-
-		<!-- OptiUI: Moved inside a left side holder panel -->
-		<!-- Hero Name -->
-		<!-- <panel x="-25.1h" y="-9.1h" width="19.0h" height="1.9h" align="center" valign="bottom" color="0 0 0 1" noclick="false" passivechildren="true"
-				onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)"
-			> -->
-			<!-- OptiUI: Experience and lifetime bars in the Hero Name panel -->
-			<!-- <panel name="game_center_exp_bar_parent" visible="true" noclick="true" passivechildren="true">
-				<panel name="game_center_exp_bar_backer" visible="false" noclick="true" passivechildren="true" >
-					<panel color="0.1 0 0.3 1" noclick="1"/>
-					<panel name="game_center_exp_bar" color="0.7 0 1 1" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" noclick="1" uspeed="-.2">
-						<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
-						<panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/>
-						<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
-						<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-					</panel>
-					<label name="game_center_exp_bar_label" x="-0.5h" width="100%" height="100%" textalign="right" textvalign="center" font="dyn_9" color="white" outline="true" noclick="1"/>
-				</panel>
-			</panel>
-			<panel name="game_center_life_bar_backer" visible="false" noclick="true" passivechildren="true" >
-				<panel color="0.2 0.2 0.1 1" noclick="1"/>
-				<panel name="game_center_life_bar" color="#e5df2f" utile="true" vtile="true" texture="/ui/fe2/elements/bar_fog.tga" noclick="1" uspeed="-.2">
-					<panel color="1 1 1 .2" align="right" width=".2h" rendermode="additive"/>
-					<panel color="0 0 0 .5" align="right" width=".2h" x=".10h"/>
-					<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
-					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-				</panel>
-				<label name="game_center_life_bar_label" x="-0.5h" width="100%" height="100%" textalign="right" textvalign="center" font="dyn_9" color="white" outline="true" noclick="1" />
-			</panel>
-			<label name="game_center_name_label" x="0.5h" width="100%" height="100%" font="dyn_10" color="white" textalign="left" textvalign="bottom" outline="1" />
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-		</panel> -->
-
 		<!-- Error Messages -->
 		<textbuffer name="game_center_error_messages"
-			x="4.5h"
+			x="2.6h"
 			y="-18.0h"
 			width="63h"
 			height="7h"
@@ -3835,317 +3803,12 @@
 			maxlines="3"
 		/>
 
-		<!-- Shop Indicator -->
-		<panel name="item_shop_sign" visible="true" x="32.4h" y="3h" width="8h" height="16h" valign="bottom" align="center" >
-			<image texture="/ui/common/item_shop_sign.tga" noclick="1" />
-			<image height="4.5h" width="4.5h" y="1.3h" valign="top" align="center" texture="common/optiui_sign.tga" />
-			<!-- <animatedimage name="animated_shop_sign" onshow="StartAnim();" height="4.5h" width="4.5h" y="1.3h" valign="top" align="center" fps="25" loop="true" loopbackframe="-1" texture="common/sign/sign.tga" /> -->
-			<!-- UIScript -->
-			<button
-				color="invisible"
-				onmouseoverlua="GetWidget('shop_tooltip', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('shop_tooltip', 'game'):SetVisible(0)"
-				onclick="PlaySound('/shared/sounds/ui/shop.wav'); If(ItemCursorVisible and PlayerCanShop, Sell(), ToggleShop());"
-				interactive="false"
-			/>
-		</panel>
-
-		<!-- Inventory -->
-		<panel name="inventory" x="28.4h" y="-0.5h" width="16.0h" height="13.4h" align="center" valign="bottom" color="invisible" noclick="1">
-			<!-- Gold Amt / Shop Button -->
-			<panel name="shop_button" width="8.4h" height="2.8h" color="0 0 0 0.5">
-				<label name="game_center_gold_label" y="0.0h" x="2.3h" height="100%" align="left" textalign="left" textvalign="bottom" font="dyn_10" color="white" outline="1" />
-				<!-- UIScript -->
-				<button
-					color="invisible"
-					onmouseoverlua="GetWidget('shop_tooltip_gold_report', 'game'):SetVisible(1)"
-					onmouseoutlua="GetWidget('shop_tooltip_gold_report', 'game'):SetVisible(0)"
-					onclick="PlaySound('/shared/sounds/ui/shop.wav'); If(ItemCursorVisible and PlayerCanShop, Sell(), ToggleShop());"
-					interactive="false"
-				/>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-			</panel>
-
-
-			<!-- Gold Report -->
-			<floater name="shop_tooltip_gold_report" height="14h" width="38h" x="-4h" y="1.5h" align="left" valign="bottom" color="invisible" noclick="true" visible="false" onload="ForceToFront();">
-				<panel growinvis="false" color="0 0 0 .6" noclick="true">
-					<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" noclick="false"/>
-					<panel valign="center" padding="1%" vpadding="1%">
-						<panel valign="center" height="100%" width="100%" >
-							<label x="0.75h" y="0.75h" font="dyn_10" content="" color=".8 .6 .0 1" outline="true" outlineoffset="1" outlinecolor="0 0 0 1" textalign="left" textvalign="center" align="left" valign="center"
-							onloadlua="self:SetText(Translate('game_gold_report'));"/>
-						</panel>
-						<panel valign="center" height="100%" width="100%" >
-							<label x="-0.25h" y="0.75h" font="dyn_10" content="" color=".8 .6 .0 1" outline="true" outlineoffset="1" outlinecolor="0 0 0 1" textalign="right" textvalign="center" align="right" valign="center" watch="GoldReport"
-							ontriggerlua="self:SetText(FormatStringNewline( '^870' .. param0 .. '\\n^870' .. param1 .. '\\n^870' .. param2 .. '\\n^870' .. param4 .. '\\n^r' .. param3 .. '\\n^v' .. param5 .. '\\n^v' .. param6 .. '\\n^w' .. param7 .. '\\n' ))"
-							onloadlua="self:SetText(FormatStringNewline( '^8700\\n ^8700\\n ^8700\\n ^8700\\n ^r0\\n ^v0\\n ^v0\\n ^w0\\n'))"/>
-						</panel>
-					</panel>
-				</panel>
-			</floater>
-
-			<instance name="simple_tooltip" tip_id="shop_tooltip" x="-4.2h" y="-3.8h" width="13.0h" height="2.8h" color="1 1 1 1" align="left" label="game_button_open_close_shop" visible="0"/>
-		</panel>
-
-		<!-- Backpack -->
-		<frame x="28.4h" y="-0.5h" width="16.0h" height="10.1h" noclick="1" align="center" valign="bottom" color="black" bordercolor="gray" borderthickness="0">
-			<!-- <panel x="79h" y="3.7h" width="18h" height="12h" color="0 0 1 0.2" /> -->
-			<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h">
-					<instance name="inventory_button" slot="36"/>
-				</panel>
-			<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" align="center">
-					<instance name="inventory_button" slot="37"/>
-				</panel>
-			<panel x="-0.0h" y="0.0h" width="4.9h" height="4.9h" align="right">
-					<instance name="inventory_button" slot="38"/>
-				</panel>
-
-			<panel x="0.0h" y="-0.0h" width="4.9h" height="4.9h" valign="bottom">
-					<instance name="inventory_button" slot="39"/>
-				</panel>
-			<panel x="0.0h" y="-0.0h" width="4.9h" height="4.9h" valign="bottom" align="center">
-					<instance name="inventory_button" slot="40"/>
-				</panel>
-			<panel x="-0.0h" y="-0.0h" width="4.9h" height="4.9h" valign="bottom" align="right">
-					<instance name="inventory_button" slot="41"/>
-			</panel>
-		</frame>
-
-		<!-- Center Framing -->
-		<!-- <image height="50%" x="25%" align="right" width="25%" texture="/ui/common/bot_center_cap.tga" noclick="1" valign="bottom" /> -->
-		<!-- <image height="50%" x="-25%" align="left" width="25%" texture="/ui/common/bot_center_cap.tga" noclick="1" valign="bottom" /> -->
-		<!-- <image height="50%" texture="/ui/common/optiui_bot_center.tga" noclick="1" valign="bottom" /> -->
-
-		<!-- UIScript -->
-		<image height="6h" width="3h" y="13.8h" x="21.2h" valign="top" align="center" texture="common/optiui_gold.tga" noclick="true" />
-		<!-- <animatedimage watch="EventPlayerGold" ontrigger="StartAnim();" name="animated_gold"  onshow="StartAnim();" height="6h" width="3h" y="13.3h" x="21.2h" valign="top" align="center" fps="30" loop="true" startframe="5" numframes="-1" loopbackframe="-1" texture="common/gold/gold.tga" noclick="true" /> -->
-
-		<!-- Inventory Cover -->
-		<panel x="28.4h" y="-0.5h" width="16.0h" height="10.1h" align="center" valign="bottom" color="black" noclick="true" watch="ActiveHasInventory" ontriggerlua="self:SetVisible(not AtoB(param))">
-			<image width="20.2h" texture="/ui/common/optiui_inventory_cover.tga" noclick="true"/>
-			<!-- <panel width="54%" height="70%" /> -->
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="0" />
-		</panel>
-
-		<!-- Level Indicator-->
-		<!-- OptiUI: Level Indicator was moved into the hero portrait -->
-		<!-- <panel x="-17.4h" y="-10.6h" height="2.9h" width="2.9h" valign="bottom" align="center" color="invisible" passivechildren="true" onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)">
-			<label name="game_center_level_label" width="100%" height="100%" textalign="center" textvalign="center" font="dyn_12" color="yellow" shadow="true" />
-		</panel> -->
-
-		<!-- OptiUI: Moved inside hero portrait -->
-		<!-- Primary Icon -->
-		<!-- <panel
-			x="-20.0h"
-			y="-1.0h"
-			height="3.0h"
-			width="3.0h"
-			align="center"
-			valign="bottom"
-			color="invisible"
-			onmouseoverlua="GetWidget('attribute2_tooltip', 'game'):SetVisible(1)"
-			onmouseoutlua="GetWidget('attribute2_tooltip', 'game'):SetVisible(0)"
-			passivechildren="true"
-		>
-			<image watch="ActiveAttributeInfo" ontriggerlua="self:SetTexture('/ui/common/optiui_primary_' .. param11 .. '.tga');" rendermode="normal" />
-		</panel> -->
-
-		<!-- primary icon cover, we use this so the below mouseover/out works nicely when swapping between things -->
-		<!-- <image
-			x="-20.0h"
-			y="-1.0h"
-			height="3.0h"
-			width="3.0h"
-			align="center"
-			valign="bottom"
-			color="invisible"
-			passivechildren="true"
-			watch="ActiveAttributeInfo"
-			ontriggerlua="
-				self:SetVisible(param11 == 'none')
-			"
-			texture="/ui/common/optiui_primary_none.tga"
-		/> -->
-
-		<!-- Alt Courier Button -->
-		<!-- <panel
-			x="-20.0h"
-			y="-1.0h"
-			height="3.0h"
-			width="3.0h"
-			align="center"
-			valign="bottom"
-			watch="AltCourierAccess"
-			ontriggerlua="self:SetVisible(AtoB(param1))"
-		>
-			<button
-				texture="/ui/common/optiui_alt_courier.tga"
-				onmouseoverlua="GetWidget('alt_courier_select_tip', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('alt_courier_select_tip', 'game'):SetVisible(0)"
-				onclicklua="GetWidget('altcourier_select', 'game'):SetVisible(1)"
-				interactive="false"
-				enabled="true"
-			/>
-			<animatedimage onshow="StartAnim();" x="-2%" height="42@" width="42%" valign="center" align="center" fps="30" loop="true" texture="common/alt_courier/AltCourier.tga" noclick="true" />
-		</panel> -->
-
-		<!-- Alt Courier Lock -->
-		<!-- <panel
-			x="-15.0h"
-			y="-1.0h"
-			height="3.0h"
-			width="3.0h"
-			align="center"
-			valign="bottom"
-			watch="AltCourierAccess"
-			ontriggerlua="self:SetVisible(AtoB(param3) and AtoB(param4))"
-		> -->
-			<!-- UIScript -->
-			<!-- <button
-				color="invisible"
-				onmouseoverlua="
-					if (self:GetButtonState() == 0) then
-						GetWidget('alt_courier_lock_tip', 'game'):SetVisible(1)
-					else
-						GetWidget('alt_courier_unlock_tip', 'game'):SetVisible(1)
-					end
-				"
-				onmouseoutlua="
-					GetWidget('alt_courier_unlock_tip', 'game'):SetVisible(0)
-					GetWidget('alt_courier_lock_tip', 'game'):SetVisible(0)
-				"
-				onclick="
-					RequestToggleDynamicAvatarLock();
-				"
-				interactive="false"
-				enabled="true"
-				numstates="2"
-				watch="AltCourierAccess"
-				ontriggerlua="	if (AtoB(param2)) then
-									self:SetButtonState(1)
-								else
-									self:SetButtonState(0)
-								end
-							"
-			>
-				<widgetstate statename="up">
-					<image texture="/ui/common/optiui_alt_courier_unlock_up.tga" noclick="true" />
-					<image texture="/ui/common/courier_unlock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-				</widgetstate>
-				<widgetstate statename="over">
-					<image texture="/ui/common/optiui_alt_courier_unlock_over.tga" noclick="true" />
-					<image texture="/ui/common/courier_unlock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-				</widgetstate>
-				<widgetstate statename="down">
-					<image texture="/ui/common/optiui_alt_courier_unlock_down.tga" noclick="true" />
-					<image texture="/ui/common/courier_unlock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-				</widgetstate>
-				<widgetstate statename="up2">
-					<image texture="/ui/common/optiui_alt_courier_lock_up.tga" noclick="true" />
-					<image texture="/ui/common/courier_lock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-				</widgetstate>
-				<widgetstate statename="over2">
-					<image texture="/ui/common/optiui_alt_courier_lock_over.tga" noclick="true" />
-					<image texture="/ui/common/courier_lock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-				</widgetstate>
-				<widgetstate statename="down2">
-					<image texture="/ui/common/optiui_alt_courier_lock_down.tga" noclick="true" />
-					<image texture="/ui/common/courier_lock.tga" x="-0.1h" width="50@" height="50%" align="center" valign="center" noclick="true" />
-				</widgetstate>
-			</button>
-		</panel> -->
-
-		<!-- Abilities -->
-		<!-- OptiUI: Adjustments to ability buttons panel size -->
-		<panel x="3.4h" y="-0.5h" width="33.0h" height="5.5h" align="center" valign="bottom" noclick="1" color="invisible" >
-
-			<panel name="panel_abilities" align="center" padding="0" noclick="0">
-
-				<panel float="right" width="11.0h" height="5.5h" grow="1" regrow="1" growinvis="0" align="center" >
-					<instance name="ability_frame_single" slot="0"/>
-					<instance name="ability_frame_single_plus_one" slot="0" slot_a="0" slot_b="5"/>
-					<instance name="ability_frame_single_plus_two" slot="0" slot_a="0" slot_b="5" slot_c="6"/>
-					<instance name="ability_frame_triple" slot="0" slot_a="5" slot_b="6" slot_c="7"/>
-					<instance name="ability_frame_double" slot="0" slot_a="5" slot_b="6" />
-
-					<instance name="ability_frame_single" slot="1"/>
-					<instance name="ability_frame_single_plus_one" slot="1" slot_a="1" slot_b="5"/>
-					<instance name="ability_frame_single_plus_two" slot="1" slot_a="1" slot_b="5" slot_c="6"/>
-					<instance name="ability_frame_triple" slot="1" slot_a="5" slot_b="6" slot_c="7"/>
-					<instance name="ability_frame_double" slot="1" slot_a="5" slot_b="6" />
-
-					<instance name="ability_frame_single" slot="2"/>
-					<instance name="ability_frame_single_plus_one" slot="2" slot_a="2" slot_b="5"/>
-					<instance name="ability_frame_single_plus_two" slot="2" slot_a="2" slot_b="5" slot_c="6"/>
-					<instance name="ability_frame_triple" slot="2" slot_a="5" slot_b="6" slot_c="7"/>
-					<instance name="ability_frame_double" slot="2" slot_a="5" slot_b="6" />
-
-					<instance name="ability_frame_single" slot="3"/>
-					<instance name="ability_frame_single_plus_one" slot="3" slot_a="3" slot_b="5"/>
-					<instance name="ability_frame_single_plus_two" slot="3" slot_a="3" slot_b="5" slot_c="6"/>
-					<instance name="ability_frame_triple" slot="3" slot_a="5" slot_b="6" slot_c="7"/>
-					<instance name="ability_frame_double" slot="3" slot_a="5" slot_b="6" />
-
-				</panel>
-
-			</panel>
-
-		</panel>
-
-		<!-- OptiUI: Moved inside a left side holder panel -->
-		<!-- Ability Selection Toggle -->
-		<!-- <panel x="-14.5h" y="-9.1h" width="1.9h" height="1.9h" align="center" valign="bottom">
-			<panel x="0h" y="0h" width="2h" height="2h" color="black">
-				<button
-					x="0h" y="0"
-					align="center"
-					valign="center"
-					width="1.4h"
-					height="1.4h"
-					color="invisible"
-					numstates="2"
-					cvar="cg_displayLevelup"
-					onclicklua="PlaySound('/shared/sounds/ui/popup.wav')"
-					interactive="false"
-				>
-
-				<widgetstate statename="up">
-					<image texture="/ui/common/ability_toggle_up.tga"  />
-				</widgetstate>
-				<widgetstate statename="over">
-					<image texture="/ui/common/ability_toggle_up_over.tga" />
-				</widgetstate>
-				<widgetstate statename="down">
-					<image y="1" x="1" texture="/ui/common/ability_toggle_up_over.tga" />
-				</widgetstate>
-
-				<widgetstate statename="up2">
-					<image texture="/ui/common/ability_toggle_down.tga" />
-				</widgetstate>
-				<widgetstate statename="over2">
-					<image texture="/ui/common/ability_toggle_down_over.tga" />
-				</widgetstate>
-				<widgetstate statename="down2">
-					<image y="1" x="1" texture="/ui/common/ability_toggle_down_over.tga" />
-				</widgetstate>
-
-
-				</button>
-			</panel>
-			<panel x="0h" y="0h" width="2h" height="2h" color="black" watch="ActiveLevel" ontriggerlua="self:SetVisible(tonumber(param1) > 0);">
-				<label x="0h" y="0h" width="100%" height="100%" textalign="center" textvalign="center" font="dyn_10" watch="ActiveLevel" color="yellow" shadow="true" ontriggerlua="self:SetText(param1);" noclick="true"/>
-			</panel>
-			<image texture="/ui/common/optiui_ability_toggle.tga" noclick="1" />
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-		</panel> -->
-
 	</panel>
 	<!-- END BOTTOM CENTER -->
 
 	<!-- BOTTOM LEFT -->
 	<!-- Attack Modifiers -->
-	<panel name="attack_modifiers_left" group="game_attack_modifiers"  x="0.6h" y="-26.5h" width="23.0h" height="3.2h" align="left"  valign="bottom" float="right" padding="0.5h" color="invisible"  noclick="true" visible="1">
+	<panel name="attack_modifiers_left" group="game_attack_modifiers"  x="0.6h" y="-25.5h" width="23.0h" height="3.2h" align="left"  valign="bottom" float="right" padding="0.5h" color="invisible"  noclick="true" visible="1">
 		<instance name="attack_modifier" index="0"/>
 		<instance name="attack_modifier" index="1"/>
 		<instance name="attack_modifier" index="2"/>
@@ -4156,7 +3819,7 @@
 		<instance name="attack_modifier" index="7"/>
 	</panel>
 
-	<panel name="attack_modifiers_right"  group="game_attack_modifiers" x="-6.8h" y="-26.5h" width="23.0h"  height="3.2h" align="right" valign="bottom" float="right" padding="0.5h"  color="invisible" noclick="true" visible="0">
+	<panel name="attack_modifiers_right"  group="game_attack_modifiers" x="-6.8h" y="-25.5h" width="23.0h"  height="3.2h" align="right" valign="bottom" float="right" padding="0.5h"  color="invisible" noclick="true" visible="0">
 		<instance name="attack_modifier" index="7"/>
 		<instance name="attack_modifier" index="6"/>
 		<instance name="attack_modifier" index="5"/>
@@ -4196,7 +3859,6 @@
 			/>
 
 		</panel>
-		<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 	</panel>
 
 	<!-- Map Right (Alt View) -->
@@ -4372,38 +4034,38 @@
 	<panel name="selection_info_right" group="game_selection_info" visible="true" width="29.8h" height="29.8h" align="right" valign="bottom" color="invisible" noclick="1">
 		<!-- Unit Selected -->
 		<panel name="game_selected_info_orders" color="invisible" visible="1" noclick="1" height="50%" valign="bottom" watch="SelectedVisible0" ontriggerlua="self:SetVisible(not AtoB(param))">
-			<panel name="game_selected_info_orders_pos" noclick="1" >
+			<panel name="game_selected_info_orders_pos" y="-0.5h" width="16.0h" height="10.1h" align="center" valign="bottom" color="0 0 0 0.5" noclick="1" >
 				<!-- UIScript -->
-				<panel x="20.23%" y="28.52%" width="15.63%" height="31.25%">
+				<panel x="0.0" y="0.0" width="4.9h" height="4.9h">
 					<instance name="command_button" slot="1" texture="/shared/icons/move.tga" onclick="OrderMove();" trigger="CommandEnabledMove"/>
 				</panel>
 				<!-- UIScript -->
-				<panel x="38.89%" y="28.52%" width="15.63%" height="31.25%">
+				<panel x="0.0" y="0.0" width="4.9h" height="4.9h" align="center">
 					<instance name="command_button"  slot="2" texture="/shared/icons/attack.tga" onclick="OrderAttack();" trigger="CommandEnabledAttack"/>
 				</panel>
 				<!-- UIScript -->
-				<panel x="57.34%" y="28.52%" width="15.63%" height="31.25%">
+				<panel x="0.0" y="0.0" width="4.9h" height="4.9h" align="right">
 					<instance name="command_button"  slot="3" texture="/shared/icons/stop.tga" onclick="OrderStop();" trigger="CommandEnabledStop"/>
 				</panel>
 				<!-- UIScript -->
-				<panel x="20.23%" y="66.02%" width="15.63%" height="31.25%">
+				<panel x="0.0" y="0.0" width="4.9h" height="4.9h" valign="bottom">
 					<instance name="command_button" slot="4" texture="/shared/icons/hold.tga" onclick="OrderHold();" trigger="CommandEnabledHold"/>
 				</panel>
 
-				<panel x="38.89%" y="66.02%" width="15.63%" height="31.25%">
+				<panel x="0.0" y="0.0" width="4.9h" height="4.9h" valign="bottom" align="center">
 					<instance name="inventory_button" slot="33" simple_tooltip_interface="game_shop_shared"/>
 				</panel>
 
-				<panel x="57.34%" y="66.02%" width="15.63%" height="31.25%">
+				<panel x="0.0" y="0.0" width="4.9h" height="4.9h" valign="bottom" align="right">
 					<instance name="inventory_button" slot="8" simple_tooltip_interface="game_shop_shared"/>
 				</panel>
 			</panel>
 			<!-- Framing -->
 			<!-- OptiUI: Removed texture from framing of the move, taunt etc commands box -->
-<!-- 			<image name="game_botright_orders_right" texture="/ui/common/bot_right_orders.tga" noclick="1" visible="1" /> -->
-			<image name="game_botright_orders_right" noclick="1" visible="1" color="invisible"/>
-<!-- 			<image name="game_botright_orders_left" hflip="1" texture="/ui/common/bot_right_orders.tga" noclick="1" visible="0" /> -->
-			<image name="game_botright_orders_left" hflip="1" noclick="1" visible="0" color="invisible" />
+			<!-- <image name="game_botright_orders_right" texture="/ui/common/bot_right_orders.tga" noclick="1" visible="1" /> -->
+			<!-- <image name="game_botright_orders_right" noclick="1" visible="1" color="invisible"/> -->
+			<!-- <image name="game_botright_orders_left" hflip="1" texture="/ui/common/bot_right_orders.tga" noclick="1" visible="0" /> -->
+			<!-- <image name="game_botright_orders_left" hflip="1" noclick="1" visible="0" color="invisible" /> -->
 		</panel>
 
 
@@ -4588,13 +4250,13 @@
 
 		<!-- Info - Buildings -->
 		<!-- UIScript -->
-		<panel name="game_selected_info_building" visible="1" color="invisible" noclick="1" watch="SelectedVisible0 SelectedVisible1 SelectedType0" ontrigger="SetVisible(SelectedVisible0 and !SelectedVisible1 and StringEquals(SelectedType0, 'building'));">
+		<panel name="game_selected_info_building" width="24.0h" height="12.0h" align="right" valign="bottom" visible="1" color="invisible" noclick="1" watch="SelectedVisible0 SelectedVisible1 SelectedType0" ontrigger="SetVisible(SelectedVisible0 and !SelectedVisible1 and StringEquals(SelectedType0, 'building'));">
 
-			<panel name="game_selected_info_building_bg" width="24.0h" height="12.0h" align="right" valign="bottom" color="black"/>
+			<panel name="game_selected_info_building_bg" color="black"/>
 
 			<!-- Icon -->
-			<panel name="game_selected_info_building_icon" x="-17.1h" y="-4.8h" height="6.0h" width="6.0h" align="right" valign="bottom">
-				<image texture="/ui/legion/portrait_background.tga" color="1 1 1 1"/>
+			<panel name="game_selected_info_building_icon" x="0.0h" y="0.0h" height="6.5h" width="6.5h" align="right" valign="top">
+				<!-- <image texture="/ui/legion/portrait_background.tga" color="1 1 1 1"/> -->
 				<image name="game_botright_portrait_icon_1"
 					onmouseldownlua="Action('PortraitCenterInfo', 1.0)"
 					onmouseluplua="Action('PortraitCenterInfo', 0.0)"
@@ -4602,8 +4264,17 @@
 					onmouseoutlua="GetWidget('unit_tooltip_info0', 'game'):SetVisible(0)"
 					onhidelua="Action('PortraitCenterInfo', 0.0)"
 				/>
-				<!-- OptiUI: Remove portrait gloss from bottom right panel -->
-<!-- 				<image texture="/ui/common/portrait_gloss_up.tga" color="#ffffffbb" noclick="true" /> -->
+				<!-- Level -->
+				<panel name="game_botright_level_bg_1" x="0.0h" y="0.0h" height="2.0h" width="2.0h" valign="bottom" align="right"
+					passivechildren="true"
+					onmouseoverlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(0)"
+				>
+					<!-- <image x="-0.5h" y="-0.5h" width="5.0h" height="5.0h" texture="/ui/common/ability_toggle.tga" noclick="true" /> -->
+					<label name="game_botright_level_label_1" width="100%" textalign="center" height="100%" textvalign="center" font="dyn_10" color="yellow" shadow="true" />
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+				</panel>
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
 
 			<!-- Item catcher -->
@@ -4624,10 +4295,10 @@
 			<!-- Health -->
 			<panel name="game_botright_health_bar_bg_1"
 				x="-1.2h"
-				y="-7.0h"
-				width="14.5h"
-				height="1.4h"
-				align="right" valign="bottom"
+				y="2.2h"
+				width="15.0h"
+				height="2.0h"
+				align="right" valign="top"
 				color="0 .2 0 0"
 				onmouseoverlua="GetWidget('health_tooltip_info', 'game'):SetVisible(1)"
 				onmouseoutlua="GetWidget('health_tooltip_info', 'game'):SetVisible(0)"
@@ -4640,45 +4311,46 @@
 					<panel color="1 1 1 .1" align="right" width=".1h" rendermode="additive"/>
 					<instance name="statusbar_overlay"/>
 				</panel>
-				<image width="-0.6h" align="center" texture="/ui/elements/bar_highlight.tga"/>
+				<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
 				<label name="game_botright_health_label_1" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
 
 			<!-- Framing -->
-			<image name="game_botright_building_right" texture="/ui/common/bot_right_structure.tga" noclick="1" visible="1" height="50%" valign="bottom" />
-			<image name="game_botright_building_left" hflip="1" texture="/ui/common/bot_right_structure.tga" noclick="1" visible="0" height="50%" valign="bottom" />
+			<!-- <image name="game_botright_building_right" color="invisible" noclick="1" visible="1" height="50%" valign="bottom" /> -->
+			<!-- <image name="game_botright_building_left"  color="invisible" noclick="1" visible="0" height="50%" valign="bottom" /> -->
 
 			<!-- Shared abilities -->
-			<panel name="game_selected_info_building_shared_abilities" width="15.0h" height="8.0h" align="right" valign="bottom" color="invisible" noclick="1">
-				<panel name="game_selected_info_building_shared_abilities_pos" x="0.4h" y="0.35h" width="100%" align="center" float="right" color="invisible" padding="0" noclick="0">
-					<instance name="ability_frame_shared" slot="33"/>
-					<instance name="ability_frame_shared" slot="34"/>
-					<instance name="ability_frame_shared" slot="35"/>
+			<panel name="game_selected_info_building_shared_abilities" width="13.0h" height="6.0h" align="right" valign="bottom" color="invisible" noclick="1">
+				<panel name="game_selected_info_building_shared_abilities_pos" width="100%" align="center" color="invisible" padding="0" noclick="0">
+					<instance name="ability_frame_shared" align="right"  slot="33"/>
+					<instance name="ability_frame_shared" align="center" slot="34"/>
+					<instance name="ability_frame_shared" align="left"   slot="35"/>
 				</panel>
 			</panel>
 
-			<!-- Level -->
-			<panel name="game_botright_level_bg_1"
-				x="-0.7h" y="-8.3h" height="3.6h" width="3.6h" valign="bottom" align="right"
-				passivechildren="true"
-				onmouseoverlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(0)"
-			>
-				<image x="-0.5h" y="-0.5h" width="5.0h" height="5.0h" texture="/ui/common/ability_toggle.tga" noclick="true" />
-				<label name="game_botright_level_label_1" width="100%" textalign="center" height="100%" textvalign="center" font="dyn_9" color="yellow" shadow="true" />
+			<!-- Name -->
+			<panel name="game_botright_name_label_1_parent" x="-1.2h" y="0.0" width="15.0h" height="2.0h" align="right" valign="top">
+				<label name="game_botright_name_label_1" x="0.5h" textalign="left"  textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" />
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+			</panel>
+			<panel name="game_botright_name_label_1B_parent" x="-1.2h" y="0.0" width="15.0h" height="2.0h" align="right" valign="top">
+				<label name="game_botright_name_label_1B" x="-0.5h" textalign="right" textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" />
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
 
-			<!-- Name -->
-			<label name="game_botright_name_label_1" x="0.7h" y="-9.3h" width="-13.2h" height="1.6h" align="right" valign="bottom" textalign="left" textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" />
-			<label name="game_botright_name_label_1B" x="0.7h" y="-9.3h" width="-13.2h" height="1.6h" align="right" valign="bottom" textalign="right" textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" />
-
 			<!-- Selected Stats -->
-			<panel name="game_selected_info_building_stats" x="-14.9h" y="-0.8h" width="8.8h" height="3.3h" align="right" valign="bottom" color="invisible" float="bottom" padding="0.2h">
+			<panel name="game_selected_info_building_stats" x="0.0h" y="-0.8h" width="8.8h" height="3.6h" align="right" valign="bottom" color="invisible" float="bottom" padding="0.2h">
 
 				<!-- Selected Damage -->
-				<panel width="-0.25h" height="1.7h" align="right" watch="SelectedDamage" ontriggerlua="self:SetVisible(tonumber(param1) ~= 0)" onmouseoverlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(0)" passivechildren="true">
+				<panel height="1.7h" align="right" passivechildren="true" color="1 0 0 0.15"
+					watch="SelectedDamage"
+					ontriggerlua="self:SetVisible(tonumber(param1) ~= 0)"
+					onmouseoverlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(0)"
+				>
 					<image width="1.7h" height="1.7h" texture="/ui/common/damage_icon.tga"/>
-					<label width="-1.5h" height="100%" align="right" font="dyn_8" color="white" shadow="1" textalign="left" textvalign="center"
+					<label width="-1.7h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center"
 						watch="SelectedDamage"
 						ontriggerlua="
 							if (tonumber(param1) == 0) then
@@ -4695,9 +4367,12 @@
 				</panel>
 
 				<!-- Selected Armor -->
-				<panel width="-0.25h" height="1.7h" align="right" onmouseoverlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(0)" passivechildren="true">
+				<panel height="1.7h" align="right" passivechildren="true" color="0 1 0 0.15"
+					onmouseoverlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(0)"
+				>
 					<image width="1.7h" height="1.7h" texture="/ui/common/armor_icon.tga"/>
-					<label width="-1.7h" height="100%" align="right" font="dyn_8" color="white" shadow="1" textalign="left" textvalign="center"
+					<label width="-1.7h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center"
 						watch="SelectedArmor"
 						ontriggerlua="
 							local diff = (tonumber(param1) - tonumber(param0))
@@ -4713,6 +4388,7 @@
 				</panel>
 
 			</panel>
+			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 		</panel>
 
 		<!-- Multiple Selected -->
