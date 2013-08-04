@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Game version: v3.2.0 -->
+<package>	
+	<template name="stash_button">
+		<panel x="{x}" y="{y}" width="{width}" height="{height}" name="game_stash_button_{slot}" >
+			<!-- Background -->
+			<panel watch="StashExists{slot}" ontrigger="SetVisible(!param);">
+				<image texture="/ui/legion/empty_pack.tga"/>
+				<image
+					texture="$white"
+					rendermode="overlay"
+					watch="StashStatus{slot}"
+					ontrigger="SetVisible(true);
+						If(!param0, SetColor('.25 .25 .25'), SetVisible(false));"
+					noclick="true"
+				/>
+			</panel>
+
+			<panel
+				watch="StashExists{slot}"
+				ontrigger="SetVisible(param);"
+				onclick="PrimaryActionStash({slot});"
+				onrightclick="SecondaryActionStash({slot});"
+				onmouseover="PlaySound('/shared/sounds/ui/button_over_03.wav'); ShowWidget('stash_tooltip{slot}');"
+				onmouseout="HideWidget('stash_tooltip{slot}');"
+				name="stash_slot_filled{slot}{altview}"
+			>
+				<panel name="stash_slot_tut{slot}{altview}" noclick="true">
+					<!-- Icon -->
+					<image
+						watch="StashIcon{slot}"
+						ontrigger="SetTexture(param);"
+						watch0="StashStatus{slot}"
+						ontrigger0="If(param0, SetRenderMode('normal'), SetRenderMode('grayscale'));"
+						noclick="true"
+					/>
+
+					<!-- Recipe scroll -->
+					<panel color="black" watch="StashRecipe{slot}" ontrigger="SetVisible(param);" noclick="true" passivechildren="true" >
+						<image
+							width="55%" height="55%"
+							align="center" valign="center"
+							watch="StashIcon{slot}"
+							ontrigger="SetTexture(param);"
+						/>
+						<image texture="/ui/elements/shop/scroll_overlay.tga"/>
+					</panel>
+
+					<!-- Bevel -->
+					<image
+						texture="/ui/elements/button_bevel_up.tga"
+						noclick="true"
+					/>
+
+					<!-- Cooldown -->
+					<piegraph start="270" end="-90" square="true" color="#000000cc" watch="StashCooldown{slot}" ontrigger="SetVisible(param1 > 0); SetValue(param2);" noclick="true"/>
+
+					<!-- Accessability Overlay -->
+					<image
+						texture="$white"
+						rendermode="overlay"
+						watch="StashStatus{slot}"
+						ontrigger="SetVisible(true); If(!param0, SetColor('#404040'), SetVisible(false));"
+						noclick="true"
+					/>
+
+					<!-- Purchased Recently -->
+					<image
+						align="right"
+						valign="top"
+						width="40%"
+						height="40%"
+						texture="/items/icons/PurchasedRecently.tga"
+						watch="StashStatus{slot}"
+						ontrigger="SetVisible(param3);"
+						noclick="true"
+					/>
+
+					<!-- Charges -->
+					<panel
+						width="38.5%"
+						height="38.5%"
+						align="right"
+						valign="bottom"
+						watch="StashCharges{slot}"
+						ontrigger="SetVisible(param gt 0);"
+						noclick="true"
+						passivechildren="true"
+						color="invisible"
+					>
+						<frame color="0 0 0 .7" bordercolor="white" borderthickness="1"/>
+						<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_8" watch="StashCharges{slot}" ontrigger="SetText(param);"/>
+					</panel>
+
+					<!-- Level -->
+					<!--
+					<panel
+						width="38.5%"
+						height="38.5%"
+						align="top"
+						valign="right"
+						watch="StashStatus{slot}"
+						ontrigger="SetVisible((param1 gt 0) and (param2 gt 1));"
+						noclick="true"
+						passivechildren="true"
+						color="invisible"
+					>
+						<frame color="0 0 0 .7" bordercolor="white" borderthickness="1"/>
+						<label
+							width="100%"
+							height="100%"
+							textalign="center"
+							textvalign="center"
+							color="white"
+							shadow="true"
+							font="dyn_8"
+							watch="StashStatus{slot}"
+							ontrigger="SetText(param1); If(param1 lt SetFont('dyn_10'), SetFont('dyn_8'));"
+						/>
+					</panel>
+					-->
+				</panel>
+			</panel>
+
+			<!-- Drop target -->
+			<panel
+				color="invisible"
+				texture="/ui/info/drop.tga"
+				watch="ItemCursorVisible PlayerCanShop"
+				ontrigger="SetVisible(ItemCursorVisible and PlayerCanShop); RefreshCursor();"
+				onmouseover="SetColor('white');"
+				onmouseout="SetColor('invisible');"
+				onclick="ItemPlaceStash({slot});"
+				onrightclick="ItemPlaceStash({slot});"
+			/>
+		</panel>
+	</template>
+	
+	<template name="stash">
+		<panel name="stash_parent" visible="0" noclick="1" valign="bottom" 
+			watch="ShopActive"
+			ontrigger="
+				If(
+					param,
+					If(
+						!IsVisibleSelf(),
+						If(
+							_shopFlag_useAnims,
+							FadeIn(75 * _shopFlag_animSpeedMult),
+							SetVisible(true)
+						)
+					),
+					If(
+						IsVisibleSelf(),
+						If(
+							_shopFlag_useAnims,
+							FadeOut(75 * _shopFlag_animSpeedMult),
+							SetVisible(false)
+						)
+					)
+				);
+			"
+		>		
+			<panel name="stash" width="24.0h" height="16.0h" align="right" valign="bottom" color="black" />			
+			<panel name="game_stash_buttons" noclick="1" >
+				<instance name="stash_button" x="19.73%" y="64.45%" width="15.625%" height="15.625%" slot="0" />
+				<instance name="stash_button" x="38.09%" y="64.45%" width="15.625%" height="15.625%" slot="1" />
+				<instance name="stash_button" x="56.84%" y="64.45%" width="15.625%" height="15.625%" slot="2" />
+				<instance name="stash_button" x="19.73%" y="83.01%" width="15.625%" height="15.625%" slot="3" />
+				<instance name="stash_button" x="38.09%" y="83.01%" width="15.625%" height="15.625%" slot="4" />
+				<instance name="stash_button" x="56.84%" y="83.01%" width="15.625%" height="15.625%" slot="5" />
+			</panel>
+			
+			<!-- Framing -->
+			<image name="game_stash_bg" texture="/ui/common/bot_right_stash.tga" noclick="1" />
+			<image name="game_stash_bg_alt" texture="/ui/common/bot_right_stash.tga" noclick="1" hflip="1" />
+			<image name="game_stash_icon" x="12.5h" y="15.0h" height="3h" width="3h" texture="/ui/common/new_shop_interface/stash.tga" noclick="1" />
+			<label name="game_stash_label" x="12.75h" y="15.0h" width="11.2h" height="3.0h" textalign="center" textvalign="center" font="dyn_12" color="white" noclick="1">game_label_stash</label>
+
+			<!-- Tip Marks-->
+			<button name="game_stash_tip_stash"
+				x="-19.8h" y="-11.2h"
+				width="2.6h" height="2.6h"
+				align="right" valign="bottom"
+				color="invisible"
+				onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showwidget('stash_tooltip');"
+				onmouseout="hidewidget('stash_tooltip');"
+				interactive="false"
+			>
+				<widgetstate statename="up">
+					<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_up.tga" />
+				</widgetstate>
+				<widgetstate statename="over">
+					<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_over.tga" />
+				</widgetstate>
+			</button>
+			<button name="game_stash_tip_deconstruct"
+				x="-5.3h" y="-8.6h"
+				width="1.7h" height="1.7h"
+				align="right" valign="bottom"
+				color="invisible"
+				onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showwidget('stash_deconstruct_tooltip');"
+				onmouseout="hidewidget('stash_deconstruct_tooltip');"
+				interactive="false"
+			>
+				<widgetstate statename="up">
+					<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_up.tga" />
+				</widgetstate>
+				<widgetstate statename="over">
+					<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_over.tga" />
+				</widgetstate>
+			</button>						
+		</panel>
+	</template>
+	
+</package>
