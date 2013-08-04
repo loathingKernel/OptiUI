@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification
+    application="Heroes of Newerth"
+    appversion="3.2.0"
+    mmversion="1.3"
+    name="OptiUI"
+    version="0.0.7"
+    description="Optimized User Interface"
+    author="Trelokotsidu"
+    weblink="http://forums.heroesofnewerth.com/showthread.php?508702-OptiUI-v0-0-7-%28Alpha-stage%29"
+    updatecheckurl="http://.../version.txt"
+    updatedownloadurl="http://.../m.honmod"A URL to a .honmod file that will be downloaded and replace this mod file when the text file specified above contains a higher version number than this mod currently has. (optional)
+>
+    <!-- Of the elements being described below each kind may appear any number of times and in any order -->
+
+    <incompatibility name="Other mod" version="1.0-1.4" />
+    <!-- States an incompatibility with certain versions of another mod to be abided by the Mod Manager; this mod cannot be enabled when the other mod is enabled. -->
+
+    <requirement name="Other mod" version="2.5.1-*" />
+    <!-- States a dependence on another mod to be abided by the Mod Manager; this mod cannot be enabled when the other mod is not present and enabled. -->
+
+    <applyafter name="Other mod" version="2.5.1-*" />
+    <applybefore name="Other mod" version="2.5.1-*" />
+    <!-- If the specified other mod is enabled, this mod will be applied after/before it. -->
+
+    <copyfile name="path1" source="path2" overwrite="newer" version="1.0" condition="..." />
+    <!-- Copies a supportive file from the mod archive. If "path2" is not specified the file "path1" is copied, if it is "path2" is copied and renamed to "path1".
+         overwrite specifies a controlled behaviour in case the target file already exists:
+         "yes"   -> target file is overwritten
+         "no"    -> target file is left as is
+         "newer" -> target file is overwritten if its version is lower than the one specified by the version attribute
+        
+        If the condition attribute is specified the copying is only performed if the given condition is true. A condition can consist of another mod being enabled or disabled or a boolean expression combining multiple such conditions. Examples of valid condition strings:
+        'Tiny UI'
+        not 'Tiny UI'
+        'Tiny UI[v3.0]' and 'Automatic Ability Learner[v1.1-1.5]'
+        ('BardUI' or ('Improved UI by Barter[v1.08]' and 'Improved UI Addon - Juking Map')) and not 'Tiny UI' -->
+
+    <editfile name="path" condition="...">
+        <!-- Edits a file from resources0.s2z or one that has already been copied
+            If condition is specified this editfile tag is only executed if the given condition is true; uses the same syntax as for copyfile. -->
+
+        <!-- Files are edited by executing a sequence of steps, each being represented by one of the four elements below.
+             All elements need a string as input, which can either be delivered as inner text node (between the <operation></operation> tags) or read from a file in the mod archive specified by a source attribute.
+             Every operation interacts with a "cursor" variable which points to a area in the file and starts out at the beginning of the file. -->
+        
+        <find position="end" /> <!-- synonyms for "find" are "seek" and "search" -->
+        <!-- Moves the "cursor" to the next occurrence of the source string
+             OR as specified by the position attribute, possible values being:
+             "start"     -> Beginning of the file (synonyms: "begin", "head", "before")
+             "end"       -> End of the file (synonyms: "tail", "after", "eof")
+             any integer -> Move forward the specified number of characters (negative values allowed) -->
+        <findup /> <!-- synonyms for "findup" are "seekup" and "searchup" -->
+        <!-- Moves the "cursor" to the next occurrence of the source string, but searching backwards. -->
+        
+        <insert position="after" /> <!-- synonym for "insert" is "add" -->
+        <!-- Inserts the source string at the "cursor", either before or after as the position attribute specifies. -->
+        
+        <replace />
+        <!-- Replaces the string pointed to by the "cursor" with the source string. -->
+
+        <delete />
+        <!-- Deletes the string pointed to by the "cursor". Does not require a source string. -->
+    </editfile>
+</modification>
