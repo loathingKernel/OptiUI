@@ -1507,7 +1507,7 @@
 
 				<!-- Bevel -->
 				<image
-					texture="/ui/elements/button_bevel_up.tga"
+					texture="/ui/elements/optiui_button_bevel_up.tga"
 				/>
 
 				<!-- Cooldown overlay-->
@@ -1594,11 +1594,32 @@
 					valign="top"
 					watch="SelectedInventoryCharges{slot}"
 					ontriggerlua="self:SetVisible(tonumber(param) > 0)"
-					color="invisible"
+					color="0 0 0 .7"
 				>
-					<frame color="0 0 0 .6" bordercolor="black" borderthickness="0"/>
-					<label textalign="center" textvalign="center" color="white" font="dyn_7" watch="SelectedInventoryCharges{slot}" ontriggerlua="self:SetText(param);"/>
+					<label textalign="center" textvalign="center" color="white" font="dyn_9"
+						watch="SelectedInventoryCharges{slot}"
+						ontriggerlua="self:SetText(param);"
+					/>
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclink="true"/>
 				</panel>
+
+				<!-- OptiUI: Added item level indicator (yeah parasite/fayde, this is for you, luvs) -->
+				<!-- Level -->
+				<panel
+					width="42.00%"
+					height="42.00%"
+					align="left"
+					valign="bottom"
+					watch="SelectedInventoryStatus{slot}"
+					ontriggerlua="self:SetVisible(tonumber(param4) > 1)"
+					color="0 0 0 .7"
+				>
+					<label textalign="center" textvalign="center" color="yellow" font="dyn_9"
+						watch="SelectedInventoryStatus{slot}" 
+						ontriggerlua="self:SetText(param3);"
+					/>
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclink="true"/>
+				</panel>				
 
 				<!-- Numeric cooldown timer -->
 				<!-- UIScript -->
@@ -1606,6 +1627,7 @@
 					<label noclick="1" valign="center" align="center" textvalign="center" textalign="center" color="#87CEEB" shadow="1" font="dyn_9" watch="SelectedInventoryCooldown{slot}" ontriggerlua="self:SetVisible(AtoB(param0)) self:SetText(self:UICmd('FtoT('..param0..', 0, 0, \'-\')')..'s')" />
 				</panel>
 			</panel>
+			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 		</panel>
 	</template>
 
@@ -3682,17 +3704,17 @@
 				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" align="center">
 						<instance name="inventory_button" slot="37"/>
 					</panel>
-				<panel x="-0.0h" y="0.0h" width="4.9h" height="4.9h" align="right">
+				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" align="right">
 						<instance name="inventory_button" slot="38"/>
 					</panel>
 
-				<panel x="0.0h" y="-0.0h" width="4.9h" height="4.9h" valign="bottom">
+				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom">
 						<instance name="inventory_button" slot="39"/>
 					</panel>
-				<panel x="0.0h" y="-0.0h" width="4.9h" height="4.9h" valign="bottom" align="center">
+				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom" align="center">
 						<instance name="inventory_button" slot="40"/>
 					</panel>
-				<panel x="-0.0h" y="-0.0h" width="4.9h" height="4.9h" valign="bottom" align="right">
+				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom" align="right">
 						<instance name="inventory_button" slot="41"/>
 				</panel>
 			</frame>
@@ -4071,10 +4093,11 @@
 
 		<!-- Info - Units/Heroes -->
 		<!-- UIScript -->
-		<panel name="game_selected_info_unit" group="selected_info" watch="SelectedVisible0 SelectedVisible1 SelectedType0" ontrigger="SetVisible(SelectedVisible0 and !SelectedVisible1 and !StringEquals(SelectedType0, 'building'));" color="invisible" noclick="1">
-			<panel name="game_selected_info_unit_bg" width="24.0h" height="16.0h" align="right" valign="bottom" color="black"/>
+		<panel name="game_selected_info_unit" width="24.0h" height="16.0h" align="right" valign="bottom" group="selected_info" watch="SelectedVisible0 SelectedVisible1 SelectedType0" ontrigger="SetVisible(SelectedVisible0 and !SelectedVisible1 and !StringEquals(SelectedType0, 'building'));" color="invisible" noclick="1">
+			
+			<panel name="game_selected_info_unit_bg" color="black"/>
 			<!-- Icon -->
-			<panel name="game_selected_info_unit_icon" x="-17.1h" y="-8.7h" height="6.0h" width="6.0h" align="right" valign="bottom">
+			<panel name="game_selected_info_unit_icon" x="0.0h" y="0.0h" height="6.5h" width="6.5h" align="right" valign="top">
 				<image texture="/ui/legion/portrait_background.tga" color="1 1 1 1"/>
 				<image name="game_botright_portrait_icon_0"
 					onmouseldownlua="Action('PortraitCenterInfo', 1.0)" onmouseluplua="Action('PortraitCenterInfo', 0.0)"
@@ -4087,8 +4110,17 @@
 					<piegraph name="game_botright_life_bar_ring" texture="/ui/common/exp_ring.tga" start="225" end="-49" square="1" color="#e5df2f" value=".2" noclick="true"/>
 					<label name="game_botright_life_bar_label" width="100%" height="100%" valign="center" textalign="center" textvalign="center" font="dyn_14" color="white" shadow="true" shadowoffset="2" />
 				</panel>
-				<!-- OptiUI: Remove portrait gloss from bottom right panel -->
-<!-- 				<image texture="/ui/common/portrait_gloss_up.tga" color="#ffffffbb" noclick="true" /> -->
+				<!-- Level -->
+				<panel name="game_botright_level_bg_0" x="0.0h" y="0.0h" height="2.0h" width="2.0h" valign="bottom" align="right" color="black"
+					passivechildren="true"
+					onmouseoverlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(0)"
+				>
+					<!-- <image name="game_botright_level_img_0" x="-0.5h" y="-0.5h" width="5.0h" height="5.0h" texture="/ui/common/ability_toggle.tga" noclick="true" /> -->
+					<label name="game_botright_level_label_0" width="100%" textalign="center" height="100%" textvalign="center" font="dyn_10" color="yellow" shadow="true" />
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+				</panel>
+				<frame name="game_botright_portrait_frame" borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
 
 			<!-- Item catcher -->
@@ -4105,24 +4137,24 @@
 			/>
 
 			<!-- Inventory -->
-			<panel name="game_selected_info_unit_inventory" x="-1.75h" y="-0.4h" width="11.9h" height="7.9h" align="right" valign="bottom" color="invisible">
-				<panel height="3.9h" width="3.9h" align="left" valign="top" color="invisible">
+			<panel name="game_selected_info_unit_inventory" x="-1.2h" y="-0.5h" width="13.0h" height="8.5h" align="right" valign="bottom" color="invisible">
+				<panel height="4.1h" width="4.1h" align="left" valign="top" color="invisible">
 					<instance name="inventory_info" slot="36"/>
 				</panel>
-				<panel height="3.9h" width="3.9h" align="center" valign="top" color="invisible">
+				<panel height="4.1h" width="4.1h" align="center" valign="top" color="invisible">
 					<instance name="inventory_info" slot="37"/>
 				</panel>
-				<panel height="3.9h" width="3.9h" align="right" valign="top" color="invisible">
+				<panel height="4.1h" width="4.1h" align="right" valign="top" color="invisible">
 					<instance name="inventory_info" slot="38"/>
 				</panel>
 
-				<panel height="3.9h" width="3.9h" align="left" valign="bottom" color="invisible">
+				<panel height="4.1h" width="4.1h" align="left" valign="bottom" color="invisible">
 					<instance name="inventory_info" slot="39"/>
 				</panel>
-				<panel height="3.9h" width="3.9h" align="center" valign="bottom" color="invisible">
+				<panel height="4.1h" width="4.1h" align="center" valign="bottom" color="invisible">
 					<instance name="inventory_info" slot="40"/>
 				</panel>
-				<panel height="3.9h" width="3.9h" align="right" valign="bottom" color="invisible">
+				<panel height="4.1h" width="4.1h" align="right" valign="bottom" color="invisible">
 					<instance name="inventory_info" slot="41"/>
 				</panel>
 			</panel>
@@ -4130,10 +4162,10 @@
 			<!-- Health -->
 			<panel name="game_botright_health_bar_bg_0"
 				x="-1.2h"
-				y="-10.8h"
-				width="14.5h"
-				height="1.4h"
-				align="right" valign="bottom"
+				y="2.2h"
+				width="15.0h"
+				height="2.0h"
+				align="right" valign="top"
 				color="0 .2 0 0"
 				onmouseoverlua="GetWidget('health_tooltip_info', 'game'):SetVisible(1)"
 				onmouseoutlua="GetWidget('health_tooltip_info', 'game'):SetVisible(0)"
@@ -4146,17 +4178,18 @@
 					<panel color="1 1 1 .1" align="right" width=".1h" rendermode="additive"/>
 				</panel>
 				<instance name="statusbar_overlay"/>
-				<image width="-0.6h" align="center" texture="/ui/elements/bar_highlight.tga"/>
-				<label name="game_botright_health_label_0" font="dyn_8" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+				<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+				<label name="game_botright_health_label_0" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
 
 			<!-- Mana -->
 			<panel name="game_botright_mana_bar_bg_0"
 				x="-1.2h"
-				y="-9.0h"
-				width="14.5h"
-				height="1.4h"
-				align="right" valign="bottom"
+				y="4.2h"
+				width="15.0h"
+				height="2.0h"
+				align="right" valign="top"
 				color="0 0 .1 1"
 				onmouseoverlua="GetWidget('mana_tooltip_info', 'game'):SetVisible(1)"
 				onmouseoutlua="GetWidget('mana_tooltip_info', 'game'):SetVisible(0)"
@@ -4165,71 +4198,89 @@
 				<panel name="game_botright_mana_bar_0" color="0 .4 1 1">
 					<instance name="statusbar_overlay"/>
 				</panel>
-				<image width="-0.6h" align="center" texture="/ui/elements/bar_highlight.tga"/>
-				<label name="game_botright_mana_label_0" font="dyn_8" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+				<image align="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+				<label name="game_botright_mana_label_0" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
 
 			<!-- Framing -->
-			<image name="game_botright_units_right" texture="/ui/common/bot_right.tga" noclick="1" visible="1" />
-			<image name="game_botright_units_left" hflip="1" texture="/ui/common/bot_right.tga" noclick="1" visible="0" />
+			<!-- <image name="game_botright_units_right" texture="/ui/common/bot_right.tga" noclick="1" visible="1" /> -->
+			<!-- <image name="game_botright_units_left"  texture="/ui/common/bot_right.tga" noclick="1" visible="0" hflip="1" /> -->
 
 			<!-- Inventory Cover -->
-			<panel name="game_selected_info_unit_inventory_cover" x="-1.85h" y="-0.4h" width="11.9h" height="7.9h" align="right" valign="bottom" color="invisible" watch="SelectedHasInventory" ontriggerlua="self:SetVisible(not AtoB(param))" passivechildren="true">
-				<image width="22.5h" height="11.25h" texture="/ui/common/inventory_cover.tga" />
-			</panel>
-
-			<!-- Level -->
-			<panel name="game_botright_level_bg_0"
-				x="-0.7h" y="-12.2h" height="3.6h" width="3.6h" valign="bottom" align="right"
-				passivechildren="true"
-				onmouseoverlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(0)"
+			<panel name="game_selected_info_unit_inventory_cover" x="-1.2h" y="-0.5h" width="13.0h" height="8.5h" align="right" valign="bottom" color="invisible" passivechildren="true"
+				watch="SelectedHasInventory"
+				ontriggerlua="self:SetVisible(not AtoB(param))"
 			>
-				<image name="game_botright_level_img_0" x="-0.5h" y="-0.5h" width="5.0h" height="5.0h" texture="/ui/common/ability_toggle.tga" noclick="true" />
-				<label name="game_botright_level_label_0" width="100%" textalign="center" height="100%" textvalign="center" font="dyn_9" color="yellow" shadow="true" />
+				<image width="17.0h" texture="/ui/common/optiui_inventory_cover.tga" />
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
 
 			<!-- Name -->
-			<label name="game_botright_name_label_0" x="0.7h" y="-13.1h" width="-13.2h" height="1.6h" align="right" valign="bottom" textalign="left" textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" />
-			<label name="game_botright_name_label_0B" x="0.7h" y="-13.1h" width="-13.2h" height="1.6h" align="right" valign="bottom" textalign="right" textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" />
+			<panel name="game_botright_name_label_0_parent" x="-1.2h" y="0.0" width="15.0h" height="2.0h" align="right" valign="top">
+				<label name="game_botright_name_label_0" x="0.5h" textalign="left"  textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" />
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+			</panel>
+			<panel name="game_botright_name_label_0B_parent" x="-1.2h" y="0.0" width="15.0h" height="2.0h" align="right" valign="top">
+				<label name="game_botright_name_label_0B" x="-0.5h" textalign="right" textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" />
+				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+			</panel>
+			<!-- <label name="game_botright_name_label_0" x="0.7h" y="-13.1h" width="-13.2h" height="1.6h" align="right" valign="bottom" textalign="left" textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" /> -->
+			<!-- <label name="game_botright_name_label_0B" x="0.7h" y="-13.1h" width="-13.2h" height="1.6h" align="right" valign="bottom" textalign="right" textvalign="center" color="white" font="dyn_10" shadow="true" shadowoffset="2" noclick="true" /> -->
 
 			<!-- Selected Stats -->
-			<panel name="game_selected_info_unit_stats" x="-14.5h" y="-1.0h" width="8.8h" height="6.8h" align="right" valign="bottom" color="invisible" float="bottom" padding="0.25h">
+			<panel name="game_selected_info_unit_stats" x="0.0h" y="-0.5h" width="8.8h" height="8.5h" align="left" valign="bottom" color="invisible" float="bottom" padding="0.3h">
 				<!-- Damage -->
-				<panel height="1.6h" watch="SelectedDamage" ontriggerlua="self:SetVisible(tonumber(param1) ~= 0)" onmouseoverlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(0)" passivechildren="true">
-					<image width="100@" height="100%" texture="/ui/common/damage_icon.tga"/>
-					<label x="15@" width="-100@" height="100%" align="right" font="dyn_8" color="white" shadow="1" textalign="left" textvalign="center"
+				<panel height="1.7h" color="1 0 0 0.15" passivechildren="true"
+					watch="SelectedDamage"
+					ontriggerlua="self:SetVisible(tonumber(param1) ~= 0)"
+					onmouseoverlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(0)"
+				>
+					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/damage_icon.tga"/>
+					<label x="15@" width="-100@" height="100%" align="right" font="dyn_9" color="white" shadow="1" textalign="left" textvalign="center" outline="1"
 						watch="SelectedDamage"
 						ontriggerlua="self:SetText(round(tonumber(param0) + tonumber(param2)) .. ' - ' .. round(tonumber(param1) + tonumber(param2)))"
 					/>
 				</panel>
+				<!-- Movement Speed -->
+				<panel height="1.7h" color="0 1 0 0.15" passivechildren="true"
+					watch="SelectedMoveSpeed"
+					ontriggerlua="self:SetVisible(tonumber(param1) ~= 0)"
+					onmouseoverlua="GetWidget('movement_tooltip_info', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('movement_tooltip_info', 'game'):SetVisible(0)"
+				>
+					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/move_speed_icon.tga"/>
+					<label x="15@" width="-100@" height="100%" align="right" font="dyn_9" color="white" shadow="1" textalign="left" textvalign="center" outline="1"
+						watch="SelectedMoveSpeed"
+						ontriggerlua="self:SetText(round(param1))"
+					/>
+				</panel>
 				<!-- Armor -->
-				<panel height="1.6h" onmouseoverlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(0)" passivechildren="true"
+				<panel height="1.7h" color="1 0 0 0.15" passivechildren="true"
+					onmouseoverlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(0)"
 					onload="
 						CreateFloat('game_player_info_armor', 0);
 						CreateFloat('game_player_info_magicarmor', 0);
 					"
 				>
-					<image width="100@" height="100%" texture="/ui/common/armor_icon.tga"/>
-					<label x="15@" width="-100@" height="100%" align="right" font="dyn_8" color="white" shadow="1" textalign="left" textvalign="center"
+					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/armor_icon.tga"/>
+					<label x="15@" width="-100@" height="100%" align="right" font="dyn_9" color="white" shadow="1" textalign="left" textvalign="center" outline="1"
 						watch="SelectedArmor"
 						ontriggerlua="self:SetText(FtoA(param1, 1)..' ^777/^999 '..FtoA(GetCvarNumber('game_player_info_magicarmor'), 1)) Set('game_player_info_armor', param1)"
 						watch1="SelectedMagicArmor"
 						ontrigger1lua="self:SetText(FtoA(GetCvarNumber('game_player_info_armor'), 1)..' ^777/^999 '..FtoA(param1, 1)) Set('game_player_info_magicarmor', param1)"
 					/>
 				</panel>
-				<!-- Movement Speed -->
-				<panel height="1.6h" watch="SelectedMoveSpeed" ontriggerlua="self:SetVisible(tonumber(param1) ~= 0)" onmouseoverlua="GetWidget('movement_tooltip_info', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('movement_tooltip_info', 'game'):SetVisible(0)" passivechildren="true">
-					<image width="100@" height="100%" texture="/ui/common/move_speed_icon.tga"/>
-					<label x="15@" width="-100@" height="100%" align="right" font="dyn_8" color="white" shadow="1" textalign="left" textvalign="center"
-						watch="SelectedMoveSpeed"
-						ontriggerlua="self:SetText(round(param1))"
-					/>
-				</panel>
 				<!-- Attributes -->
-				<panel height="1.6h" color="invisible" float="right" watch="SelectedHasAttributes" ontriggerlua="self:SetVisible(AtoB(param))" onmouseoverlua="GetWidget('attribute_tooltip_info', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attribute_tooltip_info', 'game'):SetVisible(0)" passivechildren="true">
-					<image width="100@" height="100%" texture="/ui/common/plus_icon.tga"/>
-					<label x="15@" width="-100@" height="100%" align="right" font="dyn_8" color="white" shadow="1" textalign="left" textvalign="center"
+				<panel height="1.7h" color="0 1 0 0.15" passivechildren="true" float="right"
+					watch="SelectedHasAttributes" ontriggerlua="self:SetVisible(AtoB(param))"
+					onmouseoverlua="GetWidget('attribute_tooltip_info', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('attribute_tooltip_info', 'game'):SetVisible(0)"
+				>
+					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/plus_icon.tga"/>
+					<label x="15@" width="-100@" height="100%" align="right" font="dyn_9" color="white" shadow="1" textalign="left" textvalign="center" outline="1"
 						watch="SelectedAttributes"
 						ontriggerlua="self:SetText(round(param0)..' '..round(param1)..' '..round(param2))"
 					/>
@@ -4245,6 +4296,7 @@
 				onclick="SelectUnit(SelectedIndex0);"
 				interactive="false"
 			/>
+			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 		</panel>
 
 
@@ -4265,7 +4317,7 @@
 					onhidelua="Action('PortraitCenterInfo', 0.0)"
 				/>
 				<!-- Level -->
-				<panel name="game_botright_level_bg_1" x="0.0h" y="0.0h" height="2.0h" width="2.0h" valign="bottom" align="right"
+				<panel name="game_botright_level_bg_1" x="0.0h" y="0.0h" height="2.0h" width="2.0h" valign="bottom" align="right" color="black"
 					passivechildren="true"
 					onmouseoverlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(0)"
@@ -4340,7 +4392,7 @@
 			</panel>
 
 			<!-- Selected Stats -->
-			<panel name="game_selected_info_building_stats" x="0.0h" y="-0.8h" width="8.8h" height="3.6h" align="right" valign="bottom" color="invisible" float="bottom" padding="0.2h">
+			<panel name="game_selected_info_building_stats" x="0.0h" y="-1.0h" width="8.8h" height="3.6h" align="right" valign="bottom" color="invisible" float="bottom" padding="0.2h">
 
 				<!-- Selected Damage -->
 				<panel height="1.7h" align="right" passivechildren="true" color="1 0 0 0.15"
@@ -4349,7 +4401,7 @@
 					onmouseoverlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(0)"
 				>
-					<image width="1.7h" height="1.7h" texture="/ui/common/damage_icon.tga"/>
+					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/damage_icon.tga"/>
 					<label width="-1.7h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center"
 						watch="SelectedDamage"
 						ontriggerlua="
@@ -4367,11 +4419,11 @@
 				</panel>
 
 				<!-- Selected Armor -->
-				<panel height="1.7h" align="right" passivechildren="true" color="0 1 0 0.15"
+				<panel height="1.7h" align="right" valign="center" passivechildren="true" color="0 1 0 0.15"
 					onmouseoverlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(0)"
 				>
-					<image width="1.7h" height="1.7h" texture="/ui/common/armor_icon.tga"/>
+					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/armor_icon.tga"/>
 					<label width="-1.7h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center"
 						watch="SelectedArmor"
 						ontriggerlua="
@@ -4393,16 +4445,16 @@
 
 		<!-- Multiple Selected -->
 		<!-- UIScript -->
-		<panel watch="SelectedVisible0 SelectedVisible1" ontrigger="SetVisible(SelectedVisible0 and SelectedVisible1);" noclick="1">
+		<panel name="game_selected_info_mult" watch="SelectedVisible0 SelectedVisible1" width="24.0h" height="13.0h" align="right" valign="bottom" ontrigger="SetVisible(SelectedVisible0 and SelectedVisible1);" noclick="1">
 
-			<panel name="game_selected_info_mult_backer" width="24.0h" height="13.0h" align="right" valign="bottom" color="black"/>
+			<panel name="game_selected_info_mult_backer" color="black"/>
 
 			<!-- Framing -->
-			<image name="game_botright_mult_right" texture="/ui/common/bot_right_multi.tga" noclick="1" visible="1" valign="bottom" />
-			<image name="game_botright_mult_left" hflip="1" texture="/ui/common/bot_right_multi.tga" noclick="1" visible="0" valign="bottom" />
+			<image name="game_botright_mult_right" width="31.0h" texture="/ui/common/optiui_bot_right_multi.tga" noclick="1" visible="1" valign="bottom" align="left" />
+			<image name="game_botright_mult_left"  width="31.0h" texture="/ui/common/optiui_bot_right_multi.tga" noclick="1" visible="0" valign="bottom" align="right" hflip="1" />
 
-			<panel name="game_selected_info_mult_units" x="-0.8h" y="-0.4h" width="21.4h" height="13.8h" align="right" valign="bottom" color="invisible" visible="1" float="bottom" padding="0.2h">
-				<panel y="0.5h" height="4.2h" float="right" padding="0.1h">
+			<panel name="game_selected_info_mult_units" x="0.0h" y="0.0h" align="right" valign="bottom" color="invisible" visible="1" float="bottom" padding="0.2h">
+				<panel y="0.0h" height="4.2h" float="right" padding="0.2h">
 					<instance name="multi_select_unit" index="0"/>
 					<instance name="multi_select_unit" index="1"/>
 					<instance name="multi_select_unit" index="2"/>
@@ -4410,7 +4462,7 @@
 					<instance name="multi_select_unit" index="4"/>
 				</panel>
 
-				<panel height="4.2h" float="right" padding="0.1h">
+				<panel height="4.2h" float="right" padding="0.2h">
 					<instance name="multi_select_unit" index="5"/>
 					<instance name="multi_select_unit" index="6"/>
 					<instance name="multi_select_unit" index="7"/>
@@ -4418,7 +4470,7 @@
 					<instance name="multi_select_unit" index="9"/>
 				</panel>
 
-				<panel height="4.2h" float="right" padding="0.1h">
+				<panel height="4.2h" float="right" padding="0.2h">
 					<instance name="multi_select_unit" index="10"/>
 					<instance name="multi_select_unit" index="11"/>
 					<instance name="multi_select_unit" index="12"/>
@@ -4426,6 +4478,7 @@
 					<instance name="multi_select_unit" index="14"/>
 				</panel>
 			</panel>
+			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 		</panel>
 
 		<!-- Stash -->
@@ -4436,19 +4489,19 @@
 	<!-- OptiUI: MOVABLE TEAM ICONS -->
 	<!-- Team Icons -->
 	<!-- Top left position -->
-	<!-- <panel name="game_ally_display_holder" x="0.0h" y="6.1h" width="7.45h" height="28.6h" color="invisible" noclick="1" reverse="true">
+	<panel name="game_ally_display_holder" x="0.0h" y="6.1h" width="7.45h" height="28.6h" color="invisible" noclick="1" reverse="true">
 		<instance name="team_member_icon" y="0%"  align="left" index="0"/>
 		<instance name="team_member_icon" y="25%" align="left" index="1"/>
 		<instance name="team_member_icon" y="50%" align="left" index="2"/>
 		<instance name="team_member_icon" y="75%" align="left" index="3"/>
-	</panel> -->
+	</panel>
 	<!-- Center position -->
-	<panel name="game_ally_display_holder" x="0.0h" y="-0.5h" width="90.0h" height="13.0h" align="center" valign="bottom" color="invisible" noclick="1" reverse="true">
+	<!-- <panel name="game_ally_display_holder" x="0.0h" y="-0.5h" width="90.0h" height="13.0h" align="center" valign="bottom" color="invisible" noclick="1" reverse="true">
 		<instance name="team_member_icon" y="0" align="left"  valign="top"    index="0"/>
 		<instance name="team_member_icon" y="0" align="left"  valign="bottom" index="1"/>
 		<instance name="team_member_icon" y="0" align="right" valign="top"    index="2"/>
 		<instance name="team_member_icon" y="0" align="right" valign="bottom" index="3"/>
-	</panel>
+	</panel> -->
 	<!-- Configurable -->
 	<!-- <panel name="game_ally_display_holder" color="invisible" noclick="1" reverse="true">
 		<instance name="team_member_icon" index="0"/>
