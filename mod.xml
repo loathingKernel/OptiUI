@@ -9,8 +9,8 @@
     description="Optimized User Interface"
     author="Trelokotsidu"
     weblink="http://forums.heroesofnewerth.com/showthread.php?508702-OptiUI-v0-0-8-%28Alpha-stage%29"
-    updatecheckurl="https://github.com/LoathingKernel/OptiUI/blob/master/version.txt"
-    updatedownloadurl="https://github.com/LoathingKernel/OptiUI/blob/master/OptiUI.honmod"
+    updatecheckurl="https://raw.github.com/LoathingKernel/OptiUI/master/version.txt"
+    updatedownloadurl="https://raw.github.com/LoathingKernel/OptiUI/master/OptiUI.honmod"
 >
     <!-- Textures -->
     <copyfile name="ui/elements/optiui_button_bevel_over.tga" overwrite="yes" />
@@ -54,11 +54,11 @@
     <!-- Mod Options -->
     <copyfile name="ui/optiui_options.package" overwrite="yes" />
     <editfile name="ui/mod_options_elements.package">  
-        <find><=!=[=C=D=A=T=A=[<!-- INSERT AFTER THIS -->]=]=></find>
+        <find><![CDATA[<!-- INSERT AFTER THIS -->]]></find>
         <insert position="after">
-            <=!=[=C=D=A=T=A=[
+            <![CDATA[
                 <include file="/ui/optiui_options.package" />
-            ]=]=>
+            ]]>
         </insert>
     </editfile>
 
