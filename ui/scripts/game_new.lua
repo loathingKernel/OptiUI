@@ -52,31 +52,6 @@ local GetWidget = memoizeObject(GetWidgetGame)
 ----------------------------------------------------------
 -- 						General				            --
 ----------------------------------------------------------
--- OptiUI: Aspect ratio detection code
--- OptiUI = {}
--- OptiUI.widescreen = 0
--- local function detectAspectRatio()
--- 	local width = 0
--- 	local height = 0
-
--- 	for word in GetCvarString('vid_resolution'):gmatch('%w+') do
--- 		if ((width == 0)) then 
--- 			width = word
--- 		else 
--- 			height = word
--- 		end
--- 	end
-
--- 	if ((width / 16) == (height / 10)) then
--- 		OptiUI.widescreen = true
--- 	elseif ((width / 16) == (height / 9)) then
--- 		OptiUI.widescreen = true
--- 	else
--- 		OptiUI.widescreen = false
--- 	end
--- end
--- OptiUI: end
-
 local function NotABot(name)
 	if (GameChat) and (GameChat.bots) then
 		for _, playerTable in pairs(GameChat.bots) do
@@ -613,12 +588,13 @@ local function SetRapButtonVisible(visState, visible)
 		GetWidget('ally_rap_indicator_' .. visState.allyIndex):SetVisible(visible)		
 		Set('ally_rap_available_'..visState.allyIndex, visible, 'bool')
 
-		-- OptiUI: WE don't use the texture so comment this section out
+		-- OptiUI: We don't use the texture so comment this section out
 		--if(visible) then
 		--	GetWidget('ally_rap_indicator_template_' .. visState.allyIndex):SetTexture('/ui/common/ally_frame_rap.tga')
 		--else
 		--	GetWidget('ally_rap_indicator_template_' .. visState.allyIndex):SetTexture('/ui/common/ally_frame.tga')
 		--end
+		-- OptiUI: end
 	end
 end
 
@@ -642,7 +618,10 @@ local function RapButtonRefreshVis()
 		-- and GetCvarBool('ui_rap_enabled') and GetCvarBool('ui_maintenance_RAP')
 		-- we have an ignore selection in the menu now, this is always visible minus for bots
 		if (visState.allyIndex) then
-			if ((not localSpectator) and (not visState.isBot)) then
+			-- OptiUI: Added option to disable right click menu
+			--if ((not localSpectator) and (not visState.isBot)) then
+			if ((not localSpectator) and (not visState.isBot) and (not GetCvarBool('optiui_AllyFramesDisableRightClick'))) then
+			-- OptiUI: end
 				GetWidget('ally_right_click_menu_button_' .. visState.allyIndex):SetCallback('onrightclick', function() interface:UICmd("CallEvent('ally_right_click_menu_".. visState.allyIndex .."');") end )
 			else
 				GetWidget('ally_right_click_menu_button_' .. visState.allyIndex):SetCallback('onrightclick', function() end )
@@ -719,49 +698,61 @@ end
 -- 						Ally Info						--
 ----------------------------------------------------------
 local function InitAllyInfo()
-	-- OptiUI: Detect screen aspect ratio at initialization of ally info and set position
-	-- detectAspectRatio()
-	-- -- OptiUI: end
-	-- -- OptiUI: Position ally icons based on aspect ratio
-	-- if (OptiUI.widescreen) then
-	-- 	GetWidget('game_ally_display_holder'):SetAlign("center")
-	-- 	GetWidget('game_ally_display_holder'):SetVAlign("bottom")
-	-- 	GetWidget('game_ally_display_holder'):SetX("0.0h")
-	-- 	GetWidget('game_ally_display_holder'):SetY("-0.5h")
-	-- 	GetWidget('game_ally_display_holder'):SetWidth("90.0h")
-	-- 	GetWidget('game_ally_display_holder'):SetHeight("14.4h")
-	-- else
-	-- 	GetWidget('game_ally_display_holder'):SetX("0.0h")
-	-- 	GetWidget('game_ally_display_holder'):SetY("6.1h")
-	-- 	GetWidget('game_ally_display_holder'):SetWidth("7.45h")
-	-- 	GetWidget('game_ally_display_holder'):SetHeight("28.6h")
-	-- end
+	-- OptiUI: Position ally icons based on option
+	local function PositionAllyInfo()
+		if GetCvarBool('optiui_AllyFramesWidescreen') then
+			GetWidget('game_ally_display_holder'):SetAlign("center")
+			GetWidget('game_ally_display_holder'):SetVAlign("bottom")
+			GetWidget('game_ally_display_holder'):SetX("0.0h")
+			GetWidget('game_ally_display_holder'):SetY("-0.5h")
+			GetWidget('game_ally_display_holder'):SetWidth("90.0h")
+			GetWidget('game_ally_display_holder'):SetHeight("13.0h")
+
+			GetWidget('game_top_left_ally_parent_0'):SetAlign("left")
+			GetWidget('game_top_left_ally_parent_0'):SetVAlign("top")
+			GetWidget('game_top_left_ally_parent_0'):SetY(0)
+			
+			GetWidget('game_top_left_ally_parent_1'):SetAlign("left")
+			GetWidget('game_top_left_ally_parent_1'):SetVAlign("bottom")
+			GetWidget('game_top_left_ally_parent_1'):SetY(0)
+
+			GetWidget('game_top_left_ally_parent_2'):SetAlign("right")
+			GetWidget('game_top_left_ally_parent_2'):SetVAlign("top")
+			GetWidget('game_top_left_ally_parent_2'):SetY(0)
+
+			GetWidget('game_top_left_ally_parent_3'):SetAlign("right")
+			GetWidget('game_top_left_ally_parent_3'):SetVAlign("bottom")
+			GetWidget('game_top_left_ally_parent_3'):SetY(0)
+		else
+			GetWidget('game_ally_display_holder'):SetAlign("top")
+			GetWidget('game_ally_display_holder'):SetVAlign("left")
+			GetWidget('game_ally_display_holder'):SetX("0.0h")
+			GetWidget('game_ally_display_holder'):SetY("6.1h")
+			GetWidget('game_ally_display_holder'):SetWidth("5.8h")
+			GetWidget('game_ally_display_holder'):SetHeight("26.6h")
+
+			GetWidget('game_top_left_ally_parent_0'):SetAlign("left")
+			GetWidget('game_top_left_ally_parent_0'):SetVAlign("top")
+			GetWidget('game_top_left_ally_parent_0'):SetY('0%')
+
+			GetWidget('game_top_left_ally_parent_1'):SetAlign("left")
+			GetWidget('game_top_left_ally_parent_1'):SetVAlign("top")
+			GetWidget('game_top_left_ally_parent_1'):SetY('25%')
+
+			GetWidget('game_top_left_ally_parent_2'):SetAlign("left")
+			GetWidget('game_top_left_ally_parent_2'):SetVAlign("top")
+			GetWidget('game_top_left_ally_parent_2'):SetY('50%')
+
+			GetWidget('game_top_left_ally_parent_3'):SetAlign("left")
+			GetWidget('game_top_left_ally_parent_3'):SetVAlign("top")
+			GetWidget('game_top_left_ally_parent_3'):SetY('75%')
+		end
+	end
+	interface:RegisterWatch('optiui_AllyInfoPosition', PositionAllyInfo)
+	PositionAllyInfo()
 	-- OptiUI: end
+
 	local function AllyExists(allyIndex, sourceWidget, exists)
-		-- OptiUI: Position ally icons based on aspect ratio
-		-- if (OptiUI.widescreen) then
-		-- 	if (allyIndex < 2) then
-		-- 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetAlign("left")
-		-- 	else
-		-- 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetAlign("right")
-		-- 		GetWidget('game_top_left_ally_portrait_parent_'..allyIndex):SetAlign("right")
-		-- 		GetWidget('game_top_left_ally_portrait_parent_'..allyIndex):SetX("-1.75h")
-		-- 		GetWidget('game_top_left_ally_bar_parent_'..allyIndex):SetAlign("right")
-		-- 		GetWidget('game_top_left_ally_bar_parent_'..allyIndex):SetX("-1.75h")
-		-- 		GetWidget('game_top_left_ally_button_parent_'..allyIndex):SetAlign("right")
-		-- 		GetWidget('game_top_left_ally_status_light_'..allyIndex):SetAlign("right")
-		-- 		GetWidget('game_top_left_ally_status_light_'..allyIndex):SetX("-6.23h")
-		-- 	end
-		-- 	if (AtoB(allyIndex % 2)) then
-		-- 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetVAlign("bottom")
-		-- 	else
-		-- 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetVAlign("top")
-		-- 	end
-		-- else
-		-- 	local allyOffset = allyIndex * 25
-		-- 	GetWidget('game_top_left_ally_parent_'..allyIndex):SetY(allyOffset .. '%')
-		-- end
-		-- OptiUI: end
 		GetWidget('game_top_left_ally_parent_'..allyIndex):SetVisible(AtoB(exists))
 	end
 
@@ -1246,7 +1237,7 @@ local function InitBottomCenterPanel()
 			--GetWidget('game_center_large_gear'):Rotate(30, 250)
 		end
 		if (skillPoints >= 1) then
-			GetWidget('game_center_levelup_btn_holder'):SetBorderColor("yellow")
+			GetWidget('game_center_levelup_btn_holder'):SetBorderColor("purple")
 		else
 			GetWidget('game_center_levelup_btn_holder'):SetBorderColor("gray")
 		end
@@ -1431,7 +1422,7 @@ local function InitBottomCenterPanel()
 		local canShop = AtoB(canShop)
 		if (canShop) then
 			GetWidget('item_shop_sign'):SetVisible(true)
-			GetWidget('item_shop_sign'):Sleep(1, function() GetWidget('item_shop_sign'):SlideY('-10.7h', 250) end)
+			GetWidget('item_shop_sign'):Sleep(1, function() GetWidget('item_shop_sign'):SlideY('-10.8h', 250) end)
 			-- do the above sleep to interrupt any existing sleeps to set the sign invisible
 		else
 			GetWidget('item_shop_sign'):Sleep(250, function() GetWidget('item_shop_sign'):SetVisible(false) end)
@@ -1477,8 +1468,8 @@ local function InitBottomSection()
 			GetWidget('game_selected_info_unit_bg'):SetAlign('right')
 			GetWidget('game_selected_info_unit_icon'):SetAlign('left')
 			GetWidget('game_selected_info_unit_icon'):SetX('0.0h')
-			GetWidget('game_selected_info_unit_item_catcher'):SetAlign('right')
-			GetWidget('game_selected_info_unit_item_catcher'):SetX('-17.1h')
+			--GetWidget('game_selected_info_unit_item_catcher'):SetAlign('right')
+			--GetWidget('game_selected_info_unit_item_catcher'):SetX('-17.1h')
 			GetWidget('game_selected_info_unit_inventory'):SetAlign('right')
 			GetWidget('game_selected_info_unit_inventory'):SetX('-1.2h')
 			GetWidget('game_botright_health_bar_bg_0'):SetAlign('right')
@@ -1505,8 +1496,8 @@ local function InitBottomSection()
 			-- OptiUI: Changed from right to left
 			GetWidget('game_selected_info_building_icon'):SetAlign('left')
 			--GetWidget('game_selected_info_building_icon'):SetX('-17.1h')
-			GetWidget('game_selected_info_building_item_catcher'):SetAlign('right')
-			GetWidget('game_selected_info_building_item_catcher'):SetX('-17.1h')
+			--GetWidget('game_selected_info_building_item_catcher'):SetAlign('right')
+			--GetWidget('game_selected_info_building_item_catcher'):SetX('-17.1h')
 			GetWidget('game_botright_health_bar_bg_1'):SetAlign('right')
 			GetWidget('game_botright_health_bar_bg_1'):SetX('-1.2h')
 			GetWidget('game_selected_info_building_shared_abilities'):SetAlign('right')
@@ -1578,8 +1569,8 @@ local function InitBottomSection()
 			GetWidget('game_selected_info_unit_bg'):SetAlign('left')
 			GetWidget('game_selected_info_unit_icon'):SetAlign('right')
 			GetWidget('game_selected_info_unit_icon'):SetX('0.0h')
-			GetWidget('game_selected_info_unit_item_catcher'):SetAlign('left')
-			GetWidget('game_selected_info_unit_item_catcher'):SetX('17.1h')
+			--GetWidget('game_selected_info_unit_item_catcher'):SetAlign('left')
+			--GetWidget('game_selected_info_unit_item_catcher'):SetX('17.1h')
 			GetWidget('game_selected_info_unit_inventory'):SetAlign('left')
 			GetWidget('game_selected_info_unit_inventory'):SetX('1.2h')
 			GetWidget('game_botright_health_bar_bg_0'):SetAlign('left')
@@ -1606,8 +1597,8 @@ local function InitBottomSection()
 			-- OptiUI: Changed from left to right
 			GetWidget('game_selected_info_building_icon'):SetAlign('right')
 			--GetWidget('game_selected_info_building_icon'):SetX('17.1h')
-			GetWidget('game_selected_info_building_item_catcher'):SetAlign('left')
-			GetWidget('game_selected_info_building_item_catcher'):SetX('17.1h')
+			--GetWidget('game_selected_info_building_item_catcher'):SetAlign('left')
+			--GetWidget('game_selected_info_building_item_catcher'):SetX('17.1h')
 			GetWidget('game_botright_health_bar_bg_1'):SetAlign('left')
 			GetWidget('game_botright_health_bar_bg_1'):SetX('1.2h')
 			GetWidget('game_selected_info_building_shared_abilities'):SetAlign('left')
@@ -1767,8 +1758,6 @@ local function InitBottomRight()
 
 	local function SelectedPlayerInfo(sourceWidget, playerName, playerColor)
 		GetWidget('game_botright_portrait_model'):UICmd("SetTeamColor('"..playerColor.."')")
-		-- OptiUI: Selected player hero frame color
-		GetWidget('game_botright_portrait_frame'):SetBorderColor(playerColor)
 	end
 	interface:RegisterWatch('SelectedPlayerInfo', SelectedPlayerInfo)
 
@@ -2045,7 +2034,7 @@ local function InitActiveInventory()
 			GetWidget('ability_lvlup_button_button_'..slotIndex):RefreshCallbacks()
 			-- OptiUI: Removed ability level up effect because it is heavy and distracting --
 			--GetWidget("level_up_effect_"..slotIndex):SetVisible(1)
-			GetWidget('level_up_effect_'..slotIndex):SetBorderColor("purple")
+			GetWidget('level_up_effect_'..slotIndex):SetBorderColor("yellow")
 		else
 			GetWidget('ability_lvlup_button_icon_'..slotIndex):UICmd("SetRenderMode('grayscale')")
 			GetWidget('ability_lvlup_button_icon_'..slotIndex):SetColor('#808080')

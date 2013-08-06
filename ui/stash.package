@@ -138,7 +138,7 @@
 	</template>
 	
 	<template name="stash">
-		<panel name="stash_parent" width="24.0h" height="16.0h" align="right" valign="bottom" visible="0" noclick="1"
+		<panel name="stash_parent" width="24.0h" height="14.0h" align="right" valign="bottom" visible="0" noclick="1"
 			watch="ShopActive"
 			ontrigger="
 				If(
@@ -179,7 +179,7 @@
 				<image texture="/ui/common/new_shop_interface/stash.tga" noclick="1" />
 				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
 			</panel>
-			<panel name="game_stash_label_parent" x="1.2h" y="0.0" width="15.5h" height="3.0h" align="left" valign="top">
+			<panel name="game_stash_label_parent" x="1.2h" y="0.0" width="15.5h" height="2.5h" align="left" valign="top">
 				<label name="game_stash_label" textalign="center" textvalign="center" font="dyn_12" color="white" noclick="1">game_label_stash</label>
 				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
 			</panel>
