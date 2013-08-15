@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Game version: v3.2.0 -->
+<!-- Game version: v3.2.1 -->
 <package>	
 	<template name="stash_button">
 		<panel x="{x}" y="{y}" width="{width}" height="{height}" align="{align}" valign="{valign}" name="game_stash_button_{slot}" >
@@ -138,7 +138,7 @@
 	</template>
 	
 	<template name="stash">
-		<panel name="stash_parent" width="24.0h" height="14.0h" align="right" valign="bottom" visible="0" noclick="1"
+		<panel name="stash_parent" width="24.0h" height="15.0h" align="right" valign="bottom" visible="0" noclick="1"
 			watch="ShopActive"
 			ontrigger="
 				If(
@@ -162,7 +162,7 @@
 				);
 			"
 		>		
-			<panel name="stash" color="black" />			
+			<frame name="stash" texture="/ui/frames/tooltip_bg.tga" color=".3 .35 .4 1" />			
 			<panel name="game_stash_buttons" x="1.2h" y="-0.5h" width="15.5h" height="10.1h" align="left" valign="bottom" noclick="1" >
 				<instance name="stash_button" width="4.9h" height="4.9h" align="left"   valign="top"    slot="0" />
 				<instance name="stash_button" width="4.9h" height="4.9h" align="center" valign="top"    slot="1" />
@@ -175,18 +175,18 @@
 			<!-- Framing -->
 			<!-- <image name="game_stash_bg" texture="/ui/common/bot_right_stash.tga" noclick="1" /> -->
 			<!-- <image name="game_stash_bg_alt" texture="/ui/common/bot_right_stash.tga" noclick="1" hflip="1" /> -->
-			<panel name="game_stash_icon" x="0.0h" y="0.0h" height="6.5h" width="6.5h" align="right" noclick="1">
+			<panel name="game_stash_icon" x="0.0h" y="0.0h" height="6.0h" width="6.0h" align="right" noclick="1" color="black">
 				<image texture="/ui/common/new_shop_interface/stash.tga" noclick="1" />
 				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
 			</panel>
-			<panel name="game_stash_label_parent" x="1.2h" y="0.0" width="15.5h" height="2.5h" align="left" valign="top">
+			<panel name="game_stash_label_parent" x="1.2h" y="0.0" width="15.5h" height="2.0h" align="left" valign="top" color="black">
 				<label name="game_stash_label" textalign="center" textvalign="center" font="dyn_12" color="white" noclick="1">game_label_stash</label>
 				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
 			</panel>
 			<!-- Tip Marks-->
 			<button name="game_stash_tip_stash"
-				x="-1.0h" y="-0.5h"
-				width="4.5h" height="4.5h"
+				x="-0.5h" y="-0.5h"
+				width="3.0h" height="3.0h"
 				align="right" valign="bottom"
 				color="invisible"
 				onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showwidget('stash_tooltip');"

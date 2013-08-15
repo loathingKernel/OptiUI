@@ -1,7 +1,7 @@
 ---------------------------------------------------------- 
 --	Name: 		Game Interface Script            		--				
 --  Copyright 2012 S2 Games								--
---  Game version: v3.2.0								--
+--  Game version: v3.2.1								--
 ----------------------------------------------------------
 
 local _G = getfenv(0)
@@ -179,9 +179,37 @@ local function InitMidBar()
 
 	---[[ Clock
 	Game.game_match_time_label = GetWidget('game_match_time_label')
+	-- OptiUI: Timer object init
+	Game.game_match_time_rotation_label = GetWidget('game_match_time_rotation_label')
+	Game.game_match_time_rune_label = GetWidget('game_match_time_rune_label')
+	Game.game_match_time_rotation_label:SetText('^oD^w/^pN')
+	Game.game_match_time_rune_label:SetText('Rune')
+	-- OptiUI: end
 	local function MatchTime(sourceWidget, matchTime, isPreMatchPhase)
 		Game.game_match_time_label:SetText( convertTimeRange(matchTime) )
 		Game.isPreMatchPhase = AtoB(isPreMatchPhase)
+		-- OptiUI: Day/Night, Rune Timers
+		if (not AtoB(isPreMatchPhase)) then
+			local dayDuration = GetCvarInt('g_dayLength') / 1000
+			local untilChange = (dayDuration / 2) - (Game.lastMatchTime % (dayDuration / 2)) - 1
+			local timestate = floor(Game.lastMatchTime / (dayDuration / 2)) % 2
+
+			if (timestate == 1) then
+				Game.game_match_time_rotation_label:SetText('^pN^w: '..convertTimeRange(untilChange))
+			else
+				Game.game_match_time_rotation_label:SetText('^oD^w: '..convertTimeRange(untilChange))
+			end
+
+			local powerupInterval = GetCvarInt('g_powerupSpawnInterval') / 1000
+			local untilSpawn = (powerupInterval) - (Game.lastMatchTime % (powerupInterval)) - 1
+
+			if (untilSpawn < 30) then
+				Game.game_match_time_rune_label:SetText('R: ^:^r'..convertTimeRange(untilSpawn))
+			else
+				Game.game_match_time_rune_label:SetText('R: '..convertTimeRange(untilSpawn))
+			end
+		end
+		-- OptiUI: end
 	end
 	Game.lastMatchTime = -1
 	local function PreMatchTime(sourceWidget, matchTime, isPreMatchPhase)
@@ -706,7 +734,7 @@ local function InitAllyInfo()
 			GetWidget('game_ally_display_holder'):SetX("0.0h")
 			GetWidget('game_ally_display_holder'):SetY("-0.5h")
 			GetWidget('game_ally_display_holder'):SetWidth("90.0h")
-			GetWidget('game_ally_display_holder'):SetHeight("13.0h")
+			GetWidget('game_ally_display_holder'):SetHeight("13.5h")
 
 			GetWidget('game_top_left_ally_parent_0'):SetAlign("left")
 			GetWidget('game_top_left_ally_parent_0'):SetVAlign("top")
@@ -729,7 +757,7 @@ local function InitAllyInfo()
 			GetWidget('game_ally_display_holder'):SetX("0.0h")
 			GetWidget('game_ally_display_holder'):SetY("6.1h")
 			GetWidget('game_ally_display_holder'):SetWidth("5.8h")
-			GetWidget('game_ally_display_holder'):SetHeight("26.6h")
+			GetWidget('game_ally_display_holder'):SetHeight("27.0h")
 
 			GetWidget('game_top_left_ally_parent_0'):SetAlign("left")
 			GetWidget('game_top_left_ally_parent_0'):SetVAlign("top")
@@ -809,6 +837,7 @@ local function InitAllyInfo()
 
 	local function AllyPlayerInfo(allyIndex, sourceWidget, playerName, playerColor, playerClient)
 		-- OptiUI: Set border color and bg color
+		--GetWidget('game_top_left_ally_parent_'..allyIndex):SetColor(playerColor)
 		GetWidget('game_top_left_ally_image_bg_'..allyIndex):SetBorderColor(playerColor)
 		GetWidget('game_top_left_ally_level_bg_'..allyIndex):SetColor(playerColor)
 		Game.PlayerColorsByIndex = Game.PlayerColorsByIndex or {}
@@ -842,6 +871,7 @@ local function InitAllyInfo()
 		local health, maxHealth, tempHealthPercent, tempHealthShadow = AtoN(health), AtoN(maxHealth), ToPercent(AtoN(healthPercent)), ToPercent(AtoN(healthPercent))
 		GetWidget('game_top_left_ally_health_'..allyIndex):SetWidth(tempHealthPercent)
 		GetWidget('game_top_left_ally_health_'..allyIndex):SetColor(GetHealthBarColor(healthPercent))
+		GetWidget('game_top_left_ally_health_label_'..allyIndex):SetText(round(health))
 	end
 
 	local function AllyMana(allyIndex, sourceWidget, mana, maxMana, manaPercent, manaShadow)
@@ -849,6 +879,7 @@ local function InitAllyInfo()
 		if (maxMana > 0) then
 			GetWidget('game_top_left_ally_mana_'..allyIndex):SetVisible(true)
 			GetWidget('game_top_left_ally_mana_'..allyIndex):SetWidth(tempManaPercent)
+			GetWidget('game_top_left_ally_mana_label_'..allyIndex):SetText(round(mana))
 		else
 			GetWidget('game_top_left_ally_mana_'..allyIndex):SetVisible(false)
 		end
@@ -887,7 +918,7 @@ local function InitAllyInfo()
 			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetColor('orange')
 		end	
 		-- OptiUI: Ally abilities level labels
-		--GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetText(abilityLevel)
+		GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetText(abilityLevel)
 		-- OptiUI: end
 	end
 
@@ -1156,10 +1187,12 @@ local function InitBottomCenterPanel()
 	-- Health
 	local function ActiveHealth(sourceWidget, health, maxHealth, healthPercent, healthShadow)
 		local health, maxHealth, tempHealthPercent, tempHealthShadow = AtoN(health), AtoN(maxHealth), ToPercent(AtoN(healthPercent)), ToPercent(AtoN(healthPercent))
-		if GetCvarBoolMem('cg_showHeroHealthLerp') and (Game.lastHealthEntity == GetSelectedEntity()) then
+		if GetCvarBoolMem('cg_showHeroHealthLerp') and (health > 0) and (Game.lastHealthEntity == GetSelectedEntity()) then
 			GetWidget('game_center_health_lerp'):ScaleWidth(tempHealthShadow, 500, -1)
+			GetWidget('game_center_health_lerp'):SetVisible(true)
 		else
 			Game.lastHealthEntity = GetSelectedEntity()
+			GetWidget('game_center_health_lerp'):SetVisible(false)
 			GetWidget('game_center_health_lerp'):ScaleWidth(0, 0, -1)
 		end
 		-- OptiUI: Fix for frame width = 0 graphic glitch
@@ -1191,12 +1224,13 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_mana_bar_backer'):SetVisible(mana > 0)
 			GetWidget('game_center_mana_label'):SetVisible(true)
 			GetWidget('game_center_mana_regen_label'):SetVisible(true)	
-			if GetCvarBoolMem('cg_showHeroHealthLerp') and (Game.lastManaEntity == GetSelectedEntity()) then
-				GetWidget('game_center_mana_lerp'):SetVisible(true)
+			if GetCvarBoolMem('cg_showHeroHealthLerp') and (mana > 0) and (Game.lastManaEntity == GetSelectedEntity()) then
 				GetWidget('game_center_mana_lerp'):ScaleWidth(tempManaShadow, 500, -1)
+				GetWidget('game_center_mana_lerp'):SetVisible(true)
 			else
-				GetWidget('game_center_mana_lerp'):ScaleWidth(0, 0, -1)
 				Game.lastManaEntity = GetSelectedEntity()
+				GetWidget('game_center_mana_lerp'):SetVisible(false)
+				GetWidget('game_center_mana_lerp'):ScaleWidth(0, 0, -1)
 			end
 			-- OptiUI: Small rename to keep things clean
 			GetWidget('game_center_mana_bar_backer'):SetWidth(tempManaPercent)		
@@ -1204,16 +1238,12 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_mana_label'):SetText(ceil(mana) .. '/' .. ceil(maxMana))
 			-- OptiUI: Mana regen label always visible
 			GetWidget('game_center_mana_regen_label'):SetVisible((mana/maxMana) <= 0.99)
-			-- OptiUI: Mana bar frame visible if unit has mana
-			GetWidget('game_center_mana_bar_frame'):SetVisible(true)
 		else
 			GetWidget('game_center_mana_lerp'):SetVisible(false)
 			-- OptiUI: Small rename to keep things clean
 			GetWidget('game_center_mana_bar_backer'):SetVisible(false)
 			GetWidget('game_center_mana_label'):SetVisible(false)	
 			GetWidget('game_center_mana_regen_label'):SetVisible(false)
-			-- OptiUI: Mana bar frame not visible if unit hasn't mana
-			GetWidget('game_center_mana_bar_frame'):SetVisible(false)
 		end
 	end
 	interface:RegisterWatch('ActiveMana', ActiveMana)
@@ -1355,7 +1385,7 @@ local function InitBottomCenterPanel()
 	local function ActiveArmor(sourceWidget, baseArmor, armor, mitigation)
 		local baseArmor, armor, mitigation = AtoN(baseArmor), AtoN(armor), AtoN(mitigation)
 		GetWidget('game_center_armor_label'):SetText(' ' .. format("%.1f", armor) .. ' / ' .. format("%.1f", Game.playerMagicArmor) )
-		GetWidget('game_center_damage_mitigation_label'):SetText(' ' .. FtoA(tonumber(mitigation) * 100, 1) .. ' / ' .. FtoA(tonumber(Game.playerMagicDamageMitigation) * 100, 1))
+		GetWidget('game_center_damage_mitigation_label'):SetText(' '.. FtoA(tonumber(mitigation) * 100, 1)..'% / '..FtoA(tonumber(Game.playerMagicDamageMitigation) * 100, 1)..'%')
 		Game.playerArmor = armor
 		Game.playerDamageMitigation = mitigation
 	end
@@ -1367,7 +1397,7 @@ local function InitBottomCenterPanel()
 	local function ActiveMagicArmor(sourceWidget, baseMagicArmor, magicArmor, mitigation)
 		local baseMagicArmor, magicArmor, mitigation = AtoN(baseMagicArmor), AtoN(magicArmor), AtoN(mitigation)
 		GetWidget('game_center_armor_label'):SetText(' ' .. format("%.1f", Game.playerArmor) .. ' ^777/^999 ' .. format("%.1f", magicArmor) )
-		GetWidget('game_center_damage_mitigation_label'):SetText(' ' .. FtoA(tonumber(Game.playerDamageMitigation) * 100, 1) .. ' / ' .. FtoA(tonumber(mitigation) * 100, 1))
+		GetWidget('game_center_damage_mitigation_label'):SetText(' '..FtoA(tonumber(Game.playerDamageMitigation) * 100, 1)..'% / '.. FtoA(tonumber(mitigation) * 100, 1)..'%')
 		Game.playerMagicArmor = magicArmor
 		Game.playerMagicDamageMitigation = mitigation
 	end
@@ -1405,7 +1435,10 @@ local function InitBottomCenterPanel()
 		end
 		-- Reset lerp when changing active unit
 		GetWidget('game_center_health_lerp'):ScaleWidth(0, 0, -1)
+		GetWidget('game_center_health_lerp'):SetVisible(false)
 		GetWidget('game_center_mana_lerp'):ScaleWidth(0, 0, -1)
+		GetWidget('game_center_mana_lerp'):SetVisible(false)
+
 	end
 	interface:RegisterWatch('ActiveName', ActiveName)
 
@@ -1422,11 +1455,11 @@ local function InitBottomCenterPanel()
 		local canShop = AtoB(canShop)
 		if (canShop) then
 			GetWidget('item_shop_sign'):SetVisible(true)
-			GetWidget('item_shop_sign'):Sleep(1, function() GetWidget('item_shop_sign'):SlideY('-10.8h', 250) end)
+			GetWidget('item_shop_sign'):Sleep(1, function() GetWidget('item_shop_sign'):FadeIn(100) end)
 			-- do the above sleep to interrupt any existing sleeps to set the sign invisible
 		else
 			GetWidget('item_shop_sign'):Sleep(250, function() GetWidget('item_shop_sign'):SetVisible(false) end)
-			GetWidget('item_shop_sign'):SlideY('0h', 250)
+			GetWidget('item_shop_sign'):FadeOut(100)
 		end
 	end
 	interface:RegisterWatch('PlayerCanShop', PlayerCanShop)
@@ -1459,8 +1492,8 @@ local function InitBottomSection()
 			--GetWidget('game_botright_units_left'):SetVisible(false)
 			--GetWidget('game_botright_building_right'):SetVisible(true)
 			--GetWidget('game_botright_building_left'):SetVisible(false)
-			GetWidget('game_botright_mult_right'):SetVisible(true)
-			GetWidget('game_botright_mult_left'):SetVisible(false)
+			-- GetWidget('game_botright_mult_right'):SetVisible(true)
+			-- GetWidget('game_botright_mult_left'):SetVisible(false)
 			
 			GetWidget('game_selected_info_orders'):SetAlign('right')
 			GetWidget('game_selected_info_orders_pos'):SetX('0')
@@ -1542,7 +1575,7 @@ local function InitBottomSection()
 			--GetWidget('game_stash_label'):SetX('-6.0h')
 			
 			GetWidget('game_stash_tip_stash'):SetAlign('right')
-			GetWidget('game_stash_tip_stash'):SetX('-1.0h')
+			GetWidget('game_stash_tip_stash'):SetX('-0.5h')
 			--GetWidget('game_stash_tip_deconstruct'):SetAlign('right')
 			--GetWidget('game_stash_tip_deconstruct'):SetX('-5.3h')		
 			
@@ -1560,8 +1593,8 @@ local function InitBottomSection()
 			--GetWidget('game_botright_units_left'):SetVisible(true)
 			--GetWidget('game_botright_building_right'):SetVisible(false)
 			--GetWidget('game_botright_building_left'):SetVisible(true)	
-			GetWidget('game_botright_mult_right'):SetVisible(false)
-			GetWidget('game_botright_mult_left'):SetVisible(true)
+			-- GetWidget('game_botright_mult_right'):SetVisible(false)
+			-- GetWidget('game_botright_mult_left'):SetVisible(true)
 				
 			GetWidget('game_selected_info_orders'):SetAlign('left')
 			GetWidget('game_selected_info_orders_pos'):SetX('0')
@@ -1643,7 +1676,7 @@ local function InitBottomSection()
 			--GetWidget('game_stash_label'):SetX('8.5h')
 			
 			GetWidget('game_stash_tip_stash'):SetAlign('left')
-			GetWidget('game_stash_tip_stash'):SetX('1.0h')
+			GetWidget('game_stash_tip_stash'):SetX('0.5h')
 			--GetWidget('game_stash_tip_deconstruct'):SetAlign('left')
 			--GetWidget('game_stash_tip_deconstruct'):SetX('5.3h')
 			
@@ -1691,9 +1724,11 @@ local function InitBottomRight()
 			GetWidget('game_botright_health_bar_'..targetWidget):SetWidth(ToPercent(tempHealthPercent))
 			GetWidget('game_botright_health_bar_'..targetWidget):SetColor(GetHealthBarColor(healthPercent))	
 			if (tempHealthPercent < 0) then
+				GetWidget('game_botright_health_bar_'..targetWidget):SetVisible(false)	
 				GetWidget('game_botright_health_label_'..targetWidget):SetText(Translate('game_invulnerable'))
 			else
 				GetWidget('game_botright_health_label_'..targetWidget):SetText(ceil(health) .. '/' .. ceil(maxHealth))
+				GetWidget('game_botright_health_bar_'..targetWidget):SetVisible(true)	
 			end		
 		else
 			GetWidget('game_botright_health_bar_bg_'..targetWidget):SetVisible(false)
@@ -1901,6 +1936,7 @@ local function InitBackpack()
 	local function ActiveInventoryCharges(slotIndex, sourceWidget, charges)
 		local charges = AtoN(charges)
 		if (charges) and (charges > 0) then
+			GetWidget('inventory_button_timer_'..slotIndex):SetY('0')
 			GetWidget('inventory_button_charges_parent_'..slotIndex):SetVisible(true)
 			GetWidget('inventory_button_charges_label_'..slotIndex):SetText(charges)
 			if (charges < 10) then
@@ -1910,6 +1946,7 @@ local function InitBackpack()
 				GetWidget('inventory_button_charges_label_'..slotIndex):SetFont('dyn_8')
 			end
 		else
+			GetWidget('inventory_button_timer_'..slotIndex):SetY('-25%')
 			GetWidget('inventory_button_charges_parent_'..slotIndex):SetVisible(false)
 		end
 	end
