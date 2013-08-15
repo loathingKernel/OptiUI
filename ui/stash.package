@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Game version: v3.2.1 -->
+<!-- Game version: v3.2.1.2 -->
 <package>	
 	<template name="stash_button">
 		<panel x="{x}" y="{y}" width="{width}" height="{height}" align="{align}" valign="{valign}" name="game_stash_button_{slot}" >

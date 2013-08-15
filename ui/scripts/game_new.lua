@@ -1,7 +1,7 @@
 ---------------------------------------------------------- 
 --	Name: 		Game Interface Script            		--				
 --  Copyright 2012 S2 Games								--
---  Game version: v3.2.1								--
+--  Game version: v3.2.1.2								--
 ----------------------------------------------------------
 
 local _G = getfenv(0)

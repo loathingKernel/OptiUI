@@ -46,7 +46,6 @@
 	<!-- OptiUI: New triggers -->
 	<trigger name="optiui_AllyInfoPosition"/>
 
-
 	<!-- Couriers -->
 	<!-- UIScript -->
 	<panel noclick="true" color="invisible"
