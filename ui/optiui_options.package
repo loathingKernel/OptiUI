@@ -2,48 +2,29 @@
 	<instance name="mod_options" mod_id="optiui_options" mod_name="OptiUI" />
 	
 	<instance mod_id="optiui_options" name="mod_header"
-		label="Ally Frames:"
+		label="Ally Info Frames:"
 	/>
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_AllyFramesWidescreen"
 		default="false"
 		onchange="If(_game_phase ge 5, Trigger(\\\'optiui_AllyInfoPosition\\\'));"
-		label="Move Ally Hero frames to bottom center"
+		label="Move Ally Info frames to bottom center"
 		tooltip="When ^gchecked^w the allied heroes portraits will be moved to the sides of the bottom center panel. Useful for widescreen monitors where there is unused space in that location."
+		tooltip_width="43h"
+	/>
+	<instance mod_id="optiui_options" name="mod_checkbox"
+		cvar="optiui_AllyFramesWide"
+		default="false"
+		label="Use bigger Ally Info frames"
+		tooltip="When ^gchecked^w the allied heroes portraits will be wider to cover more of the empty space on the bottom bar. Useful with the previous option but can be enabled for the top left frames too. NEEDS RESTART TO WORK!"
 		tooltip_width="43h"
 	/>
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_AllyFramesDisableRightClick"
 		default="false" 
-		label="Disable right click menu on Ally Hero portraits"
+		label="Disable right click menu on Ally Info portraits"
 		tooltip="When ^gchecked^w it will disable the right click menu on hero portraits. Useful if the in-game RAP panel shows up when you click the portrait by mistake in the middle of the battle."
 		tooltip_width="43h"
 	/>
 
-	<!-- <instance mod_id="optiui_options" name="mod_keybind_header" />
-	<instance mod_id="optiui_options" name="mod_keybind" label="Refresh selected unit" table="game" action="Cmd" param="Refresh #GetSelectedEntity()#"/>
-	<instance mod_id="optiui_options" name="mod_keybind" label="Kill selected unit" table="game" action="Cmd" param="Kill #GetSelectedEntity()#" />
-	
-	<instance mod_id="optiui_options" name="mod_header" label="Configurable Hero Stats: (these affect the toggle buttons in the Main Panel)" />
-	<instance mod_id="optiui_options" name="mod_empty" label="Only updates when when you re-toggle. (Don\\\'t use too high values or the game might crash.)" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="Max HP/MP (scale)" cvar="testpp_MaxHpMpPerAttributeScale" default="10" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="HP/MP Regen (scale)" cvar="testpp_HpMpRegenPerAttributeScale" default="10" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="AttackSpeed (scale)" cvar="testpp_AttackSpeedPerAgi" default="100" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="MovingSpeed (value)" cvar="testpp_MinMoveSpeed" default="1044" />
-	
-	<instance mod_id="optiui_options" name="mod_header" label="Toggle all open windows: (with a hotkey and/or the Test++ button)" />
-	<instance mod_id="optiui_options" name="mod_keybind" label="Toggle hotkey" table="game" trigger="testpp_ToggleWindows testpp_ToggleWindows" />
-	<instance mod_id="optiui_options" name="mod_checkbox" label="Test++ button toggles open windows" cvar="testpp_ButtonToggleWindows" default="false" tooltip="When ^gchecked^w the Test++ button will toggle all open windows. When ^runchecked^w it will only open the Main Panel." tooltip_width="43h" />
-	<instance mod_id="optiui_options" name="mod_checkbox" label="Focus entity search textbox first" cvar="testpp_FocusSpawnerFirst" default="false" tooltip="If both the Spawner and Items windows are open, it will focus Entity Search first when ^gchecked^w, or the Item Search first when ^runchecked^w." tooltip_width="59h" />
-	<instance mod_id="optiui_options" name="mod_checkbox" label="Never toggle Item and Entity Spawner windows" cvar="testpp_NeverOpen" default="false" tooltip="This will never toggle the Item or the Entity Spawner window when using the hotkey or the Test++ button." tooltip_width="43h" />
-	
-	<instance mod_id="optiui_options" name="mod_header" label="Miscellaneous:" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="Max Camera Distance (value)" cvar="testpp_MaxCamDistance" default="2500" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="Min Camera Distance (value)" cvar="testpp_MinCamDistance" default="300" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="Neutral Spawn Block Radius (units)" cvar="testpp_neutralSpawnBlockRadius" default="500" />
-	<instance mod_id="optiui_options" name="mod_empty" label="The values below only go into effect after the current interval has completed." />
-	<instance mod_id="optiui_options" name="mod_textbox" label="Neutral Spawn Interval (seconds)" cvar="testpp_neutralRespawnInterval" default="60" trigger="testpp_Trig_SpawnInterval" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="Creep Wave Interval (seconds)" cvar="testpp_creepWaveInterval" default="30" trigger="testpp_Trig_SpawnInterval" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="Powerup Spawn Interval (seconds)" cvar="testpp_powerupSpawnInterval" default="120" trigger="testpp_Trig_SpawnInterval" />
-	<instance mod_id="optiui_options" name="mod_textbox" label="Tree Spawn Interval (seconds)" cvar="testpp_treeSpawnInterval" default="300" trigger="testpp_Trig_SpawnInterval" /> -->
 </package>

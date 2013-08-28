@@ -171,51 +171,142 @@
 				<instance name="stash_button" width="4.9h" height="4.9h" align="center" valign="bottom" slot="4" />
 				<instance name="stash_button" width="4.9h" height="4.9h" align="right"  valign="bottom" slot="5" />
 			</panel>
+
+			<!-- Courier Status Icon -->
+			<panel name="stash_courier_status" x="0" y="0" width="6.0h" height="6.0h">
+				<instance name="inventory_game_icon"
+					watch="CourierState"
+					ontriggerlua="self:SetTexture('/ui/common/courier/courier_state_'..param..'.tga')"
+					watch2="CourierControllable"
+					ontrigger2lua="
+						if (AtoB(param)) then
+							self:SetRenderMode('normal')
+						else
+							self:SetRenderMode('grayscale')
+						end
+					"
+					onmouseoverlua="GetWidget('courier_state_tooltip', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('courier_state_tooltip', 'game'):SetVisible(0)"
+				/>
+
+				<!-- courier stats bubbles -->
+				<!-- status (private, dead) -->
+				<panel name="stash_courier_private" x="0" y="0" width="33%" height="33%">
+					<panel color="black" noclick="1" />
+					<label font="dyn_9" color="yellow" textalign="center" textvalign="center"
+						onmouseoverlua="GetWidget('courier_status_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('courier_status_tooltip', 'game'):SetVisible(0)"
+						watch1="CourierPrivate"
+						ontrigger1="If(StringEquals(CourierState, 'Dead'),
+										Split(
+											SetText('D'),
+											SetColor('red')
+										),
+										If(param,
+											Split(
+												SetText('P'),
+												SetColor('yellow')
+											),
+											Split(
+												SetText('S'),
+												SetColor('white')
+											)
+										)
+									);"
+						watch2="CourierState"
+						ontrigger2="If(StringEquals(param, 'Dead'),
+										Split(
+											SetText('D'),
+											SetColor('red')
+										),
+										If(CourierPrivate,
+											Split(
+												SetText('P'),
+												SetColor('yellow')
+											),
+											Split(
+												SetText('S'),
+												SetColor('white')
+											)
+										)
+									);"
+					/>
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true"/>
+				</panel>
+
+				<!-- controller (player, color) -->
+				<panel name="stash_courier_controller" x="0" y="0" width="33%" height="33%">
+					<panel color="black" noclick="1" />
+					<panel
+						color="invisible"
+						watch="CourierController"
+						ontriggerlua="
+							if (NotEmpty(param0)) then
+								self:SetColor(param0)
+							else
+								self:SetColor('invisible')
+							end
+						"
+						onmouseoverlua="GetWidget('courier_controller_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('courier_controller_tooltip', 'game'):SetVisible(0)"
+					/>
+					<!-- <image
+						texture="$invis" noclick="1"
+						watch="CourierController"
+						ontriggerlua="
+							if (NotEmpty(param2)) then
+								self:SetTexture(GetEntityIconPath(param2))
+							else
+								self:SetTexture('$invis')
+							end
+						"
+					/> -->
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true"/>
+				</panel>
+			</panel>
+
+			<!-- Courier Button -->
+			<panel name="stash_courier_button" x="-1.1h" y="-0.5h" width="4.9h" height="4.9h" valign="bottom">
+				<instance name="inventory_game_button"
+					texture="/ui/common/courier/courier_action.tga"
+					onclicklua="UseBestCourier()"
+					onmouseoverlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(0)"
+					buttonwatch="CourierControllable"
+					buttonontriggerlua="self:SetEnabled(AtoB(param))"
+				/>
+			</panel>
 			
 			<!-- Framing -->
-			<!-- <image name="game_stash_bg" texture="/ui/common/bot_right_stash.tga" noclick="1" /> -->
-			<!-- <image name="game_stash_bg_alt" texture="/ui/common/bot_right_stash.tga" noclick="1" hflip="1" /> -->
-			<panel name="game_stash_icon" x="0.0h" y="0.0h" height="6.0h" width="6.0h" align="right" noclick="1" color="black">
+			<!-- <image name="game_stash_bg" texture="/ui/common/bot_right_stash_courier.tga" noclick="1" /> -->
+			<!-- <image name="game_stash_bg_alt" texture="/ui/common/bot_right_stash_courier.tga" noclick="1" hflip="1" /> -->
+			<!-- <panel name="game_stash_icon" x="0.0h" y="0.0h" height="6.0h" width="6.0h" align="right" noclick="1" color="black">
 				<image texture="/ui/common/new_shop_interface/stash.tga" noclick="1" />
 				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
-			</panel>
-			<panel name="game_stash_label_parent" x="1.2h" y="0.0" width="15.5h" height="2.0h" align="left" valign="top" color="black">
+			</panel> -->
+			<panel name="game_stash_label_parent" x="1.2h" y="0.0" width="15.5h" height="3.0h" align="left" color="black">
+				<panel name="game_stash_icon" width="100@" height="100%" align="left" noclick="1" color="black">
+					<image texture="/ui/common/new_shop_interface/stash.tga" noclick="1" />
+				</panel>
 				<label name="game_stash_label" textalign="center" textvalign="center" font="dyn_12" color="white" noclick="1">game_label_stash</label>
 				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
+				<!-- Tip Marks-->
+				<button name="game_stash_tip_stash"
+					width="85@" height="85%"
+					align="right" valign="center"
+					color="invisible"
+					onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showwidget('stash_tooltip');"
+					onmouseout="hidewidget('stash_tooltip');"
+					interactive="false"
+				>
+					<widgetstate statename="up">
+						<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_up.tga" />
+					</widgetstate>
+					<widgetstate statename="over">
+						<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_over.tga" />
+					</widgetstate>
+				</button>
 			</panel>
-			<!-- Tip Marks-->
-			<button name="game_stash_tip_stash"
-				x="-0.5h" y="-0.5h"
-				width="3.0h" height="3.0h"
-				align="right" valign="bottom"
-				color="invisible"
-				onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showwidget('stash_tooltip');"
-				onmouseout="hidewidget('stash_tooltip');"
-				interactive="false"
-			>
-				<widgetstate statename="up">
-					<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_up.tga" />
-				</widgetstate>
-				<widgetstate statename="over">
-					<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_over.tga" />
-				</widgetstate>
-			</button>
-			<!-- <button name="game_stash_tip_deconstruct"
-				x="-5.3h" y="-8.6h"
-				width="1.7h" height="1.7h"
-				align="right" valign="bottom"
-				color="invisible"
-				onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showwidget('stash_deconstruct_tooltip');"
-				onmouseout="hidewidget('stash_deconstruct_tooltip');"
-				interactive="false"
-			>
-				<widgetstate statename="up">
-					<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_up.tga" />
-				</widgetstate>
-				<widgetstate statename="over">
-					<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_over.tga" />
-				</widgetstate>
-			</button> -->
 			<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>						
 		</panel>
 	</template>

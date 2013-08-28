@@ -2,7 +2,7 @@
 <!-- Game version: v3.2.1.2 -->
 <package>
 	<trigger name="sharing_update"/>
-	<panel x="10.2h" y="3.64h" width="1.86h" height="1.86h" color="invisible">
+	<panel x="1.6h" y="0" width="1.5h" height="1.5h" color="invisible">
 		<image texture="/ui/elements/share_frame.tga"/>
 		<image
 			width="55%" height="55@"

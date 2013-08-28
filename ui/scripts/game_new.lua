@@ -8,7 +8,7 @@ local _G = getfenv(0)
 local ipairs, pairs, select, string, table, next, type, unpack, tinsert, tconcat, tremove, format, tostring, tonumber, tsort, ceil, floor, sub, find, gfind = _G.ipairs, _G.pairs, _G.select, _G.string, _G.table, _G.next, _G.type, _G.unpack, _G.table.insert, _G.table.concat, _G.table.remove, _G.string.format, _G.tostring, _G.tonumber, _G.table.sort, _G.math.ceil, _G.math.floor, _G.string.sub, _G.string.find, _G.string.gfind
 local interface = object
 local interfaceName = interface:GetName()
-RegisterScript2('Game', '31')
+RegisterScript2('Game', '32')
 Game = {}
 Game.MAX_ALLIES 			= 3
 Game.MAX_ENEMIES 			= 4
@@ -208,6 +208,9 @@ local function InitMidBar()
 			else
 				Game.game_match_time_rune_label:SetText('R: '..convertTimeRange(untilSpawn))
 			end
+		else
+			Game.game_match_time_rotation_label:SetText('^pN^w/^oD')
+			Game.game_match_time_rune_label:SetText('Rune')
 		end
 		-- OptiUI: end
 	end
@@ -288,6 +291,7 @@ local function InitMidBar()
 	local function BaseHealth(baseID, game_base_health_header, game_base_health_backer, game_base_health_bar, sourceWidget, healthPercent)
 		game_base_health_header:SetVisible(AtoN(healthPercent) < 1)
 		if AtoN(healthPercent) < 1 then
+			game_base_health_backer:SetVisible(AtoB(healthPercent))
 			game_base_health_backer:SetWidth(ToPercent(AtoN(healthPercent)))
 			game_base_health_bar:SetColor(GetHealthBarColor(healthPercent))
 		end
@@ -726,15 +730,37 @@ end
 -- 						Ally Info						--
 ----------------------------------------------------------
 local function InitAllyInfo()
+
 	-- OptiUI: Position ally icons based on option
+	if GetCvarBoolMem('optiui_AllyFramesWide') then
+		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon_wide', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','0')
+		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon_wide', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','1')
+		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon_wide', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','2')
+		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon_wide', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','3')
+	else
+		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','0')
+		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','1')
+		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','2')
+		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','3')
+	end
+
 	local function PositionAllyInfo()
+
+		--groupfcall('team_member_icon_group', function(index, widget, groupName) widget:Destroy() end)
+
 		if GetCvarBool('optiui_AllyFramesWidescreen') then
 			GetWidget('game_ally_display_holder'):SetAlign("center")
 			GetWidget('game_ally_display_holder'):SetVAlign("bottom")
 			GetWidget('game_ally_display_holder'):SetX("0.0h")
 			GetWidget('game_ally_display_holder'):SetY("-0.5h")
-			GetWidget('game_ally_display_holder'):SetWidth("90.0h")
-			GetWidget('game_ally_display_holder'):SetHeight("13.5h")
+
+			if GetCvarBoolMem('optiui_AllyFramesWide') then
+				GetWidget('game_ally_display_holder'):SetWidth("105.0h")
+				GetWidget('game_ally_display_holder'):SetHeight("10.1h")
+			else
+				GetWidget('game_ally_display_holder'):SetWidth("90.0h")
+				GetWidget('game_ally_display_holder'):SetHeight("13.5h")
+			end
 
 			GetWidget('game_top_left_ally_parent_0'):SetAlign("left")
 			GetWidget('game_top_left_ally_parent_0'):SetVAlign("top")
@@ -756,8 +782,14 @@ local function InitAllyInfo()
 			GetWidget('game_ally_display_holder'):SetVAlign("left")
 			GetWidget('game_ally_display_holder'):SetX("0.0h")
 			GetWidget('game_ally_display_holder'):SetY("6.1h")
-			GetWidget('game_ally_display_holder'):SetWidth("5.8h")
-			GetWidget('game_ally_display_holder'):SetHeight("27.0h")
+
+			if GetCvarBoolMem('optiui_AllyFramesWide') then
+				GetWidget('game_ally_display_holder'):SetWidth("13.5h")
+				GetWidget('game_ally_display_holder'):SetHeight("19.0h")
+			else
+				GetWidget('game_ally_display_holder'):SetWidth("6.0h")
+				GetWidget('game_ally_display_holder'):SetHeight("28.0h")
+			end
 
 			GetWidget('game_top_left_ally_parent_0'):SetAlign("left")
 			GetWidget('game_top_left_ally_parent_0'):SetVAlign("top")
@@ -869,17 +901,30 @@ local function InitAllyInfo()
 
 	local function AllyHealth(allyIndex, sourceWidget, health, maxHealth, healthPercent, healthShadow)
 		local health, maxHealth, tempHealthPercent, tempHealthShadow = AtoN(health), AtoN(maxHealth), ToPercent(AtoN(healthPercent)), ToPercent(AtoN(healthPercent))
+		GetWidget('game_top_left_ally_health_'..allyIndex):SetVisible(health > 0)		
 		GetWidget('game_top_left_ally_health_'..allyIndex):SetWidth(tempHealthPercent)
 		GetWidget('game_top_left_ally_health_'..allyIndex):SetColor(GetHealthBarColor(healthPercent))
-		GetWidget('game_top_left_ally_health_label_'..allyIndex):SetText(round(health))
+		-- OptiUI: Print maxHealth in wide frames
+		if GetCvarBoolMem('optiui_AllyFramesWide') then
+			GetWidget('game_top_left_ally_health_label_'..allyIndex):SetText(round(health)..'/'..round(maxHealth))
+		else
+			GetWidget('game_top_left_ally_health_label_'..allyIndex):SetText(round(health))
+		end
+		-- OptiUI: end
 	end
 
 	local function AllyMana(allyIndex, sourceWidget, mana, maxMana, manaPercent, manaShadow)
 		local mana, maxMana, tempManaPercent, tempManaShadow = AtoN(mana), AtoN(maxMana), ToPercent(AtoN(manaPercent)), ToPercent(AtoN(manaPercent))
 		if (maxMana > 0) then
-			GetWidget('game_top_left_ally_mana_'..allyIndex):SetVisible(true)
+			GetWidget('game_top_left_ally_mana_'..allyIndex):SetVisible(mana > 0)
 			GetWidget('game_top_left_ally_mana_'..allyIndex):SetWidth(tempManaPercent)
-			GetWidget('game_top_left_ally_mana_label_'..allyIndex):SetText(round(mana))
+			-- OptiUI: Print maxHealth in wide frames
+			if GetCvarBoolMem('optiui_AllyFramesWide') then
+				GetWidget('game_top_left_ally_mana_label_'..allyIndex):SetText(round(mana)..'/'..round(maxMana))
+			else
+				GetWidget('game_top_left_ally_mana_label_'..allyIndex):SetText(round(mana))
+			end
+			-- OptiUI: end
 		else
 			GetWidget('game_top_left_ally_mana_'..allyIndex):SetVisible(false)
 		end
@@ -1189,10 +1234,8 @@ local function InitBottomCenterPanel()
 		local health, maxHealth, tempHealthPercent, tempHealthShadow = AtoN(health), AtoN(maxHealth), ToPercent(AtoN(healthPercent)), ToPercent(AtoN(healthPercent))
 		if GetCvarBoolMem('cg_showHeroHealthLerp') and (health > 0) and (Game.lastHealthEntity == GetSelectedEntity()) then
 			GetWidget('game_center_health_lerp'):ScaleWidth(tempHealthShadow, 500, -1)
-			GetWidget('game_center_health_lerp'):SetVisible(true)
 		else
 			Game.lastHealthEntity = GetSelectedEntity()
-			GetWidget('game_center_health_lerp'):SetVisible(false)
 			GetWidget('game_center_health_lerp'):ScaleWidth(0, 0, -1)
 		end
 		-- OptiUI: Fix for frame width = 0 graphic glitch
@@ -1226,10 +1269,8 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_mana_regen_label'):SetVisible(true)	
 			if GetCvarBoolMem('cg_showHeroHealthLerp') and (mana > 0) and (Game.lastManaEntity == GetSelectedEntity()) then
 				GetWidget('game_center_mana_lerp'):ScaleWidth(tempManaShadow, 500, -1)
-				GetWidget('game_center_mana_lerp'):SetVisible(true)
 			else
 				Game.lastManaEntity = GetSelectedEntity()
-				GetWidget('game_center_mana_lerp'):SetVisible(false)
 				GetWidget('game_center_mana_lerp'):ScaleWidth(0, 0, -1)
 			end
 			-- OptiUI: Small rename to keep things clean
@@ -1330,11 +1371,11 @@ local function InitBottomCenterPanel()
 	end
 	interface:RegisterWatch('ActivePlayerInfo', ActivePlayerInfo)
 
-	local function ActiveEffect(sourceWidget, activeEffect)
+	local function ActiveEffect(sourceWidget, ...)
 		-- OptiUI: Removed to fix console spam --
-		--if (activeEffect) then
-			--GetWidget('game_center_portrait_icon'):UICmd("SetEffect('"..activeEffect.."')")
-		--end
+		-- for index, effectPath in ipairs(arg) do
+		-- 	GetWidget('game_center_portrait_icon'):UICmd("SetEffectIndexed('"..effectPath.."',"..index..");")
+		-- end
 	end
 	interface:RegisterWatch('ActiveEffect', ActiveEffect)
 
@@ -1435,9 +1476,7 @@ local function InitBottomCenterPanel()
 		end
 		-- Reset lerp when changing active unit
 		GetWidget('game_center_health_lerp'):ScaleWidth(0, 0, -1)
-		GetWidget('game_center_health_lerp'):SetVisible(false)
 		GetWidget('game_center_mana_lerp'):ScaleWidth(0, 0, -1)
-		GetWidget('game_center_mana_lerp'):SetVisible(false)
 
 	end
 	interface:RegisterWatch('ActiveName', ActiveName)
@@ -1478,12 +1517,48 @@ end
 ----------------------------------------------------------
 local function InitBottomSection()
 	local function PositionBottomSection() -- Set the position of the minimap, the selected info, attack modifiers, and selected buffs. Fires on script load and game join
+		-- because of the courier stuff, we can't just mirror the buttons, so now it will get set based on this
+		-- (we also can't have dupe inventory buttons that work correctly, so this is why we have to move them)
+		local widgetPositions = {
+			['right'] = {
+				['game_info_taunt'] = 				{['align'] = "center",	 ['valign'] = "top"},
+				['game_info_fortification'] = 		{['align'] = "center",	 ['valign'] = "bottom"},
+				['game_info_courier_status'] = 		{['align'] = "right",	 ['valign'] = "top"},
+				['game_info_courier_private'] = 	{['align'] = "right",	 ['valign'] = "bottom"},
+				['game_info_courier_controller'] = 	{['align'] = "left",	 ['valign'] = "bottom"},
+				['game_info_courier_button'] = 		{['align'] = "right",	 ['valign'] = "bottom"},
+
+				['stash_courier_status'] = 			{['align'] = "right",	 ['valign'] = "top"},
+				['stash_courier_private'] = 		{['align'] = "right",	 ['valign'] = "bottom"},
+				['stash_courier_controller'] = 		{['align'] = "left",	 ['valign'] = "bottom"},
+				['stash_courier_button'] = 			{['align'] = "right",	 ['valign'] = "bottom"}
+			},
+			['left'] = {
+				['game_info_taunt'] = 				{['align'] = "center",	 ['valign'] = "top"},
+				['game_info_fortification'] = 		{['align'] = "center",	 ['valign'] = "bottom"},
+				['game_info_courier_status'] = 		{['align'] = "left",	 ['valign'] = "top"},
+				['game_info_courier_private'] = 	{['align'] = "left",	 ['valign'] = "bottom"},
+				['game_info_courier_controller'] = 	{['align'] = "right",	 ['valign'] = "bottom"},
+				['game_info_courier_button'] = 		{['align'] = "left",	 ['valign'] = "bottom"},
+
+				['stash_courier_status'] = 			{['align'] = "left",	 ['valign'] = "top"},
+				['stash_courier_private'] = 		{['align'] = "left",	 ['valign'] = "bottom"},
+				['stash_courier_controller'] = 		{['align'] = "right",	 ['valign'] = "bottom"},
+				['stash_courier_button'] = 			{['align'] = "left",	 ['valign'] = "bottom"}
+			}
+		}
+
 		if (not GetCvarBool('ui_minimap_rightside')) then		
 			GetWidget('attack_modifiers_right'):SetVisible(false)
 			GetWidget('mini_map_right'):SetVisible(false)			
 			GetWidget('attack_modifiers_left'):SetVisible(true)
 			GetWidget('mini_map_left'):SetVisible(true)		
 			GetWidget('tooltip_placement'):SetY('-21h')
+
+			for button,positions in pairs(widgetPositions['right']) do
+				GetWidget(button):SetAlign(positions.align)
+				GetWidget(button):SetVAlign(positions.valign)
+			end
 			
 			GetWidget('selection_info_right'):SetAlign('right')
 			--GetWidget('game_botright_orders_right'):SetVisible(true)
@@ -1492,8 +1567,8 @@ local function InitBottomSection()
 			--GetWidget('game_botright_units_left'):SetVisible(false)
 			--GetWidget('game_botright_building_right'):SetVisible(true)
 			--GetWidget('game_botright_building_left'):SetVisible(false)
-			-- GetWidget('game_botright_mult_right'):SetVisible(true)
-			-- GetWidget('game_botright_mult_left'):SetVisible(false)
+			--GetWidget('game_botright_mult_right'):SetVisible(true)
+			--GetWidget('game_botright_mult_left'):SetVisible(false)
 			
 			GetWidget('game_selected_info_orders'):SetAlign('right')
 			GetWidget('game_selected_info_orders_pos'):SetX('0')
@@ -1567,17 +1642,17 @@ local function InitBottomSection()
 			--GetWidget('game_stash_bg'):SetVisible(true)
 			--GetWidget('game_stash_bg_alt'):SetVisible(false)
 			
-			GetWidget('game_stash_icon'):SetAlign('right')
 			GetWidget('game_stash_label_parent'):SetAlign('left')
 			GetWidget('game_stash_label_parent'):SetX('1.2h')
+			GetWidget('game_stash_icon'):SetAlign('left')
 			--GetWidget('game_stash_icon'):SetX('-14.2h')
 			--GetWidget('game_stash_label'):SetAlign('right')
 			--GetWidget('game_stash_label'):SetX('-6.0h')
 			
 			GetWidget('game_stash_tip_stash'):SetAlign('right')
-			GetWidget('game_stash_tip_stash'):SetX('-0.5h')
-			--GetWidget('game_stash_tip_deconstruct'):SetAlign('right')
-			--GetWidget('game_stash_tip_deconstruct'):SetX('-5.3h')		
+			GetWidget('game_stash_tip_stash'):SetX('-0.25h')
+
+			GetWidget('stash_courier_button'):SetX('-1.1h')
 			
 		else
 			GetWidget('attack_modifiers_right'):SetVisible(true)
@@ -1586,6 +1661,11 @@ local function InitBottomSection()
 			GetWidget('mini_map_left'):SetVisible(false)
 			GetWidget('tooltip_placement'):SetY('-26h')
 			
+			for button,positions in pairs(widgetPositions['left']) do
+				GetWidget(button):SetAlign(positions.align)
+				GetWidget(button):SetVAlign(positions.valign)
+			end
+
 			GetWidget('selection_info_right'):SetAlign('left')
 			--GetWidget('game_botright_orders_right'):SetVisible(false)
 			--GetWidget('game_botright_orders_left'):SetVisible(true)		
@@ -1593,8 +1673,8 @@ local function InitBottomSection()
 			--GetWidget('game_botright_units_left'):SetVisible(true)
 			--GetWidget('game_botright_building_right'):SetVisible(false)
 			--GetWidget('game_botright_building_left'):SetVisible(true)	
-			-- GetWidget('game_botright_mult_right'):SetVisible(false)
-			-- GetWidget('game_botright_mult_left'):SetVisible(true)
+			--GetWidget('game_botright_mult_right'):SetVisible(false)
+			--GetWidget('game_botright_mult_left'):SetVisible(true)
 				
 			GetWidget('game_selected_info_orders'):SetAlign('left')
 			GetWidget('game_selected_info_orders_pos'):SetX('0')
@@ -1668,17 +1748,17 @@ local function InitBottomSection()
 			--GetWidget('game_stash_bg'):SetVisible(false)
 			--GetWidget('game_stash_bg_alt'):SetVisible(true)
 			
-			GetWidget('game_stash_icon'):SetAlign('left')
 			GetWidget('game_stash_label_parent'):SetAlign('right')
 			GetWidget('game_stash_label_parent'):SetX('-1.2h')
+			GetWidget('game_stash_icon'):SetAlign('right')
 			--GetWidget('game_stash_icon'):SetX('8.0h')
 			--GetWidget('game_stash_label'):SetAlign('left')
 			--GetWidget('game_stash_label'):SetX('8.5h')
 			
 			GetWidget('game_stash_tip_stash'):SetAlign('left')
-			GetWidget('game_stash_tip_stash'):SetX('0.5h')
-			--GetWidget('game_stash_tip_deconstruct'):SetAlign('left')
-			--GetWidget('game_stash_tip_deconstruct'):SetX('5.3h')
+			GetWidget('game_stash_tip_stash'):SetX('0.25h')
+
+			GetWidget('stash_courier_button'):SetX('1.1h')
 			
 		end
 	end
