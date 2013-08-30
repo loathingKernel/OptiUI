@@ -45,6 +45,7 @@
 	<trigger name="ItemTooltip"/>
 	<!-- OptiUI: New triggers -->
 	<trigger name="optiui_AllyInfoPosition"/>
+	<trigger name="optiui_BottomCenterPosition"/>
 
 	<!-- Couriers -->
 	<!-- UIScript -->
@@ -3540,10 +3541,44 @@
 
 		<!-- OptiUI: Container panel for middle screen elements. It includes mana/health bars, backpack, abilities and left side info -->
 		<panel y="-0.5h" height="10.1h" valign="bottom" color="invisible" noclick="1">
+
+			<!-- Abilities -->
+			<!-- OptiUI: Adjustments to ability buttons panel size -->
+			<panel name="game_center_abilities" x="2.6h" y="-4.6h" width="36.0h" height="5.5h" align="center" valign="bottom" noclick="1" color="invisible" >
+				<panel name="panel_abilities" align="center" padding="0" noclick="0">
+					<panel float="right" width="11.0h" height="5.5h" grow="1" regrow="1" growinvis="0" align="center" >
+						<instance name="ability_frame_single" slot="0"/>
+						<instance name="ability_frame_single_plus_one" slot="0" slot_a="0" slot_b="5"/>
+						<instance name="ability_frame_single_plus_two" slot="0" slot_a="0" slot_b="5" slot_c="6"/>
+						<instance name="ability_frame_triple" slot="0" slot_a="5" slot_b="6" slot_c="7"/>
+						<instance name="ability_frame_double" slot="0" slot_a="5" slot_b="6" />
+
+						<instance name="ability_frame_single" slot="1"/>
+						<instance name="ability_frame_single_plus_one" slot="1" slot_a="1" slot_b="5"/>
+						<instance name="ability_frame_single_plus_two" slot="1" slot_a="1" slot_b="5" slot_c="6"/>
+						<instance name="ability_frame_triple" slot="1" slot_a="5" slot_b="6" slot_c="7"/>
+						<instance name="ability_frame_double" slot="1" slot_a="5" slot_b="6" />
+
+						<instance name="ability_frame_single" slot="2"/>
+						<instance name="ability_frame_single_plus_one" slot="2" slot_a="2" slot_b="5"/>
+						<instance name="ability_frame_single_plus_two" slot="2" slot_a="2" slot_b="5" slot_c="6"/>
+						<instance name="ability_frame_triple" slot="2" slot_a="5" slot_b="6" slot_c="7"/>
+						<instance name="ability_frame_double" slot="2" slot_a="5" slot_b="6" />
+
+						<instance name="ability_frame_single" slot="3"/>
+						<instance name="ability_frame_single_plus_one" slot="3" slot_a="3" slot_b="5"/>
+						<instance name="ability_frame_single_plus_two" slot="3" slot_a="3" slot_b="5" slot_c="6"/>
+						<instance name="ability_frame_triple" slot="3" slot_a="5" slot_b="6" slot_c="7"/>
+						<instance name="ability_frame_double" slot="3" slot_a="5" slot_b="6" />
+					</panel>
+				</panel>
+			</panel>
+
 			<!-- Health -->
 			<panel
+				name="game_center_health"
 				x="2.6h"
-				y="-8.2h"
+				y="-2.1h"
 				width="36.0h"
 				height="1.9h"
 				align="center"
@@ -3571,11 +3606,11 @@
 				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
 
-
 			<!-- Mana -->
 			<panel
+				name="game_center_mana"
 				x="2.6h"
-				y="-6.1h"
+				y="0.0h"
 				width="36.0h"
 				height="1.9h"
 				align="center"
@@ -3602,45 +3637,6 @@
 				<label name="game_center_mana_regen_label" x="-0.5h" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
 				<frame name="game_center_mana_bar_frame" borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
-
-
-			<!-- Abilities -->
-			<!-- OptiUI: Adjustments to ability buttons panel size -->
-			<panel x="2.6h" y="0.0h" width="36.0h" height="5.5h" align="center" valign="bottom" noclick="1" color="invisible" >
-
-				<panel name="panel_abilities" align="center" padding="0" noclick="0">
-
-					<panel float="right" width="11.0h" height="5.5h" grow="1" regrow="1" growinvis="0" align="center" >
-						<instance name="ability_frame_single" slot="0"/>
-						<instance name="ability_frame_single_plus_one" slot="0" slot_a="0" slot_b="5"/>
-						<instance name="ability_frame_single_plus_two" slot="0" slot_a="0" slot_b="5" slot_c="6"/>
-						<instance name="ability_frame_triple" slot="0" slot_a="5" slot_b="6" slot_c="7"/>
-						<instance name="ability_frame_double" slot="0" slot_a="5" slot_b="6" />
-
-						<instance name="ability_frame_single" slot="1"/>
-						<instance name="ability_frame_single_plus_one" slot="1" slot_a="1" slot_b="5"/>
-						<instance name="ability_frame_single_plus_two" slot="1" slot_a="1" slot_b="5" slot_c="6"/>
-						<instance name="ability_frame_triple" slot="1" slot_a="5" slot_b="6" slot_c="7"/>
-						<instance name="ability_frame_double" slot="1" slot_a="5" slot_b="6" />
-
-						<instance name="ability_frame_single" slot="2"/>
-						<instance name="ability_frame_single_plus_one" slot="2" slot_a="2" slot_b="5"/>
-						<instance name="ability_frame_single_plus_two" slot="2" slot_a="2" slot_b="5" slot_c="6"/>
-						<instance name="ability_frame_triple" slot="2" slot_a="5" slot_b="6" slot_c="7"/>
-						<instance name="ability_frame_double" slot="2" slot_a="5" slot_b="6" />
-
-						<instance name="ability_frame_single" slot="3"/>
-						<instance name="ability_frame_single_plus_one" slot="3" slot_a="3" slot_b="5"/>
-						<instance name="ability_frame_single_plus_two" slot="3" slot_a="3" slot_b="5" slot_c="6"/>
-						<instance name="ability_frame_triple" slot="3" slot_a="5" slot_b="6" slot_c="7"/>
-						<instance name="ability_frame_double" slot="3" slot_a="5" slot_b="6" />
-
-					</panel>
-
-				</panel>
-
-			</panel>
-
 
 			<!-- OptiUI: Container panel for left side elements -->
 			<panel x="0.0h" y="0.0h" width="21.2h" height="10.1h" align="left" valign="bottom" color="invisible" >

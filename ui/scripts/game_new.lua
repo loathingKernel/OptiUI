@@ -1229,6 +1229,23 @@ end
 -- 			   Bottom Center Panel						--
 ----------------------------------------------------------
 local function InitBottomCenterPanel()
+
+	-- OptiUI: Position elements in Bottom Center panel
+	local function PositionBottomCenter()
+		if GetCvarBool('optiui_BottomCenterAbilitiesBelowBars') then
+			GetWidget('game_center_health'):SetY('-8.2h')
+			GetWidget('game_center_mana'):SetY('-6.1h')
+			GetWidget('game_center_abilities'):SetY('0.0h')
+		else
+			GetWidget('game_center_health'):SetY('-2.1h')
+			GetWidget('game_center_mana'):SetY('0.0h')
+			GetWidget('game_center_abilities'):SetY('-4.6h')
+		end
+	end
+	interface:RegisterWatch('optiui_BottomCenterPosition', PositionBottomCenter)
+	PositionBottomCenter()
+	-- OptiUI: end
+
 	-- Health
 	local function ActiveHealth(sourceWidget, health, maxHealth, healthPercent, healthShadow)
 		local health, maxHealth, tempHealthPercent, tempHealthShadow = AtoN(health), AtoN(maxHealth), ToPercent(AtoN(healthPercent)), ToPercent(AtoN(healthPercent))

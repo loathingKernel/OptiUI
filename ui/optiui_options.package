@@ -1,9 +1,17 @@
 <package>
 	<instance name="mod_options" mod_id="optiui_options" mod_name="OptiUI" />
-	
-	<instance mod_id="optiui_options" name="mod_header"
-		label="Ally Info Frames:"
+
+	<instance mod_id="optiui_options" name="mod_header" label="Bottom Center panel:" />
+	<instance mod_id="optiui_options" name="mod_checkbox"
+		cvar="optiui_BottomCenterAbilitiesBelowBars"
+		default="false"
+		onchange="If(_game_phase ge 5, Trigger(\\\'optiui_BottomCenterPosition\\\'));"
+		label="Display Hero Abilities below Health/Mana bars"
+		tooltip="When ^gchecked^w the Health/Mana bars are moved above the Active Hero abilities."
+		tooltip_width="43h"
 	/>
+	
+	<instance mod_id="optiui_options" name="mod_header" label="Ally Info frames:" />
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_AllyFramesWidescreen"
 		default="false"
