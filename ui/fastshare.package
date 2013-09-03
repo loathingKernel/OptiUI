@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Game version: v3.2.1.2 -->
+<!-- Game version: v3.2.2 -->
 <package>
 	<trigger name="sharing_update"/>
 	<panel x="1.6h" y="0" width="1.5h" height="1.5h" color="invisible">

@@ -4,9 +4,9 @@
 	<instance mod_id="optiui_options" name="mod_header" label="Bottom Center panel:" />
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_BottomCenterAbilitiesBelowBars"
+		label="Display Hero Abilities below Health/Mana bars"
 		default="false"
 		onchange="If(_game_phase ge 5, Trigger(\\\'optiui_BottomCenterPosition\\\'));"
-		label="Display Hero Abilities below Health/Mana bars"
 		tooltip="When ^gchecked^w the Health/Mana bars are moved above the Active Hero abilities."
 		tooltip_width="43h"
 	/>
@@ -14,25 +14,44 @@
 	<instance mod_id="optiui_options" name="mod_header" label="Ally Info frames:" />
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_AllyFramesWidescreen"
+		label="Move Ally Info frames to bottom center"
 		default="false"
 		onchange="If(_game_phase ge 5, Trigger(\\\'optiui_AllyInfoPosition\\\'));"
-		label="Move Ally Info frames to bottom center"
 		tooltip="When ^gchecked^w the allied heroes portraits will be moved to the sides of the bottom center panel. Useful for widescreen monitors where there is unused space in that location."
 		tooltip_width="43h"
 	/>
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_AllyFramesWide"
+		label="Use larger Ally Info frames (NEEDS RESTART!)"
 		default="false"
-		label="Use bigger Ally Info frames"
 		tooltip="When ^gchecked^w the allied heroes portraits will be wider to cover more of the empty space on the bottom bar. Useful with the previous option but can be enabled for the top left frames too. NEEDS RESTART TO WORK!"
 		tooltip_width="43h"
 	/>
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_AllyFramesDisableRightClick"
-		default="false" 
 		label="Disable right click menu on Ally Info portraits"
+		default="false" 
 		tooltip="When ^gchecked^w it will disable the right click menu on hero portraits. Useful if the in-game RAP panel shows up when you click the portrait by mistake in the middle of the battle."
 		tooltip_width="43h"
+	/>
+
+	<instance mod_id="optiui_options" name="mod_header" label="Mini Map:" />
+	<instance mod_id="optiui_options" name="mod_slider"
+		cvar="optiui_MiniMapSize"
+		label="Size (default size is 50%):"
+		layout="default"
+		cvartype="int"
+		default="50"
+		slider_step="1"
+		maxlabel="Max"
+		maxvalue="100"
+		minlabel="Min"
+		minvalue="0"
+		showpercent="true"
+		decimal="0"
+		showstep="true"
+		button_step="1"
+		onchange="If(_game_phase ge 5, Trigger(\\\'MiniMapPosition\\\'));"
 	/>
 
 </package>

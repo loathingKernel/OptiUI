@@ -1,7 +1,7 @@
 ---------------------------------------------------------- 
 --	Name: 		Game Interface Script            		--				
 --  Copyright 2012 S2 Games								--
---  Game version: v3.2.1.2								--
+--  Game version: v3.2.2								--
 ----------------------------------------------------------
 
 local _G = getfenv(0)
@@ -1542,7 +1542,7 @@ local function InitBottomSection()
 				['game_info_fortification'] = 		{['align'] = "center",	 ['valign'] = "bottom"},
 				['game_info_courier_status'] = 		{['align'] = "right",	 ['valign'] = "top"},
 				['game_info_courier_private'] = 	{['align'] = "right",	 ['valign'] = "bottom"},
-				['game_info_courier_controller'] = 	{['align'] = "left",	 ['valign'] = "bottom"},
+				['game_info_courier_controller'] = 	{['align'] = "left",	 ['valign'] = "top"},
 				['game_info_courier_button'] = 		{['align'] = "right",	 ['valign'] = "bottom"},
 
 				['stash_courier_status'] = 			{['align'] = "right",	 ['valign'] = "top"},
@@ -1555,7 +1555,7 @@ local function InitBottomSection()
 				['game_info_fortification'] = 		{['align'] = "center",	 ['valign'] = "bottom"},
 				['game_info_courier_status'] = 		{['align'] = "left",	 ['valign'] = "top"},
 				['game_info_courier_private'] = 	{['align'] = "left",	 ['valign'] = "bottom"},
-				['game_info_courier_controller'] = 	{['align'] = "right",	 ['valign'] = "bottom"},
+				['game_info_courier_controller'] = 	{['align'] = "right",	 ['valign'] = "top"},
 				['game_info_courier_button'] = 		{['align'] = "left",	 ['valign'] = "bottom"},
 
 				['stash_courier_status'] = 			{['align'] = "left",	 ['valign'] = "top"},
@@ -1565,11 +1565,21 @@ local function InitBottomSection()
 			}
 		}
 
+		-- OptiUI: Resizable minimap
+		local minimapSize = ((GetCvarInt('optiui_MiniMapSize') / 100) + 0.5) * 23.2
+		-- OptiUI:end
+
 		if (not GetCvarBool('ui_minimap_rightside')) then		
 			GetWidget('attack_modifiers_right'):SetVisible(false)
-			GetWidget('mini_map_right'):SetVisible(false)			
+			GetWidget('mini_map_right'):SetVisible(false)
+			-- OptiUI: Resizable minimap
+			GetWidget('attack_modifiers_left'):SetY(-(minimapSize + 0.8) .. 'h')
+			GetWidget('mini_map_left'):SetWidth(minimapSize .. 'h')
+			GetWidget('mini_map_left'):SetHeight(minimapSize .. 'h')
+			GetWidget('radial_minimap'):SetY(-minimapSize .. 'h')
+			-- OptiUI:end
 			GetWidget('attack_modifiers_left'):SetVisible(true)
-			GetWidget('mini_map_left'):SetVisible(true)		
+			GetWidget('mini_map_left'):SetVisible(true)
 			GetWidget('tooltip_placement'):SetY('-21h')
 
 			for button,positions in pairs(widgetPositions['right']) do
@@ -1672,11 +1682,19 @@ local function InitBottomSection()
 			GetWidget('stash_courier_button'):SetX('-1.1h')
 			
 		else
+			-- OptiUI: Resizable minimap
+			GetWidget('attack_modifiers_right'):SetY(-(minimapSize + 0.8) .. 'h')
+			GetWidget('mini_map_right'):SetWidth(minimapSize .. 'h')
+			GetWidget('mini_map_right'):SetHeight(minimapSize .. 'h')
+			GetWidget('radial_minimap'):SetY(-minimapSize .. 'h')
+			-- OptiUI:end
 			GetWidget('attack_modifiers_right'):SetVisible(true)
 			GetWidget('mini_map_right'):SetVisible(true)		
 			GetWidget('attack_modifiers_left'):SetVisible(false)
 			GetWidget('mini_map_left'):SetVisible(false)
-			GetWidget('tooltip_placement'):SetY('-26h')
+			-- OptiUI: Resizable minimap
+			GetWidget('tooltip_placement'):SetY(-(minimapSize + 2.8) .. 'h')
+			-- OptiUI:end
 			
 			for button,positions in pairs(widgetPositions['left']) do
 				GetWidget(button):SetAlign(positions.align)

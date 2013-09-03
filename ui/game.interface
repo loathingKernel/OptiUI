@@ -4071,7 +4071,7 @@
 
 	<!-- BOTTOM LEFT -->
 	<!-- Attack Modifiers -->
-	<panel name="attack_modifiers_left" group="game_attack_modifiers"  x="0.5h" y="-24h" width="28.8h" height="3.2h" align="left" valign="bottom" color="invisible" noclick="true" visible="1">
+	<panel name="attack_modifiers_left" group="game_attack_modifiers"  x="0.5h" y="-24.0h" width="28.8h" height="3.2h" align="left" valign="bottom" color="invisible" noclick="true" visible="1">
 		<instance name="attack_modifier" x="0%"    align="left" index="0"/>
 		<instance name="attack_modifier" x="12.5%" align="left" index="1"/>
 		<instance name="attack_modifier" x="25%"   align="left" index="2"/>
@@ -4082,7 +4082,7 @@
 		<instance name="attack_modifier" x="87.5%" align="left" index="7"/>
 	</panel>
 
-	<panel name="attack_modifiers_right"  group="game_attack_modifiers" x="-0.5h" y="-24h" width="28.8h" height="3.2h" align="right" valign="bottom" color="invisible" noclick="true" visible="0">
+	<panel name="attack_modifiers_right"  group="game_attack_modifiers" x="-0.5h" y="-24.0h" width="28.8h" height="3.2h" align="right" valign="bottom" color="invisible" noclick="true" visible="0">
 		<instance name="attack_modifier" x="-87.5%" align="right" index="7"/>
 		<instance name="attack_modifier" x="-75%"   align="right" index="6"/>
 		<instance name="attack_modifier" x="-62.5%" align="right" index="5"/>
@@ -4101,10 +4101,10 @@
 	<!-- Minimap radial menu, it will be left/right aligned when it's opened depending on the minimap position -->
 	<instance name="radial_minimap" />
 
-	<panel name="mini_map_left" group="game_mini_map" visible="true" width="29.8h" height="29.8h" align="left" valign="bottom" noclick="true">
-		<map hoversize="0.5" outlinesize="0.19h" x="0.0h" y="-0.0h" width="23.2h" height="23.2h" align="left" valign="bottom" name="minimap" texture="!minimap_texture" watch="Minimap" onclick="If(MinimapClick(param0, param1), BreakDrag());" onrightclick="If(MinimapRightClick(param0, param1), BreakDrag());"/>
-		<frame x="0.0h" y="0.0h" width="23.2h" height="23.2h" align="left" valign="bottom" borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-		<panel color="invisible" x="0.35h" y="7h" height="2.1h" width="2.1h" >
+	<panel name="mini_map_left" group="game_mini_map" visible="true" width="23.2h" height="23.2h" align="left" valign="bottom" noclick="true">
+		<map hoversize="0.5" outlinesize="0.19h" name="minimap" texture="!minimap_texture" watch="Minimap" onclick="If(MinimapClick(param0, param1), BreakDrag());" onrightclick="If(MinimapRightClick(param0, param1), BreakDrag());"/>
+		<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+		<panel color="invisible" x="1%" y="1%" height="10%" width="10%" align="left" valign="top">
 			<button noclick="1" cvar="cg_unitPlayerColors" numstates="2" color="invisible" interactive="false">
 				<widgetstate statename="up" >
 					<image texture="/ui/elements/team_colors_up.tga"/>
@@ -4120,17 +4120,14 @@
 				onmouseoutlua="GetWidget('teamcolors_tooltip', 'game'):SetVisible(0)"
 				interactive="false"
 			/>
-
 		</panel>
 	</panel>
 
-
 	<!-- Map Right (Alt View) -->
-	<panel name="mini_map_right" group="game_mini_map" visible="false" width="29.8h" height="29.8h" align="right" valign="bottom" noclick="true">
-		<!-- UIScript -->
-		<map hoversize="0.5" outlinesize="0.19h" x="-0.0h" y="-0.0h" width="23.2h" height="23.2h" align="right" valign="bottom" name="minimap_altview" texture="!minimap_texture" watch="Minimap" onclick="If(MinimapClick(param0, param1), BreakDrag());" onrightclick="If(MinimapRightClick(param0, param1), BreakDrag());"/>
-		<frame x="0.0h" y="0.0h" width="23.2h" height="23.2h" align="right" valign="bottom" borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-		<panel color="invisible" x="-0.35h" y="7h" align="right" height="2.1h" width="2.1h" >
+	<panel name="mini_map_right" group="game_mini_map" visible="false" width="23.2h" height="23.2h" align="right" valign="bottom" noclick="true">
+		<map hoversize="0.5" outlinesize="0.19h" name="minimap_altview" texture="!minimap_texture" watch="Minimap" onclick="If(MinimapClick(param0, param1), BreakDrag());" onrightclick="If(MinimapRightClick(param0, param1), BreakDrag());"/>
+		<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+		<panel color="invisible" x="-1%" y="1%" height="10%" width="10%" align="right" valign="top">
 			<button noclick="1" cvar="cg_unitPlayerColors" numstates="2" color="invisible" interactive="false">
 				<widgetstate statename="up" >
 					<image texture="/ui/elements/team_colors_up.tga"/>
@@ -4147,11 +4144,6 @@
 				interactive="false"
 			/>
 		</panel>
-		<!-- <panel x="1.0h" y="-2.0h" width="5.0h" height="5.0h" align="left" valign="bottom" color="black">
-			<button onclicklua="SendGamePing('hero_missing')"
-			/>
-			<frame bordercolor="gray" borderthickness="1" color="invisible" noclick="true"/>
-		</panel> -->
 	</panel>
 	<!-- END BOTTOM LEFT -->
 
@@ -4177,7 +4169,6 @@
 
 		<panel grow="true" regrow="1" growinvis="0" color="0 0 0 .6" noclick="true">
 			<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" noclick="false"/>
-
 
 			<!-- Hero -->
 			<panel
