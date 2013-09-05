@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification
+    application="Heroes of Newerth"
+    appversion="3.2"
+    mmversion="1.3"
+    name="OptiUI_100h"
+    version="0.1.2"
+    date="2013/09/03"
+    description="OptiUI: Makes the view fullscreen and removes bottom bar"
+    author="Trelokotsidu"
+    weblink="http://forums.heroesofnewerth.com/showthread.php?508702-OptiUI-v0-1-2-%28Alpha-stage%29"
+    updatecheckurl="https://raw.github.com/LoathingKernel/OptiUI/master/version.txt"
+    updatedownloadurl="https://raw.github.com/LoathingKernel/OptiUI/master/addons/100h/OptiUI_100h.honmod"
+>
+    <requirement name="OptiUI" version="*" />
+    <applyafter  name="OptiUI" version="*" />
+
+   
+    <editfile name="ui/game.interface">
+         <!-- Screen height -->
+        <find>
+            <![CDATA[sceneheight="88h"]]>
+        </find>
+        <replace>
+            <![CDATA[sceneheight="100h"]]>
+        </replace>
+
+        <!-- Remove bar -->
+        <find>
+            <![CDATA[<frame y="0" width="100%" height="11.5h" align="center" valign="bottom" texture="/ui/info/backdrop.tga" color=".6 .6 .6 1" noclick="true"/>]]>
+        </find>
+        <delete />
+    </editfile>
+
+</modification>
