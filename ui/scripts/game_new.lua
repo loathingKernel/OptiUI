@@ -1,7 +1,7 @@
 ---------------------------------------------------------- 
 --	Name: 		Game Interface Script            		--				
 --  Copyright 2012 S2 Games								--
---  Game version: v3.2.2								--
+--  Game version: v3.2.3								--
 ----------------------------------------------------------
 
 local _G = getfenv(0)
@@ -188,29 +188,53 @@ local function InitMidBar()
 	local function MatchTime(sourceWidget, matchTime, isPreMatchPhase)
 		Game.game_match_time_label:SetText( convertTimeRange(matchTime) )
 		Game.isPreMatchPhase = AtoB(isPreMatchPhase)
-		-- OptiUI: Day/Night, Rune Timers
-		if (not AtoB(isPreMatchPhase)) then
-			local dayDuration = GetCvarInt('g_dayLength') / 1000
-			local untilChange = (dayDuration / 2) - (Game.lastMatchTime % (dayDuration / 2)) - 1
-			local timestate = floor(Game.lastMatchTime / (dayDuration / 2)) % 2
 
+		-- OptiUI: Day/Night, Rune Timers
+		local dayDuration = GetCvarInt('g_dayLength') / 1000
+		--local powerupInterval = GetCvarInt('g_powerupSpawnInterval') / 1000
+		-- OptiUI: Hardcoding rune interval for forests of caldavar.
+		local powerupInterval = 120
+
+		if (AtoB(isPreMatchPhase)) then
+			Game.game_match_time_rotation_label:SetText('^pN^w/^oD')
+			Game.game_match_time_rune_label:SetText('Rune')
+		
+		elseif (GetTimeOfDawn) then
+			local correctedTimeOfDay = Game.lastMatchTime - (GetTimeOfDawn() / 1000)
+			if(correctedTimeOfDay < 0) then
+				correctedTimeOfDay = dayDuration + (correctedTimeOfDay + 1)
+			end
+			
+			local untilChange = (dayDuration / 2) - (correctedTimeOfDay % (dayDuration / 2)) - 1 
+			local timestate = floor(correctedTimeOfDay / (dayDuration / 2)) % 2	
 			if (timestate == 1) then
 				Game.game_match_time_rotation_label:SetText('^pN^w: '..convertTimeRange(untilChange))
 			else
 				Game.game_match_time_rotation_label:SetText('^oD^w: '..convertTimeRange(untilChange))
 			end
 
-			local powerupInterval = GetCvarInt('g_powerupSpawnInterval') / 1000
-			local untilSpawn = (powerupInterval) - (Game.lastMatchTime % (powerupInterval)) - 1
-
-			if (untilSpawn < 30) then
-				Game.game_match_time_rune_label:SetText('R: ^:^r'..convertTimeRange(untilSpawn))
+			local untilRuneSpawn = (powerupInterval) - (correctedTimeOfDay % (powerupInterval)) - 1
+			if (untilRuneSpawn < 30) then
+				Game.game_match_time_rune_label:SetText('R: ^:^r'..convertTimeRange(untilRuneSpawn))
 			else
-				Game.game_match_time_rune_label:SetText('R: '..convertTimeRange(untilSpawn))
-			end
+				Game.game_match_time_rune_label:SetText('R: '..convertTimeRange(untilRuneSpawn))
+			end			
+		
 		else
-			Game.game_match_time_rotation_label:SetText('^pN^w/^oD')
-			Game.game_match_time_rune_label:SetText('Rune')
+			local untilChange = (dayDuration / 2) - (Game.lastMatchTime % (dayDuration / 2)) - 1
+			local timestate = floor(Game.lastMatchTime / (dayDuration / 2)) % 2
+			if (timestate == 1) then
+				Game.game_match_time_rotation_label:SetText('^pN^w: '..convertTimeRange(untilChange))
+			else
+				Game.game_match_time_rotation_label:SetText('^oD^w: '..convertTimeRange(untilChange))
+			end
+
+			local untilRuneSpawn = (powerupInterval) - (Game.lastMatchTime % (powerupInterval)) - 1
+			if (untilRuneSpawn < 30) then
+				Game.game_match_time_rune_label:SetText('R: ^:^r'..convertTimeRange(untilRuneSpawn))
+			else
+				Game.game_match_time_rune_label:SetText('R: '..convertTimeRange(untilRuneSpawn))
+			end
 		end
 		-- OptiUI: end
 	end

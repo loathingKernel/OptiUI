@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Game version: v3.2.2 -->
+<!-- Game version: v3.2.3 -->
 <interface name="game" onshowlua="Cmd('Trigger movf_interfacegame 1')" onhidelua="Cmd('Trigger movf_interfacegame 0')" scenex="0" sceney="0" scenewidth="100%" sceneheight="88h" luatable="true"
 	onloadlua="
 		Trigger('MiniMapPosition')
@@ -10,7 +10,7 @@
 
 	<lua file="/ui/scripts/game_new.lua" />
 
-	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '32') Game:InitializeGameInterface()"/>
+	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '33') Game:InitializeGameInterface()"/>
 
 	<!-- Packages -->
 	<childinterface file="ui_items_1.interface" />
@@ -1346,6 +1346,14 @@
 				onmouseoutlua="{onmouseoutlua}"
 				watch="{buttonwatch}"
 				ontriggerlua="{buttonontriggerlua}"
+			/>
+
+			<panel
+				visible="0"
+				watch="{cover_watch}"
+				ontriggerlua="{cover_ontriggerlua}"
+				onmouseoverlua="{cover_onmouseoverlua}"
+				onmouseoutlua="{cover_onmouseoutlua}"
 			/>
 		</panel>
 	</template>
@@ -3528,6 +3536,79 @@
 	</panel>
 	<lua file="/ui/scripts/chat.lua" />
 
+	<!-- Walkthrough panels that needs to be in the game interface -->
+	<template name="walkthrough_tip_storage_entry_template">
+		<panel name="walkthrough_tip_storage_entry_{id}" height="4h" noclick="0" visible="0"
+			onclicklua="Game_Walkthrough.MiscTipClicked({id})"
+			onmouseover="Call('walkthrough_tip_storage_entry_color_panel_{id}', 'FadeIn(150);');"
+			onmouseout="Call('walkthrough_tip_storage_entry_color_panel_{id}', 'FadeOut(150);');"
+		>
+			<frame texture="/ui/frames/togglebox.tga" borderthickness="1.0h" color="1 1 1 1" blockinput="false" noclick="1" />
+			<image name="walkthrough_tip_storage_entry_icon_{id}" x="14@" width="58@" height="58%" valign="center" noclick="true"/>
+			 
+			<label name="walkthrough_tip_storage_entry_label_{id}" x="86@" textvalign="center" font="dyn_11" color=".9 .9 .9 1" shadow="true" noclick="1" blockinput="false" content="" />
+			<!-- More Information -->
+			<button
+				x="-16@"
+				width="48@" height="48%" 
+				align="right" valign="center"
+				color="invisible"
+				onclicklua="Game_Walkthrough.MiscTipClicked({id})"
+			>
+				<widgetstate statename="up">
+					<image texture="/ui/elements/tip_mark_up.tga" noclick="true" />
+				</widgetstate>
+				<widgetstate statename="over">
+					<image texture="/ui/elements/tip_mark_over.tga" noclick="true" />
+				</widgetstate>
+				<widgetstate statename="down" x="1" y="1">
+					<image texture="/ui/elements/tip_mark_over.tga" noclick="true" />
+				</widgetstate>
+				<widgetstate statename="disabled">
+					<image texture="/ui/elements/tip_mark_up.tga" rendermode="grayscale" noclick="true" />
+				</widgetstate>
+			</button>
+			
+			<!-- Use this for Flash -->
+			<panel name="walkthrough_tip_storage_entry_color_panel_{id}" noclick="true" blocksinput="false">
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.6h" color="#177bdf82" noclick="1" blocksinput="false"/>
+				<frame texture="/ui/frames/roundframe.tga" borderthickness="0.6h" color="#0080ff" noclick="1" blocksinput="false"/>
+			</panel>
+			
+		</panel>
+	</template>
+	<panel name="game_walkthrough_section" color="invisible" noclick="1" visible="0">
+		<panel name="game_walkthrough_tip_parent" blockinput="0" grow="1" regrow="1" growinvis="0" noclick="1" onclick="FadeOut(150);" onrightclick="FadeOut(150);" width="70h" align="center" valign="bottom" y="-21h" visible="0"
+			onshow="If(game_walkthrough_tip_duration != 0, SleepWidget(game_walkthrough_tip_duration, 'FadeOut(150)'));"
+		>
+			<frame texture="/ui/frames/togglebox.tga" borderthickness="1.4h" color="1 1 1 1" blockinput="false" noclick="1" />
+			<panel name="game_walkthrough_tip_info_parent" grow="1" regrow="1" growinvis="0" y="1.4h" width="-2.8h" align="center" noclick="1" blockinput="0" float="bottom">			
+				<panel grow="1" regrow="1" growinvis="0" width="100%" noclick="true" blockinput="0" >
+					<panel width="11.0h" height="11.0h" valign="top">
+						<image name="game_walkthrough_tip_icon" texture="$invis" noclick="1" blockinput="0"  visible="0"  />
+						<frame color="invisible" bordercolor=".4 .4 .4 1" borderthickness="1" blockinput="0" noclick="1" />
+					</panel>
+					<panel grow="1" regrow="1" growinvis="0" width="-12.5h" align="right" noclick="1" blockinput="0" float="bottom" padding="0.3h">
+						<label name="game_walkthrough_tip_icon_label" fity="true" color="#ffaa00" outline="1" font="dyn_16" textalign="left" content="" noclick="1" visible="0" blockinput="0"  />	
+						<label name="game_walkthrough_tip_icon_desc" fity="true" wrap="true" color="1 1 1 1" shadow="1" font="dyn_14" noclick="1" visible="0" blockinput="0" 
+							content=""
+						/>
+					</panel>
+				</panel>
+				<panel height="1.5h"/>
+			</panel>			
+		</panel>	
+		
+		<panel name="walkthrough_tip_storage_container" align="right" valign="bottom" x="0.5h" y="-25.0h" width="21h" float="bottom" padding="0.4h" grow="true" regrow="true" growinvis="false">
+			<instance name="walkthrough_tip_storage_entry_template" id="1" />
+			<instance name="walkthrough_tip_storage_entry_template" id="2" />
+			<instance name="walkthrough_tip_storage_entry_template" id="3" />
+			<instance name="walkthrough_tip_storage_entry_template" id="4" />
+			<instance name="walkthrough_tip_storage_entry_template" id="5" />
+		</panel>
+	</panel>
+	<!-- end of walkthrough stuff -->
+
 	<!-- Shop / Obsv -->
 	<childinterface file="game_shop_v3.interface" />
 	<!-- Doesn't exist yet
@@ -4403,6 +4484,10 @@
 						onmouseoutlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(0)"
 						buttonwatch="CourierControllable"
 						buttonontriggerlua="self:SetEnabled(AtoB(param))"
+						cover_onmouseoverlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(1)"
+						cover_onmouseoutlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(0)"
+						cover_watch="CourierControllable"
+						cover_ontriggerlua="self:SetVisible(not AtoB(param))"
 					/>
 				</panel>
 			</panel>

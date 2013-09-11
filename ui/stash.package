@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Game version: v3.2.2 -->
+<!-- Game version: v3.2.3 -->
 <package>	
 	<template name="stash_button">
 		<panel x="{x}" y="{y}" width="{width}" height="{height}" align="{align}" valign="{valign}" name="game_stash_button_{slot}" >
@@ -274,6 +274,10 @@
 					onmouseoutlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(0)"
 					buttonwatch="CourierControllable"
 					buttonontriggerlua="self:SetEnabled(AtoB(param))"
+					cover_onmouseoverlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(1)"
+					cover_onmouseoutlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(0)"
+					cover_watch="CourierControllable"
+					cover_ontriggerlua="self:SetVisible(not AtoB(param))"
 				/>
 			</panel>
 			
