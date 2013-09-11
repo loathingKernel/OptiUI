@@ -199,26 +199,26 @@ local function InitMidBar()
 			Game.game_match_time_rotation_label:SetText('^pN^w/^oD')
 			Game.game_match_time_rune_label:SetText('Rune')
 		
-		elseif (GetTimeOfDawn) then
-			local correctedTimeOfDay = Game.lastMatchTime - (GetTimeOfDawn() / 1000)
-			if(correctedTimeOfDay < 0) then
-				correctedTimeOfDay = dayDuration + (correctedTimeOfDay + 1)
-			end
+		-- elseif (GetTimeOfDawn) then
+		-- 	local correctedTimeOfDay = Game.lastMatchTime - (GetTimeOfDawn() / 1000)
+		-- 	if(correctedTimeOfDay < 0) then
+		-- 		correctedTimeOfDay = dayDuration + (correctedTimeOfDay + 1)
+		-- 	end
 			
-			local untilChange = (dayDuration / 2) - (correctedTimeOfDay % (dayDuration / 2)) - 1 
-			local timestate = floor(correctedTimeOfDay / (dayDuration / 2)) % 2	
-			if (timestate == 1) then
-				Game.game_match_time_rotation_label:SetText('^pN^w: '..convertTimeRange(untilChange))
-			else
-				Game.game_match_time_rotation_label:SetText('^oD^w: '..convertTimeRange(untilChange))
-			end
+		-- 	local untilChange = (dayDuration / 2) - (correctedTimeOfDay % (dayDuration / 2)) - 1 
+		-- 	local timestate = floor(correctedTimeOfDay / (dayDuration / 2)) % 2	
+		-- 	if (timestate == 1) then
+		-- 		Game.game_match_time_rotation_label:SetText('^pN^w: '..convertTimeRange(untilChange))
+		-- 	else
+		-- 		Game.game_match_time_rotation_label:SetText('^oD^w: '..convertTimeRange(untilChange))
+		-- 	end
 
-			local untilRuneSpawn = (powerupInterval) - (correctedTimeOfDay % (powerupInterval)) - 1
-			if (untilRuneSpawn < 30) then
-				Game.game_match_time_rune_label:SetText('R: ^:^r'..convertTimeRange(untilRuneSpawn))
-			else
-				Game.game_match_time_rune_label:SetText('R: '..convertTimeRange(untilRuneSpawn))
-			end			
+		-- 	local untilRuneSpawn = (powerupInterval) - (correctedTimeOfDay % (powerupInterval)) - 1
+		-- 	if (untilRuneSpawn < 30) then
+		-- 		Game.game_match_time_rune_label:SetText('R: ^:^r'..convertTimeRange(untilRuneSpawn))
+		-- 	else
+		-- 		Game.game_match_time_rune_label:SetText('R: '..convertTimeRange(untilRuneSpawn))
+		-- 	end			
 		
 		else
 			local untilChange = (dayDuration / 2) - (Game.lastMatchTime % (dayDuration / 2)) - 1
