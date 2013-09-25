@@ -119,6 +119,7 @@ local function InitArcadeText()
 		['seductive'] = {3200, 2},
 		['thai'] = {3200, 2},
 		['thaienglish'] = {3200, 2},
+		['pirate'] = {3200, 2},
 		}
 
 	local function ArcadeMessage(message, condition, self, value, set)	
