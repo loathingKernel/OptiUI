@@ -10,7 +10,7 @@
 
 	<lua file="/ui/scripts/game_new.lua" />
 
-	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '33') Game:InitializeGameInterface()"/>
+	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '34') Game:InitializeGameInterface()"/> 
 
 	<!-- Packages -->
 	<childinterface file="ui_items_1.interface" />
@@ -3093,9 +3093,10 @@
 		</panel>
 	</panel>
 
-	<panel name="arcade_messages" width="80h" height="30h" y="0h" align="center" color="invisible" noclick="1">
+	<panel name="arcade_messages" width="100h" height="30h" y="0h" align="center" color="invisible" noclick="1">
 		<modelpanel
 			name="game_arcade_model_1"
+			width="80h" align="center"
 			visible="0"
 			noclick="true"
 			anim="idle"
@@ -3114,6 +3115,7 @@
 		/>
 		<modelpanel
 			name="game_arcade_model_2"
+			width="80h" align="center"
 			visible="0"
 			noclick="true"
 			anim="idle"
@@ -3126,6 +3128,24 @@
 			carmerafar="5000"
 			depthclear="false"
 			depthcompress="true"
+			sunazimuth="-90"
+			sunaltitude="180"
+			suncolor="1 1 1"
+		/>
+		<modelpanel
+			name="game_arcade_model_3"
+			visible="0"
+			noclick="true"
+			anim="idle"
+			cameradistance="0"
+			lookat="false"
+			camerapos="0 1625 0"
+			cameraangles="0 0 180"
+			camerafov="50"
+			cameranear="1"
+			carmerafar="5000"
+			depthclear="false"
+			depthcompress="true"				
 			sunazimuth="-90"
 			sunaltitude="180"
 			suncolor="1 1 1"
@@ -5117,10 +5137,10 @@
 		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared_simple34" slot="34" help="true" />
 		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared_simple35" slot="35" help="true" />
 
-		<instance name="courier_state_tooltip" id="courier_state_tooltip" />
-		<instance name="courier_status_tooltip" id="courier_status_tooltip" />
-		<instance name="courier_controller_tooltip" id="courier_controller_tooltip" />
-		<instance name="courier_action_tooltip" id="courier_action_tooltip" />
+		<instance name="courier_state_tooltip" />
+		<instance name="courier_status_tooltip" />
+		<instance name="courier_controller_tooltip" />
+		<instance name="courier_action_tooltip" />
 	</panel>
 
 	<childinterface file="game_shop_shared.interface" />

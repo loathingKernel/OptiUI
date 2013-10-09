@@ -8,7 +8,7 @@ local _G = getfenv(0)
 local ipairs, pairs, select, string, table, next, type, unpack, tinsert, tconcat, tremove, format, tostring, tonumber, tsort, ceil, floor, sub, find, gfind = _G.ipairs, _G.pairs, _G.select, _G.string, _G.table, _G.next, _G.type, _G.unpack, _G.table.insert, _G.table.concat, _G.table.remove, _G.string.format, _G.tostring, _G.tonumber, _G.table.sort, _G.math.ceil, _G.math.floor, _G.string.sub, _G.string.find, _G.string.gfind
 local interface = object
 local interfaceName = interface:GetName()
-RegisterScript2('Game', '32')
+RegisterScript2('Game', '33')
 Game = {}
 Game.MAX_ALLIES 			= 3
 Game.MAX_ENEMIES 			= 4
@@ -120,16 +120,17 @@ local function InitArcadeText()
 		['thai'] = {3200, 2},
 		['thaienglish'] = {3200, 2},
 		['pirate'] = {3200, 2},
-		}
+		['bamf'] = {3200, 3},
+	}
 
 	local function ArcadeMessage(message, condition, self, value, set)	
 		if (condition == true) or (condition == tonumber(value)) then		
 			local modelPanel 
-			if (Game.arcadeSetTable[set][2] == 1) then
-				modelPanel = GetWidget('game_arcade_model_1', 'game')
-			else
+			local modelPanel = GetWidget('game_arcade_model_'..Game.arcadeSetTable[set][2], 'game')
+			if (not modelPanel) then
 				modelPanel = GetWidget('game_arcade_model_2', 'game')
-			end			
+			end
+
 			modelPanel:SetVisible(true)
 			modelPanel:UICmd("SetAnim('idle')")
 			modelPanel:UICmd("SetModel('" .. '/ui/common/models/'.. set .. '/' .. message .. '.mdf' .. "')")
