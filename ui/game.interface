@@ -2983,10 +2983,24 @@
 
 	</panel>
 
-	<!-- OptiUIL Respawn Timers -->
+	<!-- OptiUI: Respawn Timers -->
+	<template name="respawn_timer_icon" >
+		<panel x="{x}" width="20%" color="{color}">
+		</panel>
+	</template>
 	<panel name="game_top_center_respawn_timers_lg" y="0" x="-41h" width="30h" height="5h" align="center" noclick="true" color="black">
+		<instance name="respawn_timer_icon" x="0%"  color="red" />
+		<instance name="respawn_timer_icon" x="20%" color="green" />
+		<instance name="respawn_timer_icon" x="40%" color="blue" />
+		<instance name="respawn_timer_icon" x="60%" color="red" />
+		<instance name="respawn_timer_icon" x="80%" color="green" />
 	</panel>
 	<panel name="game_top_center_respawn_timers_hb" y="0" x="41h"  width="30h" height="5h" align="center" noclick="true" color="black">
+		<instance name="respawn_timer_icon" x="0%"  color="red" />
+		<instance name="respawn_timer_icon" x="20%" color="green" />
+		<instance name="respawn_timer_icon" x="40%" color="blue" />
+		<instance name="respawn_timer_icon" x="60%" color="red" />
+		<instance name="respawn_timer_icon" x="80%" color="green" />
 	</panel>
 
 	<panel y="0" width="50.5h" height="3.3h" align="center" valign="top" noclick="1" color="invisible">
