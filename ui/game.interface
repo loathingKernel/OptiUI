@@ -22,6 +22,7 @@
 	<childinterface file="/ui/confirmations.interface" />
 	<childinterface file="/ui/testpp/game_dev.interface" />
 	<include file="game_radialmenu.package" />
+	<include file="optiui_respawn_timers.package" />
 
 	<if condition="(releaseStage_dev or releaseStage_test) and !releaseStage_rc and !releaseStage_stable and !ui_disableQAChecklist" >
 		<panel y="-1" x="-26h" width="3.0h" height="3.0h" grow="1" align="right" name="game_qa_mini_button" visible="1" noclick="0" valign="top" passivechildren="1" color="0 0 0 1" onshow="BringToFront();"
@@ -2077,7 +2078,7 @@
 				
 				<panel name="game_top_left_ally_dead_{index}" y="0h" >
 					<image texture="/ui/legion/dead.tga" />
-					<label name="game_top_left_ally_respawn_{index}" font="dyn_10" color="yellow" shadow="true" textalign="center" textvalign="center" />
+					<label name="game_top_left_ally_respawn_{index}" font="dyn_16" color="yellow" shadow="true" textalign="center" textvalign="center" />
 				</panel>
 
 				<!--  Voip Mic  -->
@@ -2349,7 +2350,7 @@
 				
 				<panel name="game_top_left_ally_dead_{index}" y="0h" >
 					<image texture="/ui/legion/dead.tga" />
-					<label name="game_top_left_ally_respawn_{index}" font="dyn_10" color="yellow" shadow="true" textalign="center" textvalign="center" />
+					<label name="game_top_left_ally_respawn_{index}" font="dyn_16" color="yellow" shadow="true" textalign="center" textvalign="center" />
 				</panel>
 
 				<!--  Voip Mic  -->
@@ -2983,26 +2984,6 @@
 
 	</panel>
 
-	<!-- OptiUI: Respawn Timers -->
-	<template name="respawn_timer_icon" >
-		<panel x="{x}" width="20%" color="{color}">
-		</panel>
-	</template>
-	<panel name="game_top_center_respawn_timers_lg" y="0" x="-41h" width="30h" height="5h" align="center" noclick="true" color="black">
-		<instance name="respawn_timer_icon" x="0%"  color="red" />
-		<instance name="respawn_timer_icon" x="20%" color="green" />
-		<instance name="respawn_timer_icon" x="40%" color="blue" />
-		<instance name="respawn_timer_icon" x="60%" color="red" />
-		<instance name="respawn_timer_icon" x="80%" color="green" />
-	</panel>
-	<panel name="game_top_center_respawn_timers_hb" y="0" x="41h"  width="30h" height="5h" align="center" noclick="true" color="black">
-		<instance name="respawn_timer_icon" x="0%"  color="red" />
-		<instance name="respawn_timer_icon" x="20%" color="green" />
-		<instance name="respawn_timer_icon" x="40%" color="blue" />
-		<instance name="respawn_timer_icon" x="60%" color="red" />
-		<instance name="respawn_timer_icon" x="80%" color="green" />
-	</panel>
-
 	<panel y="0" width="50.5h" height="3.3h" align="center" valign="top" noclick="1" color="invisible">
 		<!-- Legion Health -->
 		<panel name="game_base_health_header_0" x="0" y="0" height="1.6h" width="11.0h" align="left" valign="bottom" noclick="1" color="invisible" >
@@ -3112,7 +3093,7 @@
 		</panel>
 	</panel>
 
-	<panel name="arcade_messages" width="100h" height="30h" y="0h" align="center" color="invisible" noclick="1">
+<!-- 	<panel name="arcade_messages" width="100h" height="30h" y="0h" align="center" color="invisible" noclick="1">
 		<modelpanel
 			name="game_arcade_model_1"
 			width="80h" align="center"
@@ -3169,7 +3150,7 @@
 			sunaltitude="180"
 			suncolor="1 1 1"
 		/>
-	</panel>
+	</panel> -->
 
 	<panel valign="top" align="left" x="3h" y="12h" height="10.5h" width="45h" noclick="true" visible="true" name="KillBoard">
 		<instance name="killBoardEntry" id="1" />

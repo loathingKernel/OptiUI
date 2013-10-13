@@ -108,67 +108,67 @@ end
 -- 					Arcade Text				        	--
 ----------------------------------------------------------
 local function InitArcadeText()
-	Game.arcadeSetTable = {
-		['arcade_text'] = {1800, 1},
-		['unicorn'] = {3200, 1},
-		['balls'] = {3200, 2},
-		['english'] = {3200, 2},
-		['pimp'] = {3200, 2},
-		['meme'] = {3200, 2},
-		['seduction'] = {3200, 2},
-		['seductive'] = {3200, 2},
-		['thai'] = {3200, 2},
-		['thaienglish'] = {3200, 2},
-		['pirate'] = {3200, 2},
-		['bamf'] = {3200, 3},
-	}
+	-- Game.arcadeSetTable = {
+	-- 	['arcade_text'] = {1800, 1},
+	-- 	['unicorn'] = {3200, 1},
+	-- 	['balls'] = {3200, 2},
+	-- 	['english'] = {3200, 2},
+	-- 	['pimp'] = {3200, 2},
+	-- 	['meme'] = {3200, 2},
+	-- 	['seduction'] = {3200, 2},
+	-- 	['seductive'] = {3200, 2},
+	-- 	['thai'] = {3200, 2},
+	-- 	['thaienglish'] = {3200, 2},
+	-- 	['pirate'] = {3200, 2},
+	-- 	['bamf'] = {3200, 3},
+	-- }
 
-	local function ArcadeMessage(message, condition, self, value, set)	
-		if (condition == true) or (condition == tonumber(value)) then		
-			local modelPanel 
-			local modelPanel = GetWidget('game_arcade_model_'..Game.arcadeSetTable[set][2], 'game')
-			if (not modelPanel) then
-				modelPanel = GetWidget('game_arcade_model_2', 'game')
-			end
+	-- local function ArcadeMessage(message, condition, self, value, set)	
+	-- 	if (condition == true) or (condition == tonumber(value)) then		
+	-- 		local modelPanel 
+	-- 		local modelPanel = GetWidget('game_arcade_model_'..Game.arcadeSetTable[set][2], 'game')
+	-- 		if (not modelPanel) then
+	-- 			modelPanel = GetWidget('game_arcade_model_2', 'game')
+	-- 		end
 
-			modelPanel:SetVisible(true)
-			modelPanel:UICmd("SetAnim('idle')")
-			modelPanel:UICmd("SetModel('" .. '/ui/common/models/'.. set .. '/' .. message .. '.mdf' .. "')")
-			modelPanel:UICmd("SetEffect('" .. '/ui/common/models/'.. set .. '/' .. 'bloodlust.effect' ..  "')")
-			modelPanel:Sleep(Game.arcadeSetTable[set][1], function() modelPanel:SetVisible(false) end)
-		end		
-	end
-	interface:RegisterWatch('EventTowerDeny', 		function(...) ArcadeMessage('denied', 		true, ...) end)
-	interface:RegisterWatch('EventFirstKill', 		function(...) ArcadeMessage('bloodlust', 	true, ...) end)
-	interface:RegisterWatch('EventMultiKill', 		function(...) ArcadeMessage('hattrick', 	1, ...) 	ArcadeMessage('quadkill', 	2, ...) 	ArcadeMessage('annihilation', 3, ...) end)
-	interface:RegisterWatch('EventKillStreak', 		function(...) ArcadeMessage('bloodbath', 	10, ...) 	ArcadeMessage('immortal', 	15, ...) end)
-	interface:RegisterWatch('EventTeamWipe', 		function(...) ArcadeMessage('genocide', 	true, ...) end)
-	interface:RegisterWatch('EventSmackdown', 		function(...) ArcadeMessage('smackdown', 	true, ...) end)
-	interface:RegisterWatch('EventHumiliation', 	function(...) ArcadeMessage('humiliation', 	true, ...) end)
-	interface:RegisterWatch('EventRival', 			function(...) ArcadeMessage('nemesis', 		true, ...) end)
-	interface:RegisterWatch('EventPayback', 		function(...) ArcadeMessage('payback', 		true, ...) end)
-	interface:RegisterWatch('EventRageQuit', 		function(...) ArcadeMessage('ragequit', 	true, ...) end)
-	interface:RegisterWatch('EventVictory', 		function(...) ArcadeMessage('victory', 		true, ...) end)
-	interface:RegisterWatch('EventDefeat', 			function(...) ArcadeMessage('defeat', 		true, ...) end)
+	-- 		modelPanel:SetVisible(true)
+	-- 		modelPanel:UICmd("SetAnim('idle')")
+	-- 		modelPanel:UICmd("SetModel('" .. '/ui/common/models/'.. set .. '/' .. message .. '.mdf' .. "')")
+	-- 		modelPanel:UICmd("SetEffect('" .. '/ui/common/models/'.. set .. '/' .. 'bloodlust.effect' ..  "')")
+	-- 		modelPanel:Sleep(Game.arcadeSetTable[set][1], function() modelPanel:SetVisible(false) end)
+	-- 	end		
+	-- end
+	-- interface:RegisterWatch('EventTowerDeny', 		function(...) ArcadeMessage('denied', 		true, ...) end)
+	-- interface:RegisterWatch('EventFirstKill', 		function(...) ArcadeMessage('bloodlust', 	true, ...) end)
+	-- interface:RegisterWatch('EventMultiKill', 		function(...) ArcadeMessage('hattrick', 	1, ...) 	ArcadeMessage('quadkill', 	2, ...) 	ArcadeMessage('annihilation', 3, ...) end)
+	-- interface:RegisterWatch('EventKillStreak', 		function(...) ArcadeMessage('bloodbath', 	10, ...) 	ArcadeMessage('immortal', 	15, ...) end)
+	-- interface:RegisterWatch('EventTeamWipe', 		function(...) ArcadeMessage('genocide', 	true, ...) end)
+	-- interface:RegisterWatch('EventSmackdown', 		function(...) ArcadeMessage('smackdown', 	true, ...) end)
+	-- interface:RegisterWatch('EventHumiliation', 	function(...) ArcadeMessage('humiliation', 	true, ...) end)
+	-- interface:RegisterWatch('EventRival', 			function(...) ArcadeMessage('nemesis', 		true, ...) end)
+	-- interface:RegisterWatch('EventPayback', 		function(...) ArcadeMessage('payback', 		true, ...) end)
+	-- interface:RegisterWatch('EventRageQuit', 		function(...) ArcadeMessage('ragequit', 	true, ...) end)
+	-- interface:RegisterWatch('EventVictory', 		function(...) ArcadeMessage('victory', 		true, ...) end)
+	-- interface:RegisterWatch('EventDefeat', 			function(...) ArcadeMessage('defeat', 		true, ...) end)
 
-	local function AccountMessage(self, accountLevel, newVerified)	
-		local newVerified = AtoB(newVerified)
-		local modelPanel = GetWidget('game_arcade_model_2', 'game')
+	-- local function AccountMessage(self, accountLevel, newVerified)	
+	-- 	local newVerified = AtoB(newVerified)
+	-- 	local modelPanel = GetWidget('game_arcade_model_2', 'game')
 		
-		modelPanel:Sleep(1500, function() 
-			modelPanel:SetVisible(true)
-			modelPanel:UICmd("SetAnim('idle')")
-			if (newVerified) then
-				modelPanel:UICmd("SetModel('" .. '/ui/common/models/levelup/verified.mdf' .. "')")
-				modelPanel:UICmd("SetEffect('" .. '/ui/common/models/levelup/verified.effect' ..  "')")
-			else
-				modelPanel:UICmd("SetModel('" .. '/ui/common/models/levelup/levelup.mdf' .. "')")
-				modelPanel:UICmd("SetEffect('" .. '/ui/common/models/levelup/levelup.effect' ..  "')")		
-			end
-			modelPanel:Sleep(5000, function() modelPanel:SetVisible(false) end)
-		end)
-	end	
-	interface:RegisterWatch('EventAccountLevelup', 	function(...) AccountMessage(...) end)
+	-- 	modelPanel:Sleep(1500, function() 
+	-- 		modelPanel:SetVisible(true)
+	-- 		modelPanel:UICmd("SetAnim('idle')")
+	-- 		if (newVerified) then
+	-- 			modelPanel:UICmd("SetModel('" .. '/ui/common/models/levelup/verified.mdf' .. "')")
+	-- 			modelPanel:UICmd("SetEffect('" .. '/ui/common/models/levelup/verified.effect' ..  "')")
+	-- 		else
+	-- 			modelPanel:UICmd("SetModel('" .. '/ui/common/models/levelup/levelup.mdf' .. "')")
+	-- 			modelPanel:UICmd("SetEffect('" .. '/ui/common/models/levelup/levelup.effect' ..  "')")		
+	-- 		end
+	-- 		modelPanel:Sleep(5000, function() modelPanel:SetVisible(false) end)
+	-- 	end)
+	-- end	
+	-- interface:RegisterWatch('EventAccountLevelup', 	function(...) AccountMessage(...) end)
 end
 
 ----------------------------------------------------------
@@ -200,27 +200,6 @@ local function InitMidBar()
 		if (AtoB(isPreMatchPhase)) then
 			Game.game_match_time_rotation_label:SetText('^pN^w/^oD')
 			Game.game_match_time_rune_label:SetText('Rune')
-		
-		-- elseif (GetTimeOfDawn) then
-		-- 	local correctedTimeOfDay = Game.lastMatchTime - (GetTimeOfDawn() / 1000)
-		-- 	if(correctedTimeOfDay < 0) then
-		-- 		correctedTimeOfDay = dayDuration + (correctedTimeOfDay + 1)
-		-- 	end
-			
-		-- 	local untilChange = (dayDuration / 2) - (correctedTimeOfDay % (dayDuration / 2)) - 1 
-		-- 	local timestate = floor(correctedTimeOfDay / (dayDuration / 2)) % 2	
-		-- 	if (timestate == 1) then
-		-- 		Game.game_match_time_rotation_label:SetText('^pN^w: '..convertTimeRange(untilChange))
-		-- 	else
-		-- 		Game.game_match_time_rotation_label:SetText('^oD^w: '..convertTimeRange(untilChange))
-		-- 	end
-
-		-- 	local untilRuneSpawn = (powerupInterval) - (correctedTimeOfDay % (powerupInterval)) - 1
-		-- 	if (untilRuneSpawn < 30) then
-		-- 		Game.game_match_time_rune_label:SetText('R: ^:^r'..convertTimeRange(untilRuneSpawn))
-		-- 	else
-		-- 		Game.game_match_time_rune_label:SetText('R: '..convertTimeRange(untilRuneSpawn))
-		-- 	end			
 		
 		else
 			local untilChange = (dayDuration / 2) - (Game.lastMatchTime % (dayDuration / 2)) - 1
