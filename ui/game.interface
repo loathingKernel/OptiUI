@@ -22,6 +22,7 @@
 	<childinterface file="/ui/confirmations.interface" />
 	<childinterface file="/ui/testpp/game_dev.interface" />
 	<include file="game_radialmenu.package" />
+	<include file="optiui_respawn_timers.package" />
 
 	<if condition="(releaseStage_dev or releaseStage_test) and !releaseStage_rc and !releaseStage_stable and !ui_disableQAChecklist" >
 		<panel y="-1" x="-26h" width="3.0h" height="3.0h" grow="1" align="right" name="game_qa_mini_button" visible="1" noclick="0" valign="top" passivechildren="1" color="0 0 0 1" onshow="BringToFront();"
