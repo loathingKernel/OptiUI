@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Game version: v3.2.1 -->
 <package>
 	<!-- INSERT AFTER THIS -->
 	<include file="/ui/optiui_options.package" />

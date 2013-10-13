@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Game version: v3.2.3 -->
 <interface name="game" onshowlua="Cmd('Trigger movf_interfacegame 1')" onhidelua="Cmd('Trigger movf_interfacegame 0')" scenex="0" sceney="0" scenewidth="100%" sceneheight="88h" luatable="true"
 	onloadlua="
 		Trigger('MiniMapPosition')
@@ -2078,7 +2077,7 @@
 				
 				<panel name="game_top_left_ally_dead_{index}" y="0h" >
 					<image texture="/ui/legion/dead.tga" />
-					<label name="game_top_left_ally_respawn_{index}" font="dyn_10" color="yellow" shadow="true" textalign="center" textvalign="center" />
+					<label name="game_top_left_ally_respawn_{index}" font="dyn_16" color="yellow" shadow="true" textalign="center" textvalign="center" />
 				</panel>
 
 				<!--  Voip Mic  -->
@@ -2350,7 +2349,7 @@
 				
 				<panel name="game_top_left_ally_dead_{index}" y="0h" >
 					<image texture="/ui/legion/dead.tga" />
-					<label name="game_top_left_ally_respawn_{index}" font="dyn_10" color="yellow" shadow="true" textalign="center" textvalign="center" />
+					<label name="game_top_left_ally_respawn_{index}" font="dyn_16" color="yellow" shadow="true" textalign="center" textvalign="center" />
 				</panel>
 
 				<!--  Voip Mic  -->
@@ -2984,9 +2983,9 @@
 
 	</panel>
 
-	<panel name="game_base_health_header_0" y="0" width="50.5h" height="3.3h" align="center" valign="top" noclick="1" color="invisible">
+	<panel y="0" width="50.5h" height="3.3h" align="center" valign="top" noclick="1" color="invisible">
 		<!-- Legion Health -->
-		<panel  x="0" y="0" height="1.6h" width="11.0h" align="left" valign="bottom" noclick="1" color="invisible" >
+		<panel name="game_base_health_header_0" x="0" y="0" height="1.6h" width="11.0h" align="left" valign="bottom" noclick="1" color="invisible" >
 			<image texture="/ui/legion/behind_bar.tga" rendermode="overlay" color="1 1 1 1" noclick="1"/>
 			<panel name="game_base_health_backer_0" align="right" color="0 0 0 0" noclick="1">
 				<panel name="game_base_health_bar_0" color="0 1 0 0" noclick="1"/>
@@ -3093,7 +3092,7 @@
 		</panel>
 	</panel>
 
-	<panel name="arcade_messages" width="100h" height="30h" y="0h" align="center" color="invisible" noclick="1">
+<!-- 	<panel name="arcade_messages" width="100h" height="30h" y="0h" align="center" color="invisible" noclick="1">
 		<modelpanel
 			name="game_arcade_model_1"
 			width="80h" align="center"
@@ -3150,7 +3149,7 @@
 			sunaltitude="180"
 			suncolor="1 1 1"
 		/>
-	</panel>
+	</panel> -->
 
 	<panel valign="top" align="left" x="3h" y="12h" height="10.5h" width="45h" noclick="true" visible="true" name="KillBoard">
 		<instance name="killBoardEntry" id="1" />
@@ -3546,7 +3545,7 @@
 
 		</panel>
 
-		<image texture="/ui/common/scores_menu_buttons.tga" noclick="true"/>
+		<!-- <image texture="/ui/common/scores_menu_buttons.tga" noclick="true"/> -->
 	</panel>
 
 	<!-- END TOP -->

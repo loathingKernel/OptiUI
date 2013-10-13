@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <package>
 	<instance name="mod_options" mod_id="optiui_options" mod_name="OptiUI" />
 
