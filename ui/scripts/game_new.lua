@@ -8,7 +8,7 @@ local _G = getfenv(0)
 local ipairs, pairs, select, string, table, next, type, unpack, tinsert, tconcat, tremove, format, tostring, tonumber, tsort, ceil, floor, sub, find, gfind = _G.ipairs, _G.pairs, _G.select, _G.string, _G.table, _G.next, _G.type, _G.unpack, _G.table.insert, _G.table.concat, _G.table.remove, _G.string.format, _G.tostring, _G.tonumber, _G.table.sort, _G.math.ceil, _G.math.floor, _G.string.sub, _G.string.find, _G.string.gfind
 local interface = object
 local interfaceName = interface:GetName()
-RegisterScript2('Game', '33')
+RegisterScript2('Game', '34')
 Game = {}
 Game.MAX_ALLIES 			= 3
 Game.MAX_ENEMIES 			= 4
@@ -108,67 +108,67 @@ end
 -- 					Arcade Text				        	--
 ----------------------------------------------------------
 local function InitArcadeText()
-	-- Game.arcadeSetTable = {
-	-- 	['arcade_text'] = {1800, 1},
-	-- 	['unicorn'] = {3200, 1},
-	-- 	['balls'] = {3200, 2},
-	-- 	['english'] = {3200, 2},
-	-- 	['pimp'] = {3200, 2},
-	-- 	['meme'] = {3200, 2},
-	-- 	['seduction'] = {3200, 2},
-	-- 	['seductive'] = {3200, 2},
-	-- 	['thai'] = {3200, 2},
-	-- 	['thaienglish'] = {3200, 2},
-	-- 	['pirate'] = {3200, 2},
-	-- 	['bamf'] = {3200, 3},
-	-- }
+	Game.arcadeSetTable = {
+		['arcade_text'] = {1800, 1},
+		['unicorn'] = {3200, 1},
+		['balls'] = {3200, 2},
+		['english'] = {3200, 2},
+		['pimp'] = {3200, 2},
+		['meme'] = {3200, 2},
+		['seduction'] = {3200, 2},
+		['seductive'] = {3200, 2},
+		['thai'] = {3200, 2},
+		['thaienglish'] = {3200, 2},
+		['pirate'] = {3200, 2},
+		['bamf'] = {3200, 3},
+	}
 
-	-- local function ArcadeMessage(message, condition, self, value, set)	
-	-- 	if (condition == true) or (condition == tonumber(value)) then		
-	-- 		local modelPanel 
-	-- 		local modelPanel = GetWidget('game_arcade_model_'..Game.arcadeSetTable[set][2], 'game')
-	-- 		if (not modelPanel) then
-	-- 			modelPanel = GetWidget('game_arcade_model_2', 'game')
-	-- 		end
+	local function ArcadeMessage(message, condition, self, value, set)	
+		if (condition == true) or (condition == tonumber(value)) then		
+			local modelPanel 
+			local modelPanel = GetWidget('game_arcade_model_'..Game.arcadeSetTable[set][2], 'game')
+			if (not modelPanel) then
+				modelPanel = GetWidget('game_arcade_model_2', 'game')
+			end
 
-	-- 		modelPanel:SetVisible(true)
-	-- 		modelPanel:UICmd("SetAnim('idle')")
-	-- 		modelPanel:UICmd("SetModel('" .. '/ui/common/models/'.. set .. '/' .. message .. '.mdf' .. "')")
-	-- 		modelPanel:UICmd("SetEffect('" .. '/ui/common/models/'.. set .. '/' .. 'bloodlust.effect' ..  "')")
-	-- 		modelPanel:Sleep(Game.arcadeSetTable[set][1], function() modelPanel:SetVisible(false) end)
-	-- 	end		
-	-- end
-	-- interface:RegisterWatch('EventTowerDeny', 		function(...) ArcadeMessage('denied', 		true, ...) end)
-	-- interface:RegisterWatch('EventFirstKill', 		function(...) ArcadeMessage('bloodlust', 	true, ...) end)
-	-- interface:RegisterWatch('EventMultiKill', 		function(...) ArcadeMessage('hattrick', 	1, ...) 	ArcadeMessage('quadkill', 	2, ...) 	ArcadeMessage('annihilation', 3, ...) end)
-	-- interface:RegisterWatch('EventKillStreak', 		function(...) ArcadeMessage('bloodbath', 	10, ...) 	ArcadeMessage('immortal', 	15, ...) end)
-	-- interface:RegisterWatch('EventTeamWipe', 		function(...) ArcadeMessage('genocide', 	true, ...) end)
-	-- interface:RegisterWatch('EventSmackdown', 		function(...) ArcadeMessage('smackdown', 	true, ...) end)
-	-- interface:RegisterWatch('EventHumiliation', 	function(...) ArcadeMessage('humiliation', 	true, ...) end)
-	-- interface:RegisterWatch('EventRival', 			function(...) ArcadeMessage('nemesis', 		true, ...) end)
-	-- interface:RegisterWatch('EventPayback', 		function(...) ArcadeMessage('payback', 		true, ...) end)
-	-- interface:RegisterWatch('EventRageQuit', 		function(...) ArcadeMessage('ragequit', 	true, ...) end)
-	-- interface:RegisterWatch('EventVictory', 		function(...) ArcadeMessage('victory', 		true, ...) end)
-	-- interface:RegisterWatch('EventDefeat', 			function(...) ArcadeMessage('defeat', 		true, ...) end)
+			modelPanel:SetVisible(true)
+			modelPanel:UICmd("SetAnim('idle')")
+			modelPanel:UICmd("SetModel('" .. '/ui/common/models/'.. set .. '/' .. message .. '.mdf' .. "')")
+			modelPanel:UICmd("SetEffect('" .. '/ui/common/models/'.. set .. '/' .. 'bloodlust.effect' ..  "')")
+			modelPanel:Sleep(Game.arcadeSetTable[set][1], function() modelPanel:SetVisible(false) end)
+		end		
+	end
+	interface:RegisterWatch('EventTowerDeny', 		function(...) ArcadeMessage('denied', 		true, ...) end)
+	interface:RegisterWatch('EventFirstKill', 		function(...) ArcadeMessage('bloodlust', 	true, ...) end)
+	interface:RegisterWatch('EventMultiKill', 		function(...) ArcadeMessage('hattrick', 	1, ...) 	ArcadeMessage('quadkill', 	2, ...) 	ArcadeMessage('annihilation', 3, ...) end)
+	interface:RegisterWatch('EventKillStreak', 		function(...) ArcadeMessage('bloodbath', 	10, ...) 	ArcadeMessage('immortal', 	15, ...) end)
+	interface:RegisterWatch('EventTeamWipe', 		function(...) ArcadeMessage('genocide', 	true, ...) end)
+	interface:RegisterWatch('EventSmackdown', 		function(...) ArcadeMessage('smackdown', 	true, ...) end)
+	interface:RegisterWatch('EventHumiliation', 	function(...) ArcadeMessage('humiliation', 	true, ...) end)
+	interface:RegisterWatch('EventRival', 			function(...) ArcadeMessage('nemesis', 		true, ...) end)
+	interface:RegisterWatch('EventPayback', 		function(...) ArcadeMessage('payback', 		true, ...) end)
+	interface:RegisterWatch('EventRageQuit', 		function(...) ArcadeMessage('ragequit', 	true, ...) end)
+	interface:RegisterWatch('EventVictory', 		function(...) ArcadeMessage('victory', 		true, ...) end)
+	interface:RegisterWatch('EventDefeat', 			function(...) ArcadeMessage('defeat', 		true, ...) end)
 
-	-- local function AccountMessage(self, accountLevel, newVerified)	
-	-- 	local newVerified = AtoB(newVerified)
-	-- 	local modelPanel = GetWidget('game_arcade_model_2', 'game')
+	local function AccountMessage(self, accountLevel, newVerified)	
+		local newVerified = AtoB(newVerified)
+		local modelPanel = GetWidget('game_arcade_model_2', 'game')
 		
-	-- 	modelPanel:Sleep(1500, function() 
-	-- 		modelPanel:SetVisible(true)
-	-- 		modelPanel:UICmd("SetAnim('idle')")
-	-- 		if (newVerified) then
-	-- 			modelPanel:UICmd("SetModel('" .. '/ui/common/models/levelup/verified.mdf' .. "')")
-	-- 			modelPanel:UICmd("SetEffect('" .. '/ui/common/models/levelup/verified.effect' ..  "')")
-	-- 		else
-	-- 			modelPanel:UICmd("SetModel('" .. '/ui/common/models/levelup/levelup.mdf' .. "')")
-	-- 			modelPanel:UICmd("SetEffect('" .. '/ui/common/models/levelup/levelup.effect' ..  "')")		
-	-- 		end
-	-- 		modelPanel:Sleep(5000, function() modelPanel:SetVisible(false) end)
-	-- 	end)
-	-- end	
-	-- interface:RegisterWatch('EventAccountLevelup', 	function(...) AccountMessage(...) end)
+		modelPanel:Sleep(1500, function() 
+			modelPanel:SetVisible(true)
+			modelPanel:UICmd("SetAnim('idle')")
+			if (newVerified) then
+				modelPanel:UICmd("SetModel('" .. '/ui/common/models/levelup/verified.mdf' .. "')")
+				modelPanel:UICmd("SetEffect('" .. '/ui/common/models/levelup/verified.effect' ..  "')")
+			else
+				modelPanel:UICmd("SetModel('" .. '/ui/common/models/levelup/levelup.mdf' .. "')")
+				modelPanel:UICmd("SetEffect('" .. '/ui/common/models/levelup/levelup.effect' ..  "')")		
+			end
+			modelPanel:Sleep(5000, function() modelPanel:SetVisible(false) end)
+		end)
+	end	
+	interface:RegisterWatch('EventAccountLevelup', 	function(...) AccountMessage(...) end)
 end
 
 ----------------------------------------------------------
@@ -2488,8 +2488,6 @@ local function GamePhaseChange(sourceWidget, gamePhase)
 		GetWidget("game_hero_tip_parent", "game"):SetVisible(0);
 	end
 
-	GameCommunicatorEvent(8, sourceWidget, gamePhase)
-
 	if (GameChat) then
 		GameChat.GamePhase(sourceWidget, gamePhase)
 	end	
@@ -2499,14 +2497,7 @@ local function GamePhaseChange(sourceWidget, gamePhase)
 end	
 interface:RegisterWatch('GamePhase', GamePhaseChange)
 
-local function GamePhaseExtended(...)
-	GameCommunicatorEvent(6, ...)
-end
-interface:RegisterWatch('GamePhaseExtended', GamePhaseExtended)
-
 local function ChatWhisperUpdate(...)
-	if (GameChatIMRecieved) then GameChatIMRecieved(...) end
-
 	if (GameChat) then
 		GameChat.ChatWhisperUpdate(...)
 	end	
@@ -2514,8 +2505,6 @@ end
 interface:RegisterWatch('ChatWhisperUpdate', ChatWhisperUpdate)
 
 local function AllChatMessages(...)
-	if (GameAllChatMessageRecieved) then GameAllChatMessageRecieved(...) end
-	
 	if (GameChat) then
 		GameChat.AllChatMessages(...)
 	end
@@ -2535,23 +2524,6 @@ local function GLIncorrectDisplay(_, param)
 	end
 end
 interface:RegisterWatch('GLIncorrectDisplay', GLIncorrectDisplay)	
-
-interface:RegisterWatch('ChatNotificationBuddy', 		function(...) 	HoN_Notifications:GameChatNotification(0, ...) end)	
-interface:RegisterWatch('ChatNotificationClan', 		function(...) 	HoN_Notifications:GameChatNotification(1, ...) end)	
-interface:RegisterWatch('ChatNotificationMessage', 		function(...) 	HoN_Notifications:GameChatNotification(2, ...) end)	
-interface:RegisterWatch('ChatNotificationInvite', 		function(...) 	HoN_Notifications:GameChatNotification(3, ...) end)	
-interface:RegisterWatch('ChatNotificationGroupInvite', 	function(...) 	HoN_Notifications:GameChatNotification(4, ...) end)
-
-interface:RegisterWatch('ChatUserNames', 			function(...) 	GameCommunicatorEvent(0, ...) end)
-interface:RegisterWatch('ChatUserEvent', 			function(...) 	GameCommunicatorEvent(1, ...) end)
-interface:RegisterWatch('ChatChanTopic', 			function(...) 	GameCommunicatorEvent(2, ...) end)
-interface:RegisterWatch('LobbyPlayerListSize', 		function(...) 	GameCommunicatorEvent(3, ...) end)
-interface:RegisterWatch('LobbyGameInfo', 			function(...) 	GameCommunicatorEvent(4, ...) end)
-interface:RegisterWatch('ChatLeftGame', 			function(...) 	GameCommunicatorEvent(7, ...) end)
-interface:RegisterWatch('ChatSetFocusChannel', 		function(...) 	GameCommunicatorEvent(9, ...) end)
-for i=0, 31 do
-	interface:RegisterWatch("LobbyPlayerList"..i, 	function(...) 	GameCommunicatorEvent(5, i, ...) end)
-end
 
 ----------------------------------------------------------
 -- 		Allow UI script to call object functions	    --

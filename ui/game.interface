@@ -261,7 +261,7 @@
 						<!-- Icon -->
 						<panel width="100@" height="100%">
 							<image texture="{texture}" />
-							<frame color="invisible" borderthickness="1" bordercolor=".3 .3 .3 1"/>
+							<frame color="invisible" borderthickness="1" bordercolor=".3 .3 .3 1" />
 						</panel>
 						<!-- Name / Lvl -->
 						<panel width="-120@" height="100%" float="bottom" padding="0">
@@ -273,7 +273,6 @@
 						<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
 						<label y="-1" fitx="true" fitxpadding="0.7h" font="dyn_10" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
 							onshow="SetText(GetKeybindButton('game', '{command}', ''));"
-
 						/>
 					</panel>
 				</panel>
@@ -806,7 +805,7 @@
 					<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_8"
 						watch="ActiveInventoryCharges{slot}"
 						ontriggerlua="self:SetText(param)"/>
-					<frame color="invisible" bordercolor="gray" borderthickness="1"/>
+					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
 				</panel>
 
 				<!-- Ability Refresh effect -->
@@ -994,7 +993,7 @@
 					color="0 0 0 .7"
 				>
 					<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_9" watch="ActiveInventoryCharges{slot}" ontriggerlua="self:SetText(param);"/>
-					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="true" />
+					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
 				</panel>
 
 				<!-- Refresh effect -->
@@ -1232,7 +1231,7 @@
 						shadow="true"
 						font="dyn_8"
 					/>
-					<frame color="invisible" bordercolor="gray" borderthickness="1"/>
+					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
 				</panel>
 
 				<!-- Refresh effect -->
@@ -1328,12 +1327,16 @@
 	</template>
 	
 	<template name="inventory_game_button">
-		<panel noclick="1">
+		<panel noclick="1"
+			watch="{main_watch}"
+			ontriggerlua="{main_ontriggerlua}"
+			visible="{visible=1}"
+		>
 			<!-- Icon -->
 			<image noclick="true"
 				texture="{texture}"
-				watch="{imagewatch}"
-				ontriggerlua="{imageontriggerlua}"
+				watch="{image_watch}"
+				ontriggerlua="{image_ontriggerlua}"
 			/>
 
 			<!-- UIScript -->
@@ -1343,10 +1346,38 @@
 				onclick="{onclick}"
 				onmouseoverlua="{onmouseoverlua}"
 				onmouseoutlua="{onmouseoutlua}"
-				watch="{buttonwatch}"
-				ontriggerlua="{buttonontriggerlua}"
+				watch="{button_watch}"
+				ontriggerlua="{button_ontriggerlua}"
 			/>
 
+			<!-- charges -->
+			<panel
+				width="33.3%"
+				height="33.3%"
+				align="right"
+				valign="top"
+				noclick="true"
+				passivechildren="true"
+				color="0 0 0 .6"
+				visible="{hasCharges=false}"
+				watch="{charges_panel_watch}"
+				ontriggerlua="{charges_panel_ontriggerlua}"
+			>
+				<label noclick="1"
+					watch="{charges_watch}"
+					ontriggerlua="{charges_ontriggerlua}"
+					width="100%"
+					height="100%"
+					textalign="center"
+					textvalign="center"
+					color="white"
+					shadow="true"
+					font="dyn_8"
+				/>
+				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
+			</panel>
+
+			<!-- cover -->
 			<panel
 				visible="0"
 				watch="{cover_watch}"
@@ -1500,7 +1531,7 @@
 					<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_8"
 						watch="ActiveInventoryCharges{slot}"
 						ontriggerlua="self:SetText(param);"/>
-					<frame color="invisible" bordercolor="gray" borderthickness="1"/>
+					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
 				</panel>
 
 				<frame
@@ -2056,7 +2087,7 @@
 	<template name="statusbar_overlay">
 		<image texture="/ui/legion/{barimage=optiui_behind_bar.tga}" rendermode="{rendermode=overlay}" color="{barcolor=1 1 1 1}"/>
 		<image align="center" valign="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
-		<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="true"/>
+		<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
 	</template>
 
 	<!-- Team Member Icon -->
@@ -2983,6 +3014,9 @@
 
 	</panel>
 
+	<!-- OptiUI: Respawn_Timers_Addon START -->
+	<!-- OptiUI: Respawn_Timers_Addon END   -->
+
 	<panel y="0" width="50.5h" height="3.3h" align="center" valign="top" noclick="1" color="invisible">
 		<!-- Legion Health -->
 		<panel name="game_base_health_header_0" x="0" y="0" height="1.6h" width="11.0h" align="left" valign="bottom" noclick="1" color="invisible" >
@@ -3092,7 +3126,7 @@
 		</panel>
 	</panel>
 
-<!-- 	<panel name="arcade_messages" width="100h" height="30h" y="0h" align="center" color="invisible" noclick="1">
+ 	<panel name="arcade_messages" width="100h" height="30h" y="0h" align="center" color="invisible" noclick="1">
 		<modelpanel
 			name="game_arcade_model_1"
 			width="80h" align="center"
@@ -3149,7 +3183,7 @@
 			sunaltitude="180"
 			suncolor="1 1 1"
 		/>
-	</panel> -->
+	</panel>
 
 	<panel valign="top" align="left" x="3h" y="12h" height="10.5h" width="45h" noclick="true" visible="true" name="KillBoard">
 		<instance name="killBoardEntry" id="1" />
@@ -4090,11 +4124,11 @@
 				<!-- Gold Report -->
 				<floater name="shop_tooltip_gold_report" height="14h" width="38h" x="-4h" y="1.5h" align="left" valign="bottom" color="invisible" noclick="true" visible="false" onload="ForceToFront();">
 					<panel growinvis="false" color="0 0 0 .6" noclick="true">
-						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" noclick="false"/>
+						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" />
 						<panel valign="center" padding="1%" vpadding="1%">
 							<panel valign="center" height="100%" width="100%" >
 								<label x="0.75h" y="0.75h" font="dyn_10" content="" color=".8 .6 .0 1" outline="true" outlineoffset="1" outlinecolor="0 0 0 1" textalign="left" textvalign="center" align="left" valign="center"
-								onloadlua="self:SetText(Translate('game_gold_report'));"/>
+								onloadlua="self:SetText(Translate('game_gold_report'));" />
 							</panel>
 							<panel valign="center" height="100%" width="100%" >
 								<label x="-0.25h" y="0.75h" font="dyn_10" content="" color=".8 .6 .0 1" outline="true" outlineoffset="1" outlinecolor="0 0 0 1" textalign="right" textvalign="center" align="right" valign="center" watch="GoldReport"
@@ -4268,7 +4302,7 @@
 	>
 
 		<panel grow="true" regrow="1" growinvis="0" color="0 0 0 .6" noclick="true">
-			<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" noclick="false"/>
+			<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" />
 
 			<!-- Hero -->
 			<panel
@@ -4281,7 +4315,7 @@
 				<panel grow="true" height="1.8h">
 					<panel x="0.3h" y="0.3h" width="1.8h" height="1.8h">
 						<image watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetTexture(param4) end" />
-						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" noclick="false"/>
+						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" />
 					</panel>
 					<label x="2.3h" y="0.1h" height="100%" font="dyn_9" textvalign="center" color="1 1 1 1" noclick="true" watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetText(param3) self:SetWidth(GetStringWidth('dyn_9', param3) + self:GetXFromString('0.3h')) end" content="--" />
 				</panel>
@@ -4299,7 +4333,7 @@
 				>
 					<panel width="-0.6h" align="center">
 						<panel watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetWidth(FtoP(param5)) self:SetColor(Saturate(1 - (tonumber(param5) - 0.50) / 0.50), (tonumber(param5) + (((tonumber(param5) - 0.05) / 1.0) * 0.2)) / 0.45, 0, 1) end" color="0 1 0 0">
-							<frame color="invisible" borderthickness="1" bordercolor="0 0 0 1" noclick="false"/>
+							<frame color="invisible" borderthickness="1" bordercolor="0 0 0 1" />
 						</panel>
 					</panel>
 				</panel>
@@ -4312,7 +4346,7 @@
 				>
 					<panel width="-0.6h" align="center">
 						<panel texture="/ui/info/mana_pos.tga" watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetWidth(round(tonumber(param6)*100.0)..'%') end">
-							<frame color="invisible" borderthickness="1" bordercolor="0 0 0 1" noclick="false"/>
+							<frame color="invisible" borderthickness="1" bordercolor="0 0 0 1" />
 						</panel>
 					</panel>
 				</panel>
@@ -4343,7 +4377,7 @@
 				<panel grow="true" height="1.8h">
 					<panel x="0.3h" y="0.3h" width="1.8h" height="1.8h">
 						<image watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetTexture(param4) end" />
-						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" noclick="false"/>
+						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" />
 					</panel>
 					<label x="2.3h" y="0.1h" height="100%" font="dyn_9" textvalign="center" color="1 1 1 1" noclick="true" watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetText(param3) self:SetWidth(GetStringWidth('dyn_9', param3) + self:GetXFromString('0.3h')) end" content="--" />
 				</panel>
@@ -4362,7 +4396,7 @@
 				<panel grow="true" height="1.8h">
 					<panel x="0.3h" y="0.3h" width="1.8h" height="1.8h">
 						<image watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetTexture(param4) end" />
-						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" noclick="false"/>
+						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" />
 					</panel>
 					<label x="2.3h" y="0.1h" height="100%" font="dyn_9" textvalign="center" color="1 1 1 1" noclick="true" watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetText(param3) self:SetWidth(GetStringWidth('dyn_9', param3) + self:GetXFromString('0.3h')) end" content="--" />
 				</panel>
@@ -4376,7 +4410,7 @@
 					<panel width="-0.6h" align="center">
 						<panel width="2" color="1 0 0 1"/>
 						<panel watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetWidth(FtoP(param5)) if (not AtoB(param13)) then self:SetColor(Saturate(1 - (tonumber(param5) - 0.50) / 0.50), (tonumber(param5) + (((tonumber(param5) - 0.05) / 1.0) * 0.2)) / 0.45, 0, 1) else self:SetColor('1 1 0') end end" color="0 1 0 0">
-							<frame color="invisible" borderthickness="1" bordercolor="0 0 0 1" noclick="false"/>
+							<frame color="invisible" borderthickness="1" bordercolor="0 0 0 1" />
 						</panel>
 					</panel>
 				</panel>
@@ -4501,8 +4535,8 @@
 						onclicklua="UseBestCourier()"
 						onmouseoverlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(1)"
 						onmouseoutlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(0)"
-						buttonwatch="CourierControllable"
-						buttonontriggerlua="self:SetEnabled(AtoB(param))"
+						button_watch="CourierControllable"
+						button_ontriggerlua="self:SetEnabled(AtoB(param))"
 						cover_onmouseoverlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(1)"
 						cover_onmouseoutlua="GetWidget('courier_action_tooltip', 'game'):SetVisible(0)"
 						cover_watch="CourierControllable"
@@ -5708,7 +5742,7 @@
 						watch="AltCourierList{slot}"
 						ontrigger="SetModel(param4); SetEffect(param5); SetModelPos(param6); SetModelAngles(param7); SetModelScale(param8);"
 					/>
-					<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="true"
+					<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="1"
 						watch="AltCourierList{slot}" ontriggerlua="if (AtoB(param14)) then self:SetBorderColor('#57420c') else self:SetBorderColor('0.2 .2 .2 1') end"
 					/>
 
@@ -5720,7 +5754,7 @@
 							watch="AltCourierList{slot}"
 							ontriggerlua="self:SetTexture(param3);"
 						/>
-						<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="true"
+						<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="1"
 							watch="AltCourierList{slot}" ontriggerlua="if (AtoB(param14)) then self:SetBorderColor('#57420c') else self:SetBorderColor('0.2 .2 .2 1') end"
 						/>
 					</panel>
@@ -5758,7 +5792,7 @@
 						watch="AltCourierList{slot}"
 						ontrigger="SetModel(param18); SetEffect(param19); SetModelPos(param20); SetModelAngles(param21); SetModelScale(param22);"
 					/>
-					<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="true"
+					<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="1"
 						watch="AltCourierList{slot}" ontriggerlua="if (AtoB(param14)) then self:SetBorderColor('#57420c') else self:SetBorderColor('0.2 .2 .2 1') end"
 					/>
 
@@ -5770,7 +5804,7 @@
 							watch="AltCourierList{slot}"
 							ontriggerlua="self:SetTexture(param17);"
 						/>
-						<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="true"
+						<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="1"
 							watch="AltCourierList{slot}" ontriggerlua="if (AtoB(param14)) then self:SetBorderColor('#57420c') else self:SetBorderColor('0.2 .2 .2 1') end"
 						/>
 					</panel>
@@ -6441,7 +6475,7 @@
 			<panel grow="1" regrow="1" growinvis="0" width="100%" noclick="true">
 				<panel width="11.0h" height="11.0h" valign="top">
 					<image name="game_hero_tip_icon" texture="$invis" noclick="1" visible="0"  />
-					<frame color="invisible" bordercolor=".4 .4 .4 1" borderthickness="1" noclick="true" />
+					<frame color="invisible" bordercolor=".4 .4 .4 1" borderthickness="1" noclick="1" />
 				</panel>
 				<panel grow="1" regrow="1" growinvis="0" width="-12.0h" align="right" noclick="1" float="bottom" padding="0.3h">
 					<label name="game_hero_tip_icon_label" fity="true" color="red" outline="1" font="dyn_16" textalign="left" content="" noclick="1" visible="0" />
@@ -6480,6 +6514,9 @@
 		</panel>
 	</panel>
 
+	<!-- purchase dice confirmation -->
+
+	<instance name="generic_dialog_box_game_template" />
 	<instance name="generic_dialog_box_combo_game_template" />
 
 	<!--
