@@ -3126,7 +3126,7 @@
 		</panel>
 	</panel>
 
- 	<panel name="arcade_messages" width="100h" height="30h" y="0h" align="center" color="invisible" noclick="1">
+	<panel name="arcade_messages" width="100h" height="30h" y="0h" align="center" color="invisible" noclick="1">
 		<modelpanel
 			name="game_arcade_model_1"
 			width="80h" align="center"
@@ -3579,7 +3579,6 @@
 
 		</panel>
 
-		<!-- <image texture="/ui/common/scores_menu_buttons.tga" noclick="true"/> -->
 	</panel>
 
 	<!-- END TOP -->
