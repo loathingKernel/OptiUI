@@ -1,7 +1,6 @@
 ---------------------------------------------------------- 
 --	Name: 		Game Interface Script            		--				
 --  Copyright 2012 S2 Games								--
---  Game version: v3.2.3								--
 ----------------------------------------------------------
 
 local _G = getfenv(0)
@@ -52,6 +51,7 @@ local GetWidget = memoizeObject(GetWidgetGame)
 ----------------------------------------------------------
 -- 						General				            --
 ----------------------------------------------------------
+
 local function NotABot(name)
 	if (GameChat) and (GameChat.bots) then
 		for _, playerTable in pairs(GameChat.bots) do
@@ -125,12 +125,11 @@ local function InitArcadeText()
 
 	local function ArcadeMessage(message, condition, self, value, set)	
 		if (condition == true) or (condition == tonumber(value)) then		
-			local modelPanel 
 			local modelPanel = GetWidget('game_arcade_model_'..Game.arcadeSetTable[set][2], 'game')
 			if (not modelPanel) then
 				modelPanel = GetWidget('game_arcade_model_2', 'game')
 			end
-
+	
 			modelPanel:SetVisible(true)
 			modelPanel:UICmd("SetAnim('idle')")
 			modelPanel:UICmd("SetModel('" .. '/ui/common/models/'.. set .. '/' .. message .. '.mdf' .. "')")
@@ -656,7 +655,6 @@ local function RapButtonRefreshVis()
 		-- we have an ignore selection in the menu now, this is always visible minus for bots
 		if (visState.allyIndex) then
 			-- OptiUI: Added option to disable right click menu
-			--if ((not localSpectator) and (not visState.isBot)) then
 			if ((not localSpectator) and (not visState.isBot) and (not GetCvarBool('optiui_AllyFramesDisableRightClick'))) then
 			-- OptiUI: end
 				GetWidget('ally_right_click_menu_button_' .. visState.allyIndex):SetCallback('onrightclick', function() interface:UICmd("CallEvent('ally_right_click_menu_".. visState.allyIndex .."');") end )
@@ -1499,7 +1497,6 @@ local function InitBottomCenterPanel()
 		-- Reset lerp when changing active unit
 		GetWidget('game_center_health_lerp'):ScaleWidth(0, 0, -1)
 		GetWidget('game_center_mana_lerp'):ScaleWidth(0, 0, -1)
-
 	end
 	interface:RegisterWatch('ActiveName', ActiveName)
 
