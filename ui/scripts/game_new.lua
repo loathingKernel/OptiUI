@@ -123,19 +123,22 @@ local function InitArcadeText()
 		['bamf'] = {3200, 3},
 	}
 
-	local function ArcadeMessage(message, condition, self, value, set)	
-		if (condition == true) or (condition == tonumber(value)) then		
-			local modelPanel = GetWidget('game_arcade_model_'..Game.arcadeSetTable[set][2], 'game')
-			if (not modelPanel) then
-				modelPanel = GetWidget('game_arcade_model_2', 'game')
+	local function ArcadeMessage(message, condition, self, value, set)
+		-- OptiUI: Option to disable arcade messages
+		if (not GetCvarBool('optiui_ArcadeMessagesDisabled')) then
+			if (condition == true) or (condition == tonumber(value)) then		
+				local modelPanel = GetWidget('game_arcade_model_'..Game.arcadeSetTable[set][2], 'game')
+				if (not modelPanel) then
+					modelPanel = GetWidget('game_arcade_model_2', 'game')
+				end
+		
+				modelPanel:SetVisible(true)
+				modelPanel:UICmd("SetAnim('idle')")
+				modelPanel:UICmd("SetModel('" .. '/ui/common/models/'.. set .. '/' .. message .. '.mdf' .. "')")
+				modelPanel:UICmd("SetEffect('" .. '/ui/common/models/'.. set .. '/' .. 'bloodlust.effect' ..  "')")
+				modelPanel:Sleep(Game.arcadeSetTable[set][1], function() modelPanel:SetVisible(false) end)
 			end
-	
-			modelPanel:SetVisible(true)
-			modelPanel:UICmd("SetAnim('idle')")
-			modelPanel:UICmd("SetModel('" .. '/ui/common/models/'.. set .. '/' .. message .. '.mdf' .. "')")
-			modelPanel:UICmd("SetEffect('" .. '/ui/common/models/'.. set .. '/' .. 'bloodlust.effect' ..  "')")
-			modelPanel:Sleep(Game.arcadeSetTable[set][1], function() modelPanel:SetVisible(false) end)
-		end		
+		end
 	end
 	interface:RegisterWatch('EventTowerDeny', 		function(...) ArcadeMessage('denied', 		true, ...) end)
 	interface:RegisterWatch('EventFirstKill', 		function(...) ArcadeMessage('bloodlust', 	true, ...) end)
@@ -596,9 +599,11 @@ local function InitPlayerTopLeftInfo()
 		if (buybackExhausted) then
 			GetWidget('game_top_left_buyback_exhausted_label'):SetColor('gray')
 			GetWidget('game_top_left_buyback_label'):SetColor('#999900')
+			GetWidget('game_top_left_buyback_indicator'):SetColor('#FF0000')
 		else
 			GetWidget('game_top_left_buyback_exhausted_label'):SetColor('white')
 			GetWidget('game_top_left_buyback_label'):SetColor('yellow')
+			GetWidget('game_top_left_buyback_indicator'):SetColor('#00FF00')
 		end
 	end
 	interface:RegisterWatch('HeroBuyBacksExhausted', HeroBuyBacksExhausted)

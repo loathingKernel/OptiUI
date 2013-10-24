@@ -2,6 +2,15 @@
 <package>
 	<instance name="mod_options" mod_id="optiui_options" mod_name="OptiUI" />
 
+	<instance mod_id="optiui_options" name="mod_header" label="Arcade Messages:" />
+	<instance mod_id="optiui_options" name="mod_checkbox"
+		cvar="optiui_ArcadeMessagesDisabled"
+		label="Disable announcer effects at the top of the screen"
+		default="false"
+		tooltip="Disables the playback of the announcer splash effects at the top of the screen for events like Bloodlust, Double Kill, etc"
+		tooltip_width="43h"
+	/>
+
 	<instance mod_id="optiui_options" name="mod_header" label="Bottom Center panel:" />
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_BottomCenterAbilitiesBelowBars"

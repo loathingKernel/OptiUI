@@ -2,10 +2,9 @@
 <!-- Game version: v3.2.2 -->
 <package>
 	<trigger name="sharing_update"/>
-	<panel x="1.6h" y="0" width="1.5h" height="1.5h" color="invisible">
-		<image texture="/ui/elements/share_frame.tga"/>
+	<panel x="2.0h" y="0" width="1.5h" height="1.5h" color="invisible">
 		<image
-			width="55%" height="55@"
+			width="90%" height="90%"
 			align="center" valign="center"
 			noclick="1"
 			onload="SetTexture('/shared/icons/minimap_courier.tga');"

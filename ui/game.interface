@@ -3006,10 +3006,10 @@
 				<image width="90%" height="90%" align="center" valign="center" texture="/ui/elements/options_icon_stats.tga" noclick="1"/>
 			</panel>
 
-			<!-- OptiUI: Moved inside the portrait panel -->
-			<!-- Level -->
-
 			<include file="fastshare.package"/>
+
+			<label name="game_top_left_buyback_indicator" x="4.0h" content="Buyback" color="white" font="dyn_9" textvalign="center" noclick="1" />
+
 		</panel>
 
 	</panel>
