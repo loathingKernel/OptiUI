@@ -3014,9 +3014,7 @@
 
 	</panel>
 
-	<!-- OptiUI: Respawn_Timers_Addon START -->
 	<include file="optiui_respawn_timers.package" />
-	<!-- OptiUI: Respawn_Timers_Addon END   -->
 
 	<panel y="0" width="50.5h" height="3.3h" align="center" valign="top" noclick="1" color="invisible">
 		<!-- Legion Health -->
