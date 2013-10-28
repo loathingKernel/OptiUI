@@ -2,7 +2,7 @@
 <package>
 
 	<template name="respawn_timer_icon" >
-		<panel x="{x}" width="6h" color="invisible" 
+		<panel x="{x}" width="6h" color="invisible"
 			watch="ScoreboardPlayerRespawn{index}"
 			ontriggerlua="self:SetVisible(tonumber(param) > 0)"
 		>
@@ -19,27 +19,27 @@
 				/>
 			</panel>
 		</panel>
-	</template>
+ 	</template>
 
-	<panel name="game_top_center_respawn_timers_lg" y="0" x="-41h" width="30h" height="6h" align="center" noclick="true" color="invisible" passivechildren="true"
+	<panel name="game_top_center_respawn_timers_lg" y="0" x="-41h" width="30h" height="6h" align="center" float="right" noclick="true" color="invisible" passivechildren="true"
 		watch="Team"
 		ontriggerlua="if (param == '2') then self:SetVisible(true) else self:SetVisible(false) end"
 	>
-		<instance name="respawn_timer_icon" x="0%"  index="0" />
-		<instance name="respawn_timer_icon" x="20%" index="1" />
-		<instance name="respawn_timer_icon" x="40%" index="2" />
-		<instance name="respawn_timer_icon" x="60%" index="3" />
-		<instance name="respawn_timer_icon" x="80%" index="4" />
+		<instance name="respawn_timer_icon" index="0" />
+		<instance name="respawn_timer_icon" index="1" />
+		<instance name="respawn_timer_icon" index="2" />
+		<instance name="respawn_timer_icon" index="3" />
+		<instance name="respawn_timer_icon" index="4" />
 	</panel>
-	<panel name="game_top_center_respawn_timers_hb" y="0" x="-41h"  width="30h" height="6h" align="center" noclick="true" color="invisible" passivechildren="true"
+	<panel name="game_top_center_respawn_timers_hb" y="0" x="-41h"  width="30h" height="6h" align="center" float="right" noclick="true" color="invisible" passivechildren="true"
 		watch="Team"
 		ontriggerlua="if (param == '1') then self:SetVisible(true) else self:SetVisible(false) end"
 	>
-		<instance name="respawn_timer_icon" x="0%"  index="5" />
-		<instance name="respawn_timer_icon" x="20%" index="6" />
-		<instance name="respawn_timer_icon" x="40%" index="7" />
-		<instance name="respawn_timer_icon" x="60%" index="8" />
-		<instance name="respawn_timer_icon" x="80%" index="9" />
+		<instance name="respawn_timer_icon" index="5" />
+		<instance name="respawn_timer_icon" index="6" />
+		<instance name="respawn_timer_icon" index="7" />
+		<instance name="respawn_timer_icon" index="8" />
+		<instance name="respawn_timer_icon" index="9" />
 	</panel>
 
 </package>

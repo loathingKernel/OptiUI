@@ -3680,29 +3680,29 @@
 
 			<!-- Abilities -->
 			<!-- OptiUI: Adjustments to ability buttons panel size -->
-			<panel name="game_center_abilities" x="2.6h" y="-4.6h" width="36.0h" height="5.5h" align="center" valign="bottom" noclick="1" color="invisible" >
-				<panel x="0.0h" width="9.0h" align="left" noclick="1" >
+			<panel name="game_center_abilities" x="2.6h" y="-4.6h" width="36.2h" height="5.5h" align="center" valign="bottom" noclick="1" float="right" color="invisible" >
+				<panel width="9.0h" noclick="1" >
 					<instance name="ability_frame_single" slot="0"/>
 					<instance name="ability_frame_single_plus_one" slot="0" slot_a="0" slot_b="5"/>
 					<instance name="ability_frame_single_plus_two" slot="0" slot_a="0" slot_b="5" slot_c="6"/>
 					<instance name="ability_frame_triple" slot="0" slot_a="5" slot_b="6" slot_c="7"/>
 					<instance name="ability_frame_double" slot="0" slot_a="5" slot_b="6" />
 				</panel>
-				<panel x="9.0h" width="9.0h" align="left" noclick="1" >
+				<panel width="9.0h" noclick="1" >
 					<instance name="ability_frame_single" slot="1"/>
 					<instance name="ability_frame_single_plus_one" slot="1" slot_a="1" slot_b="5"/>
 					<instance name="ability_frame_single_plus_two" slot="1" slot_a="1" slot_b="5" slot_c="6"/>
 					<instance name="ability_frame_triple" slot="1" slot_a="5" slot_b="6" slot_c="7"/>
 					<instance name="ability_frame_double" slot="1" slot_a="5" slot_b="6" />
 				</panel>
-				<panel x="-9.0h" width="9.0h" align="right" noclick="1" >
+				<panel width="9.0h" noclick="1" >
 					<instance name="ability_frame_single" slot="2"/>
 					<instance name="ability_frame_single_plus_one" slot="2" slot_a="2" slot_b="5"/>
 					<instance name="ability_frame_single_plus_two" slot="2" slot_a="2" slot_b="5" slot_c="6"/>
 					<instance name="ability_frame_triple" slot="2" slot_a="5" slot_b="6" slot_c="7"/>
 					<instance name="ability_frame_double" slot="2" slot_a="5" slot_b="6" />
 				</panel>
-				<panel x="-0.0h" width="9.0h" align="right" noclick="1" >
+				<panel width="9.0h" noclick="1" >
 					<instance name="ability_frame_single" slot="3"/>
 					<instance name="ability_frame_single_plus_one" slot="3" slot_a="3" slot_b="5"/>
 					<instance name="ability_frame_single_plus_two" slot="3" slot_a="3" slot_b="5" slot_c="6"/>
@@ -3716,7 +3716,7 @@
 				name="game_center_health"
 				x="2.6h"
 				y="-2.1h"
-				width="36.0h"
+				width="36.2h"
 				height="1.9h"
 				align="center"
 				valign="bottom"
@@ -3748,7 +3748,7 @@
 				name="game_center_mana"
 				x="2.6h"
 				y="0.0h"
-				width="36.0h"
+				width="36.2h"
 				height="1.9h"
 				align="center"
 				valign="bottom"
@@ -4149,32 +4149,30 @@
 
 		<!-- Level Up Buttons -->
 		<!-- OptiUI: Moved ability level up button holder below everything else -->
-		<frame name="game_center_levelup_btn_holder" x="0.6h" y="-11.2h" width="40.0h" height="4.0h" align="center" valign="bottom" borderthickness="0" bordercolor="gray" color="0 0 0 .0" noclick="1" >
-			<panel width="4.0h" align="left" noclick="1" >
+		<frame name="game_center_levelup_btn_holder" x="0.6h" y="-11.2h" width="40.2h" height="4.0h" align="center" valign="bottom" borderthickness="1" bordercolor="gray" float="right" color="0 0 0 .4" noclick="1" >
+			<panel width="4.0h" noclick="1" >
 				<panel valign="center" align="center" height="72%" width="72@" >
 					<instance name="ability_button_lvlup" slot="4"/>
 				</panel>
 			</panel>
-			<panel width="36.0h" align="right" noclick="1" >
-				<panel x="0.0h" width="9.0h" align="left" noclick="1" >
-					<panel valign="center" align="center" height="85%" width="85@" >
-						<instance name="ability_button_lvlup" slot="0"/>
-					</panel>
+			<panel width="9.0h" noclick="1" >
+				<panel valign="center" align="center" height="85%" width="85@" >
+					<instance name="ability_button_lvlup" slot="0"/>
 				</panel>
-				<panel x="9.0h" width="9.0h" align="left" noclick="1" >
-					<panel valign="center" align="center" height="85%" width="85@" >
-						<instance name="ability_button_lvlup" slot="1"/>
-					</panel>
+			</panel>
+			<panel width="9.0h" noclick="1" >
+				<panel valign="center" align="center" height="85%" width="85@" >
+					<instance name="ability_button_lvlup" slot="1"/>
 				</panel>
-				<panel x="-9.0h" width="9.0h" align="right" noclick="1" >
-					<panel valign="center" align="center" height="85%" width="85@" >
-						<instance name="ability_button_lvlup" slot="2"/>
-					</panel>
+			</panel>
+			<panel width="9.0h"  noclick="1" >
+				<panel valign="center" align="center" height="85%" width="85@" >
+					<instance name="ability_button_lvlup" slot="2"/>
 				</panel>
-				<panel x="-0.0h" width="9.0h" align="right" noclick="1" >
-					<panel valign="center" align="center" height="85%" width="85@" >
-						<instance name="ability_button_lvlup" slot="3"/>
-					</panel>
+			</panel>
+			<panel width="9.0h" noclick="1" >
+				<panel valign="center" align="center" height="85%" width="85@" >
+					<instance name="ability_button_lvlup" slot="3"/>
 				</panel>
 			</panel>
 		</frame>
