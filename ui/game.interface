@@ -350,7 +350,6 @@
 			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="5.5h" color="black">
 				<instance name="ability_button" slot="{slot}"/>
 			</panel>
- 			<!-- <image width="9.0h" height="9.0h" align="center" valign="center" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
 			<!-- mana cost -->
 			<!-- OptiUI: Added ability lvl label next to mana cost -->
 			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="5.5h" noclick="true"
@@ -746,8 +745,7 @@
 				/>
 				<!-- UIScript -->
 				<button
-					texture="/ui/common/button_gloss.tga"
-					rendermode="additive"
+					rendermode="overlay"
 					onclicklua="PlaySound('/shared/sounds/ui/ability_select.wav')"
 					onclick="PrimaryAction({slot}); ActivateTool({slot});"
 					onrightclicklua="PlaySound('/shared/sounds/ui/ability_select.wav')"
@@ -775,10 +773,8 @@
 					ontrigger1lua="
 						if ((tonumber(param5) > 0) or (tonumber(param7) == 0)) then
 							self:SetEnabled(1)
-							self:SetColor('#4D4D4D')
 						else
 							self:SetEnabled(0)
-							self:SetColor('invisible')
 						end"
 					interactive="false"
 				/>
@@ -1754,7 +1750,6 @@
 		<panel>
 			<!-- OptiUI: New effect is silly and it lags. Remove it -->
  			<image texture="/ui/legion/empty_pack.tga"/>
- 			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			<panel name="ability_lvlup_button_{slot}">
 				<image name="ability_lvlup_button_icon_{slot}" noclick="1" />
 				<button  name="ability_lvlup_button_button_{slot}"
@@ -1767,8 +1762,8 @@
 				<panel name="ability_lvlup_button_label_parent_{slot}" y="-0.23h" width="1.7h" height="1.4h" align="center" valign="bottom" color="invisible" noclick="true" passivechildren="true" >
 					<label name="ability_lvlup_button_label_{slot}" width="100%" height="100%" textalign="center" textvalign="center" color="white" font="dyn_9" outline="1" />
 				</panel>
-				<frame name="level_up_effect_{slot}" borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
+			<frame name="level_up_effect_{slot}" borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 		</panel>
 	</template>
 
@@ -4151,27 +4146,27 @@
 		<!-- OptiUI: Moved ability level up button holder below everything else -->
 		<frame name="game_center_levelup_btn_holder" x="0.6h" y="-11.2h" width="40.2h" height="4.0h" align="center" valign="bottom" borderthickness="1" bordercolor="gray" float="right" color="0 0 0 .4" noclick="1" >
 			<panel width="4.0h" noclick="1" >
-				<panel valign="center" align="center" height="72%" width="72@" >
+				<panel valign="center" align="center" height="70%" width="70@" >
 					<instance name="ability_button_lvlup" slot="4"/>
 				</panel>
 			</panel>
 			<panel width="9.0h" noclick="1" >
-				<panel valign="center" align="center" height="85%" width="85@" >
+				<panel valign="center" align="center" height="80%" width="80@" >
 					<instance name="ability_button_lvlup" slot="0"/>
 				</panel>
 			</panel>
 			<panel width="9.0h" noclick="1" >
-				<panel valign="center" align="center" height="85%" width="85@" >
+				<panel valign="center" align="center" height="80%" width="80@" >
 					<instance name="ability_button_lvlup" slot="1"/>
 				</panel>
 			</panel>
 			<panel width="9.0h"  noclick="1" >
-				<panel valign="center" align="center" height="85%" width="85@" >
+				<panel valign="center" align="center" height="80%" width="80@" >
 					<instance name="ability_button_lvlup" slot="2"/>
 				</panel>
 			</panel>
 			<panel width="9.0h" noclick="1" >
-				<panel valign="center" align="center" height="85%" width="85@" >
+				<panel valign="center" align="center" height="80%" width="80@" >
 					<instance name="ability_button_lvlup" slot="3"/>
 				</panel>
 			</panel>
@@ -4567,8 +4562,8 @@
 
 				<!-- lifetime bar section-->
 				<panel name="game_botright_life_bar_backer" visible="false" noclick="true" passivechildren="true">
-					<piegraph texture="/ui/common/exp_ring.tga" start="225" end="-49" square="1" color=".2 .2 .1 1" value="1" noclick="true"/>
-					<piegraph name="game_botright_life_bar_ring" texture="/ui/common/exp_ring.tga" start="225" end="-49" square="1" color="#e5df2f" value=".2" noclick="true"/>
+					<piegraph texture="/ui/common/exp_ring.tga" start="90" end="360" square="1" color=".2 .2 .1 1" value="1" noclick="true"/>
+					<piegraph name="game_botright_life_bar_ring" texture="/ui/common/exp_ring.tga" start="90" end="360" square="1" color="#e5df2f" value=".2" noclick="true"/>
 					<label name="game_botright_life_bar_label" width="100%" height="100%" valign="center" textalign="center" textvalign="center" font="dyn_14" color="white" shadow="true" shadowoffset="2" />
 				</panel>
 

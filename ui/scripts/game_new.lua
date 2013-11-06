@@ -2192,7 +2192,6 @@ local function InitActiveInventory()
 			GetWidget('ability_lvlup_button_button_'..slotIndex):SetCallback('onclick', function()	GetWidget('ability_lvlup_button_button_'..slotIndex):UICmd("PlaySound('/shared/sounds/ui/levelup_ability.wav'); LevelUpAbility("..slotIndex..");")end )
 			GetWidget('ability_lvlup_button_button_'..slotIndex):RefreshCallbacks()
 			-- OptiUI: Removed ability level up effect because it is heavy and distracting --
-			--GetWidget("level_up_effect_"..slotIndex):SetVisible(1)
 			GetWidget('level_up_effect_'..slotIndex):SetBorderColor("yellow")
 		else
 			GetWidget('ability_lvlup_button_icon_'..slotIndex):UICmd("SetRenderMode('grayscale')")
@@ -2200,7 +2199,6 @@ local function InitActiveInventory()
 			GetWidget('ability_lvlup_button_button_'..slotIndex):SetCallback('onclick', function() GetWidget('ability_lvlup_button_button_'..slotIndex):UICmd("PlaySound('/shared/sounds/ui/error.wav');") end )
 			GetWidget('ability_lvlup_button_button_'..slotIndex):RefreshCallbacks()
 			-- OptiUI: Removed ability level up effect because it is heavy and distracting --
-			--GetWidget("level_up_effect_"..slotIndex):SetVisible(0)
 			GetWidget('level_up_effect_'..slotIndex):SetBorderColor("gray")
 		end
 	end
