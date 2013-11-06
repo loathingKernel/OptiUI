@@ -9,7 +9,7 @@
 
 	<lua file="/ui/scripts/game_new.lua" />
 
-	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '34') Game:InitializeGameInterface()"/> 
+	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '35') Game:InitializeGameInterface()"/> 
 
 	<!-- Packages -->
 	<childinterface file="ui_items_1.interface" />
@@ -42,6 +42,12 @@
 	<trigger name="GameMenuTooltipText"/>
 	<trigger name="CourierUpgrade"/>
 	<trigger name="ItemTooltip"/>
+
+	<trigger name="DicePrompt" />
+	<panel noclick="1" color="invisible"
+		onloadlua="Cmd('UnAlias DiceHotkey; Alias DiceHotkey Trigger DicePrompt')"
+	/>
+
 	<!-- OptiUI: New triggers -->
 	<trigger name="optiui_AllyInfoPosition"/>
 	<trigger name="optiui_BottomCenterPosition"/>
@@ -1337,6 +1343,14 @@
 				texture="{texture}"
 				watch="{image_watch}"
 				ontriggerlua="{image_ontriggerlua}"
+				watch2="{cooldown_timer}"
+				ontrigger2lua="
+					if (tonumber(param) > 0) then
+						self:SetRenderMode('grayscale')
+					else
+						self:SetRenderMode('normal')
+					end
+				"
 			/>
 
 			<!-- UIScript -->
@@ -1385,6 +1399,29 @@
 				onmouseoverlua="{cover_onmouseoverlua}"
 				onmouseoutlua="{cover_onmouseoutlua}"
 			/>
+
+			<!-- cooldown stuff -->
+			<piegraph
+				visible="0"
+				start="270" end="-90"
+				square="true"
+				color="#000000cc"
+				watch="{cooldown_timer}"
+				ontriggerlua="self:SetVisible(tonumber(param) > 0)"
+				watch2="{cooldown_percent}"
+				ontrigger2lua="self:SetValue(tonumber(param))"
+			/>
+			<label
+				font="dyn_12"
+				color="#87CEEB"
+				outline="1"
+				visible="0"
+				watch="{cooldown_timer}"
+				ontriggerlua="self:SetVisible(tonumber(param) > 0) self:SetText(param..'s')"
+				textalign="center"
+				textvalign="center"
+			/>
+
 		</panel>
 	</template>
 
@@ -1896,35 +1933,15 @@
 				</panel>
 
 				<image
+					name="game_scoreboard_hero_image_{index}"
 					x="0.5h"
 					width="96@"
 					height="96%"
 					noclick="false"
+					onmouseoverlua="Game.HoverScoreboardHero({index})"
 					watch="ScoreboardPlayer{index}"
-					ontriggerlua=
-					"
-						local heroName = param1
+					ontriggerlua="
 						self:SetTexture(param2)
-						self:SetCallback('onmouseover',
-							function()
-								if (not Empty(self:GetTexture())) then
-									Trigger('GameImagePreviewInit',
-										self:GetWidth(),
-										self:GetHeight(),
-										self:GetAbsoluteX(),
-										self:GetAbsoluteY(),
-										'0',
-										self:GetTexture()
-									)
-									Trigger('GameImagePreviewVis', '1', '250%')
-
-								end
-								Trigger('genericGameFloatingTip', '1', GetStringWidth('dyn_12', heroName) + self:GetWidthFromString('1.0h'), '', heroName,
-									'', '', '',  -(GetStringWidth('dyn_12', heroName) + self:GetWidthFromString('2.4h')), self:GetWidthFromString('1.5h'))
-							end
-						)
-						self:RefreshCallbacks()
-
 						if (AtoB(param8)) then
 							self:SetRenderMode('normal')
 						else
@@ -2064,8 +2081,8 @@
 
 				<label x="0" width="2.0h" height="100%" textalign="center" textvalign="center" font="dyn_10" color="yellow" shadow="true" shadowcolor="black" noclick="true"
 					watch="ScoreboardPlayerRespawn{index}"
-					ontriggerlua="	self:SetVisible(tonumber(param) > 0)
-									self:SetText(param)"
+					ontriggerlua="	self:SetVisible((tonumber(param0) > 0) and (not AtoB(param1)))
+									self:SetText(param0)"
 				/>
 			</panel>
 		</panel>
@@ -2178,8 +2195,8 @@
 				<button name="ally_right_click_menu_button_{index}"
 					color="invisible"
 					onclick="SelectUnit(AllyIndex{index});"
-					onmouseoverlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(1)"
-					onmouseoutlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(0)"
+					onmouseoverlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(1) Game:AllyHover({index})"
+					onmouseoutlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(0) GetWidget('genericGameFloatingTip', 'game'):SetVisible(0)"
 					interactive="false"
 				/>
 
@@ -2892,8 +2909,8 @@
 			<button
 				color="invisible"
 				onclick="SelectHero();"
-				onmouseoverlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(0)"
+				onmouseoverlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(1) Game:SelfHover()"
+				onmouseoutlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(0) GetWidget('genericGameFloatingTip', 'game'):SetVisible(0)"
 				interactive="false"
 			/>
 
@@ -3022,6 +3039,7 @@
 			<panel name="game_base_health_backer_0" align="right" color="0 0 0 0" noclick="1">
 				<panel name="game_base_health_bar_0" color="0 1 0 0" noclick="1"/>
 				<instance name="statusbar_overlay"/>
+				<label name="game_base_health_percent_0" textalign="center" textvalign="center" font="dyn_9" color="white" outline="1" noclick="1"/>
 			</panel>
 			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true"/>
 			<label x="-0.5h" y="-1.7h" width="100%" height="100%" textalign="right" textvalign="center" font="dyn_9" color="green" outline="1" noclick="1" content="World Tree"/>
@@ -3033,6 +3051,7 @@
 			<panel name="game_base_health_backer_1" align="left" color="0 0 0 0" noclick="1">
 				<panel name="game_base_health_bar_1" color="0 1 0 0" noclick="1"/>
 				<instance name="statusbar_overlay"/>
+				<label name="game_base_health_percent_1" textalign="center" textvalign="center" font="dyn_9" color="white" outline="1" noclick="1"/>
 			</panel>
 			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true"/>
 			<label x="0.5h" y="-1.7h" width="100%" height="100%" textalign="left" textvalign="center" font="dyn_9" color="red" outline="1" noclick="1" content="Sacrificial Shrine"/>
@@ -4424,16 +4443,41 @@
 		<!-- Unit Selected -->
 		<panel name="game_selected_info_orders" color="invisible" visible="1" noclick="1" height="50%" valign="bottom" watch="SelectedVisible0" ontriggerlua="self:SetVisible(not AtoB(param))">
 			<panel name="game_selected_info_orders_pos" y="-0.5h" width="16.0h" height="10.1h" align="center" valign="bottom" color="invisible" noclick="1" >
+				<!-- dice -->
+				<panel name="game_info_dice" x="0" y="0" width="4.9h" height="4.9h" align="left" valign="top">
+					<instance name="inventory_game_button"
+						visible="0"
+						main_watch="DiceInfo"
+						main_ontriggerlua="self:SetVisible(AtoB(param1))"
+						button_watch="DiceInfo"
+						button_ontriggerlua="self:SetEnabled(AtoB(param2))"
+						texture="/ui/common/dice.tga"
+						hasCharges="true"
+						charges_watch="DiceInfo"
+						charges_ontriggerlua="self:SetText(param0)"
+						onclicklua="Trigger('DicePrompt')"
+						onmouseoverlua="GetWidget('dice_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('dice_tooltip', 'game'):SetVisible(0)"
+						cover_watch="DiceInfo"
+						cover_ontriggerlua="self:SetVisible(not AtoB(param2))"
+						cover_onmouseoverlua="GetWidget('dice_tooltip', 'game'):SetVisible(1)"
+						cover_onmouseoutlua="GetWidget('dice_tooltip', 'game'):SetVisible(0)"
+						charges_panel_watch="DiceInfo"
+						charges_panel_ontriggerlua="self:SetVisible(AtoN(param0) > 0)"
+						cooldown_timer=""
+						cooldown_percent=""
+					/>
+				</panel>
 				<!-- taunt -->
-				<panel name="game_info_taunt" x="0" y="0" width="4.9h" height="4.9h">
+				<panel name="game_info_taunt" x="0" y="0" width="4.9h" height="4.9h" align="center" valign="top">
 					<instance name="inventory_button" slot="8" simple_tooltip_interface="game_shop_shared"/>
 				</panel>
 				<!-- fortification -->
-				<panel name="game_info_fortification" x="0" y="0" width="4.9h" height="4.9h" valign="bottom">
+				<panel name="game_info_fortification" x="0" y="0" width="4.9h" height="4.9h" align="center" valign="bottom">
 					<instance name="inventory_button" slot="33" simple_tooltip_interface="game_shop_shared"/>
 				</panel>
 				<!-- Courier Status Icon -->
-				<panel name="game_info_courier_status" x="0" y="0" width="4.9h" height="4.9h" align="right">
+				<panel name="game_info_courier_status" x="0" y="0" width="4.9h" height="4.9h" align="right" valign="top">
 					<instance name="inventory_game_icon"
 						watch="CourierState"
 						ontriggerlua="self:SetTexture('/ui/common/courier/courier_state_'..param..'.tga')"
@@ -5171,6 +5215,8 @@
 		<instance name="courier_status_tooltip" />
 		<instance name="courier_controller_tooltip" />
 		<instance name="courier_action_tooltip" />
+
+		<instance name="dice_tooltip" />
 	</panel>
 
 	<childinterface file="game_shop_shared.interface" />
@@ -6510,8 +6556,6 @@
 			</panel>
 		</panel>
 	</panel>
-
-	<!-- purchase dice confirmation -->
 
 	<instance name="generic_dialog_box_game_template" />
 	<instance name="generic_dialog_box_combo_game_template" />

@@ -7,7 +7,7 @@ local _G = getfenv(0)
 local ipairs, pairs, select, string, table, next, type, unpack, tinsert, tconcat, tremove, format, tostring, tonumber, tsort, ceil, floor, sub, find, gfind = _G.ipairs, _G.pairs, _G.select, _G.string, _G.table, _G.next, _G.type, _G.unpack, _G.table.insert, _G.table.concat, _G.table.remove, _G.string.format, _G.tostring, _G.tonumber, _G.table.sort, _G.math.ceil, _G.math.floor, _G.string.sub, _G.string.find, _G.string.gfind
 local interface = object
 local interfaceName = interface:GetName()
-RegisterScript2('Game', '34')
+RegisterScript2('Game', '35')
 Game = {}
 Game.MAX_ALLIES 			= 3
 Game.MAX_ENEMIES 			= 4
@@ -22,6 +22,7 @@ Game.INVENTORY_START     	= 36
 Game.INVENTORY_END       	= 41
 Game.INVENTORY_SPEC_1		= 8 	-- Taunt
 Game.INVENTORY_SPEC_2		= 33	-- Fortification
+Game.KROSMODE_BASE_HEALTH	= 5000
 
 Game.lastHealthEntity = nil
 Game.lastManaEntity = nil
@@ -63,7 +64,7 @@ local function NotABot(name)
 	return true
 end
 
-local function convertTimeRange (inputTimeSeconds)
+local function convertTimeRange(inputTimeSeconds)
 	local rangeHours = 0
 	local rangeMinutes = 0
 	local rangeSeconds = 0
@@ -295,16 +296,23 @@ local function InitMidBar()
 	end)	
 	
 	-- Base Health
-	local function BaseHealth(baseID, game_base_health_header, game_base_health_backer, game_base_health_bar, sourceWidget, healthPercent)
+	local function BaseHealth(baseID, game_base_health_header, game_base_health_backer, game_base_health_bar, game_base_health_label, sourceWidget, healthPercent)
 		game_base_health_header:SetVisible(AtoN(healthPercent) < 1)
 		if AtoN(healthPercent) < 1 then
 			game_base_health_backer:SetVisible(AtoB(healthPercent))
 			game_base_health_backer:SetWidth(ToPercent(AtoN(healthPercent)))
 			game_base_health_bar:SetColor(GetHealthBarColor(healthPercent))
+			if (GetTrigger("GameMode"):GetLastValue() == "krosmode") then
+				game_base_health_label:SetText(Translate("game_krosmode_base_health", "health", math.floor(Game.KROSMODE_BASE_HEALTH * tonumber(healthPercent))))
+				game_base_health_label:SetVisible(1)
+			else
+				game_base_health_label:SetVisible(0)
+			end
+
 		end
 	end
 	for i=0,1,1 do
-		interface:RegisterWatch('BaseHealth'..i, function(...) BaseHealth(i, GetWidget('game_base_health_header_'..i), GetWidget('game_base_health_backer_'..i), GetWidget('game_base_health_bar_'..i), ...) end)
+		interface:RegisterWatch('BaseHealth'..i, function(...) BaseHealth(i, GetWidget('game_base_health_header_'..i), GetWidget('game_base_health_backer_'..i), GetWidget('game_base_health_bar_'..i), GetWidget('game_base_health_percent_'..i), ...) end)
 	end
 
 	---[[ Player scores
@@ -459,12 +467,61 @@ function Game.ToggleScoreboard()
 	end
 end
 
+function Game.HoverScoreboardHero(index)
+	local info = Game.scoreboardInfo[index]
+
+	if (info and NotEmpty(info.name)) then
+		local widget = GetWidget("game_scoreboard_hero_image_"..index)
+
+		if (widget) then
+			local texture = widget:GetTexture()
+
+			if (NotEmpty(texture)) then
+				Trigger('GameImagePreviewInit',
+					widget:GetWidth(),
+					widget:GetHeight(),
+					widget:GetAbsoluteX(),
+					widget:GetAbsoluteY(),
+					'0',
+					texture
+				)
+				Trigger('GameImagePreviewVis', '1', '250%')
+			end
+
+			if (AtoB(info.permaDead) and (AtoN(info.respawnTime) > 0)) then
+				Trigger('genericGameFloatingTip', '1',
+					math.max(GetStringWidth('dyn_12', info.heroName) + interface:GetWidthFromString('1.0h'), interface:GetWidthFromString('14.0h')),
+					'', info.heroName, 'team_tip_permadead', '', '',
+					-math.max((GetStringWidth('dyn_12', info.heroName) + interface:GetWidthFromString('2.4h')), interface:GetWidthFromString('15.4h')),
+					interface:GetWidthFromString('1.5h')
+				)
+			else
+				Trigger('genericGameFloatingTip', '1',
+					GetStringWidth('dyn_12', info.heroName) + interface:GetWidthFromString('1.0h'),
+					'', info.heroName, '', '', '',
+					-(GetStringWidth('dyn_12', info.heroName) + interface:GetWidthFromString('2.4h')),
+					interface:GetWidthFromString('1.5h')
+				)
+			end
+		end
+	end
+end
+
 local function InitScoreboard()
 	Game.scoreboardVisible = {}
 	Game.scoreGrowHeight = GetWidget("Nscores"):GetHeight()
 	Game.scoreboardOpen = false
 	Game.scoreboardLastTop, Game.scoreboardLastBottom = 0, 0
-	local function ScoreboardPlayer(index, widget, name)
+
+	Game.scoreboardInfo = {}
+	for i=0,9 do
+		Game.scoreboardInfo[i] = {}
+	end
+
+	local function ScoreboardPlayer(index, widget, name, heroName)
+		Game.scoreboardInfo[index].name = name
+		Game.scoreboardInfo[index].heroName = heroName
+
 		if (name and string.len(name) > 0) then
 			Game.scoreboardVisible[index] = true
 		else
@@ -475,6 +532,14 @@ local function InitScoreboard()
 	end
 	for i=0,9 do
 		interface:RegisterWatch('ScoreboardPlayer'..i, function(...) ScoreboardPlayer(i, ...) end)
+	end
+
+	local function ScoreboardRespawn(index, widget, cooldown, permaDead)
+		Game.scoreboardInfo[index].respawnTime = cooldown
+		Game.scoreboardInfo[index].permaDead = permaDead
+	end
+	for i=0,9 do
+		interface:RegisterWatch('ScoreboardPlayerRespawn'..i, function(...) ScoreboardRespawn(i, ...) end)
 	end
 
 	local function ScoreboardChange(widget, param)
@@ -489,6 +554,12 @@ end
 ----------------------------------------------------------
 -- 				Player Top Left Info					--
 ----------------------------------------------------------
+function Game:SelfHover()
+	if (AtoB(Game.selfPermaDead) and (Game.lastRespawnTime > 0)) then
+		Trigger('genericGameFloatingTip', 'true', '14h', '', '', 'player_tip_permadead', '', '', '3h', '-2h')
+	end
+end
+
 local function InitPlayerTopLeftInfo()
 	local function HeroIcon(sourceWidget, heroIcon)
 		GetWidget('game_top_left_hero_icon'):SetTexture(heroIcon)
@@ -517,18 +588,21 @@ local function InitPlayerTopLeftInfo()
 	end
 	interface:RegisterWatch('PlayerInfo', PlayerInfo)
 
-	local function HeroRespawn(sourceWidget, respawnTime)
+	local function HeroRespawn(sourceWidget, respawnTime, respawnDuration, respawnPercent, permaDead)
+		GetWidget('game_top_left_respawn_timer'):SetVisible(not AtoB(permaDead))
 		GetWidget('game_top_left_respawn_timer'):SetText(respawnTime)
 	end
 	Game.lastRespawnTime = -1
-	local function PreHeroRespawn(sourceWidget, respawnTime)
+	Game.selfPermaDead = "false"
+	local function PreHeroRespawn(sourceWidget, respawnTime, respawnDuration, respawnPercent, permaDead)
 		local respawnTime = tonumber(respawnTime)
 		if (respawnTime) then
 			local tempRespawnTime = ceil(respawnTime / 1000)
 			if (Game.lastRespawnTime ~= tempRespawnTime) then
-				HeroRespawn(sourceWidget, tempRespawnTime)
+				HeroRespawn(sourceWidget, tempRespawnTime, respawnDuration, respawnPercent, permaDead)
 			end
 			Game.lastRespawnTime = tempRespawnTime
+			Game.selfPermaDead = permaDead
 		end
 	end
 	interface:RegisterWatch('HeroRespawn', PreHeroRespawn)
@@ -737,6 +811,12 @@ end
 ----------------------------------------------------------
 -- 						Ally Info						--
 ----------------------------------------------------------
+function Game:AllyHover(index)
+	if (AtoB(Game.allyPermaDead[index]) and (Game.lastAllyRespawnTime[index] > 0)) then
+		Trigger('genericGameFloatingTip', 'true', '16h', '', '', 'team_tip_permadead', '', '', '3h', '-2h')
+	end
+end
+
 local function InitAllyInfo()
 
 	-- OptiUI: Position ally icons based on option
@@ -845,18 +925,21 @@ local function InitAllyInfo()
 		end
 	end
 
-	local function AllyRespawn(allyIndex, sourceWidget, respawnTime)
+	local function AllyRespawn(allyIndex, sourceWidget, respawnTime, respawnDuration, respawnPercent, permaDead)
+		GetWidget('game_top_left_ally_respawn_'..allyIndex):SetVisible(not AtoB(permaDead))
 		GetWidget('game_top_left_ally_respawn_'..allyIndex):SetText(respawnTime)
 	end
-	Game.lastAllyRespawnTime = {-1,-1,-1,-1}
-	local function PreAllyRespawn(allyIndex, sourceWidget, respawnTime)
+	Game.lastAllyRespawnTime = {[0] = -1, [1] = -1, [2] = -1, [3] = -1}
+	Game.allyPermaDead = {[0] = "false", [1] = "false", [2] = "false", [3] = "false"}
+	local function PreAllyRespawn(allyIndex, sourceWidget, respawnTime, respawnDuration, respawnPercent, permaDead)
 		local respawnTime = tonumber(respawnTime)
 		if (respawnTime) then
 			local tempRespawnTime = ceil(respawnTime / 1000)
 			if (Game.lastAllyRespawnTime[allyIndex]) and (Game.lastAllyRespawnTime[allyIndex] ~= tempRespawnTime) then
-				AllyRespawn(allyIndex, sourceWidget, tempRespawnTime)
+				AllyRespawn(allyIndex, sourceWidget, tempRespawnTime, respawnDuration, respawnPercent, permaDead)
 			end
 			Game.lastAllyRespawnTime[allyIndex] = tempRespawnTime
+			Game.allyPermaDead = permaDead
 		end
 	end
 
@@ -975,7 +1058,7 @@ local function InitAllyInfo()
 		-- OptiUI: end
 	end
 
-	for i=0,Game.MAX_ALLIES,1 do	
+	for i=0,Game.MAX_ALLIES,1 do
 		interface:RegisterWatch('AllyExists'..i, function(...) AllyExists(i, ...) end)
 		interface:RegisterWatch('AllyHeroInfo'..i, function(...) AllyHeroInfo(i, ...) end)
 		interface:RegisterWatch('AllyStatus'..i, function(...) AllyStatus(i, ...) end)
@@ -1547,6 +1630,9 @@ local function InitBottomSection()
 			['right'] = {
 				['game_info_taunt'] = 				{['align'] = "center",	 ['valign'] = "top"},
 				['game_info_fortification'] = 		{['align'] = "center",	 ['valign'] = "bottom"},
+				['game_info_dice'] =				{['align'] = "left", 	 ['valign'] = "top"},
+				--['game_thing'] = 					{['align'] = "left",	 ['valign'] = "bottom"},
+
 				['game_info_courier_status'] = 		{['align'] = "right",	 ['valign'] = "top"},
 				['game_info_courier_private'] = 	{['align'] = "right",	 ['valign'] = "bottom"},
 				['game_info_courier_controller'] = 	{['align'] = "left",	 ['valign'] = "top"},
@@ -1560,6 +1646,9 @@ local function InitBottomSection()
 			['left'] = {
 				['game_info_taunt'] = 				{['align'] = "center",	 ['valign'] = "top"},
 				['game_info_fortification'] = 		{['align'] = "center",	 ['valign'] = "bottom"},
+				['game_info_dice'] =				{['align'] = "right", 	 ['valign'] = "top"},
+				--['game_thing'] = 					{['align'] = "right",	 ['valign'] = "bottom"},
+
 				['game_info_courier_status'] = 		{['align'] = "left",	 ['valign'] = "top"},
 				['game_info_courier_private'] = 	{['align'] = "left",	 ['valign'] = "bottom"},
 				['game_info_courier_controller'] = 	{['align'] = "right",	 ['valign'] = "top"},
@@ -1595,14 +1684,16 @@ local function InitBottomSection()
 			end
 			
 			GetWidget('selection_info_right'):SetAlign('right')
-			--GetWidget('game_botright_orders_right'):SetVisible(true)
-			--GetWidget('game_botright_orders_left'):SetVisible(false)	
-			--GetWidget('game_botright_units_right'):SetVisible(true)
-			--GetWidget('game_botright_units_left'):SetVisible(false)
-			--GetWidget('game_botright_building_right'):SetVisible(true)
-			--GetWidget('game_botright_building_left'):SetVisible(false)
-			--GetWidget('game_botright_mult_right'):SetVisible(true)
-			--GetWidget('game_botright_mult_left'):SetVisible(false)
+
+			-- set the correct frame visible based on having dice
+			--local hasDice = AtoB(UITrigger.GetTrigger("hasDice"):GetLastValue()) -- real trigger goes here
+			--local hasDice = Game.DiceInfo[2]
+			--GetWidget('game_botright_orders_right'):SetVisible(not hasDice)
+			--GetWidget('game_botright_orders_left'):SetVisible(false)
+			--GetWidget('game_botright_orders_right_5'):SetVisible(hasDice)
+			--GetWidget('game_botright_orders_left_5'):SetVisible(false)
+			-- GetWidget('game_botright_orders_right_6'):SetVisible(hasDice)
+			-- GetWidget('game_botright_orders_left_6'):SetVisible(false)
 			
 			GetWidget('game_selected_info_orders'):SetAlign('right')
 			GetWidget('game_selected_info_orders_pos'):SetX('0')
@@ -1709,14 +1800,16 @@ local function InitBottomSection()
 			end
 
 			GetWidget('selection_info_right'):SetAlign('left')
+
+			-- set the correct frame visible based on having dice
+			--local hasDice = AtoB(UITrigger.GetTrigger("hasDice"):GetLastValue()) -- real trigger goes here
+			--local hasDice = Game.DiceInfo[2]
 			--GetWidget('game_botright_orders_right'):SetVisible(false)
-			--GetWidget('game_botright_orders_left'):SetVisible(true)		
-			--GetWidget('game_botright_units_right'):SetVisible(false)
-			--GetWidget('game_botright_units_left'):SetVisible(true)
-			--GetWidget('game_botright_building_right'):SetVisible(false)
-			--GetWidget('game_botright_building_left'):SetVisible(true)	
-			--GetWidget('game_botright_mult_right'):SetVisible(false)
-			--GetWidget('game_botright_mult_left'):SetVisible(true)
+			--GetWidget('game_botright_orders_left'):SetVisible(not hasDice)
+			--GetWidget('game_botright_orders_right_5'):SetVisible(false)
+			--GetWidget('game_botright_orders_left_5'):SetVisible(hasDice)
+			-- GetWidget('game_botright_orders_right_6'):SetVisible(false)
+			-- GetWidget('game_botright_orders_left_6'):SetVisible(hasDice)
 				
 			GetWidget('game_selected_info_orders'):SetAlign('left')
 			GetWidget('game_selected_info_orders_pos'):SetX('0')
@@ -1805,6 +1898,47 @@ local function InitBottomSection()
 		end
 	end
 	interface:RegisterWatch('MiniMapPosition', PositionBottomSection)
+
+	-- dice stuff
+	local function DicePrompt()
+		-- only prompt if there are dice for the game mode and they are in the well
+		if (Game.DiceInfo[2] and Game.DiceInfo[3]) then
+			local lastPromptedPrice = GetDBEntry("LastDicePromptPrice")
+
+			if ((not lastPromptedPrice) or (lastPromptedPrice ~= Game.diceGoldCost)) then
+				Set("ui_DontPromptDice", "false", "bool")
+			end
+
+			if (not GetCvarBool("ui_DontPromptDice")) then
+				Trigger('TriggerDialogBoxWithComboboxGame',
+					"dice_name",
+					"general_confirm",
+					"general_cancel",
+					"UseDice();", "",
+					"general_are_you_sure",
+					Translate("dice_prompt_body", "cost", Game.diceGoldCost, "tokens", Game.DiceInfo[1], "gold", UIGoldCoins()),
+					"general_dontPrompt",
+					"ui_DontPromptDice"
+				)
+				GetDBEntry("LastDicePromptPrice", Game.diceGoldCost, true)
+			else
+				UseDice()
+			end
+		end
+	end
+	interface:RegisterWatch('DicePrompt', DicePrompt)
+
+	Game.DiceInfo = {0, false, false}
+	local function DiceInfo(_, numDice, hasDice, canUseDice)
+		if (AtoB(hasDice) ~= Game.DiceInfo[2]) then
+			Game.DiceInfo = {tonumber(numDice), AtoB(hasDice), AtoB(canUseDice)}
+			PositionBottomSection()
+		else
+			Game.DiceInfo = {tonumber(numDice), AtoB(hasDice), AtoB(canUseDice)}
+		end		
+	end
+	interface:RegisterWatch('DiceInfo', DiceInfo)
+
 	PositionBottomSection()
 end
 
@@ -2419,6 +2553,24 @@ local function InitReactiveTips()
 
 end
 
+local function InitDynamicProducts()
+	-- dynamic products should exist when this first runs, so populate things to start
+	local function DynamicProductUpdate()
+		local dynamicProductTable = GetDynamicProducts()
+
+		if (dynamicProductTable) then
+			-- dice stuff
+			if (dynamicProductTable["Dice_Bundle1"]) then
+				Game.diceGoldCost = dynamicProductTable["Dice_Bundle1"].GoldCost
+				GetWidget("dice_tooltip_body_2"):SetText(Translate("dice_tooltip_body2", "cost", Game.diceGoldCost))
+			end
+		end
+	end
+	interface:RegisterWatch("ChatDynamicProductListUpdate", DynamicProductUpdate)
+
+	DynamicProductUpdate()
+end
+
 ----------------------------------------------------------
 -- 						Init	   						 --
 ----------------------------------------------------------
@@ -2440,6 +2592,7 @@ function Game:InitializeGameInterface()
 	InitActiveInventory()
 	--InitAbililties()
 	InitReactiveTips()
+	InitDynamicProducts()
 	
 	InitSounds = nil
 	InitArcadeText = nil
@@ -2459,6 +2612,7 @@ function Game:InitializeGameInterface()
 	--InitAbililties = nil	
 	InitReactiveTips = nil
 	InitWaveTicker = nil
+	InitDynamicProducts = nil
 	
 	self.InitializeGameInterface = nil
 end
