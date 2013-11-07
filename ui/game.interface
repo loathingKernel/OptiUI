@@ -2976,7 +2976,7 @@
 			<label name="game_top_left_buyback_label" x="61%" width="40%" height="100%" font="dyn_9" shadow="true" shadowoffset="2" color="yellow" textvalign="center" textalign="left" noclick="1" />
 		</panel>
 
-		<panel x="0h" y="0h" width="10.9h" height="1.5h" align="right" valign="bottom" color="invisible" noclick="true">
+		<panel x="0h" y="0h" width="10.9h" height="1.5h" align="right" valign="bottom" color="invisible" noclick="0">
 			<!-- Collapse Team Icons Button -->
 			<panel width="100@" height="100%" align="right" color="invisible">
 				<!-- UIScript -->
@@ -3024,7 +3024,7 @@
 
 			<include file="fastshare.package"/>
 
-			<label name="game_top_left_buyback_indicator" x="4.0h" content="Buyback" color="white" font="dyn_9" textvalign="center" noclick="1" />
+			<label name="game_top_left_buyback_indicator" x="4.0h" width="4.9h" content="Buyback" color="white" font="dyn_9" textvalign="center" noclick="0" />
 
 		</panel>
 
@@ -3039,8 +3039,8 @@
 			<panel name="game_base_health_backer_0" align="right" color="0 0 0 0" noclick="1">
 				<panel name="game_base_health_bar_0" color="0 1 0 0" noclick="1"/>
 				<instance name="statusbar_overlay"/>
-				<label name="game_base_health_percent_0" textalign="center" textvalign="center" font="dyn_9" color="white" outline="1" noclick="1"/>
 			</panel>
+			<label name="game_base_health_percent_0" textalign="center" textvalign="center" font="dyn_9" color="white" outline="1" noclick="1" />
 			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true"/>
 			<label x="-0.5h" y="-1.7h" width="100%" height="100%" textalign="right" textvalign="center" font="dyn_9" color="green" outline="1" noclick="1" content="World Tree"/>
 		</panel>
@@ -3051,8 +3051,8 @@
 			<panel name="game_base_health_backer_1" align="left" color="0 0 0 0" noclick="1">
 				<panel name="game_base_health_bar_1" color="0 1 0 0" noclick="1"/>
 				<instance name="statusbar_overlay"/>
-				<label name="game_base_health_percent_1" textalign="center" textvalign="center" font="dyn_9" color="white" outline="1" noclick="1"/>
 			</panel>
+			<label name="game_base_health_percent_1" textalign="center" textvalign="center" font="dyn_9" color="white" outline="1" noclick="1" />
 			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true"/>
 			<label x="0.5h" y="-1.7h" width="100%" height="100%" textalign="left" textvalign="center" font="dyn_9" color="red" outline="1" noclick="1" content="Sacrificial Shrine"/>
 		</panel>
