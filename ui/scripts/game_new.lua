@@ -516,6 +516,9 @@ local function InitScoreboard()
 	Game.scoreboardInfo = {}
 	for i=0,9 do
 		Game.scoreboardInfo[i] = {}
+		-- OptiUI: Announce buybacks
+		Game.scoreboardInfo[i].respawnTime = 0
+		-- OptiUI: End
 	end
 
 	local function ScoreboardPlayer(index, widget, name, heroName)
@@ -535,6 +538,11 @@ local function InitScoreboard()
 	end
 
 	local function ScoreboardRespawn(index, widget, cooldown, permaDead)
+		-- OptiUI: Announce buybacks
+		if ((AtoN(Game.scoreboardInfo[index].respawnTime) > 1) and (AtoN(cooldown) == 0)) then
+			widget:UICmd("TeamChat('^r" .. Game.scoreboardInfo[index].heroName .. "^* has bought back and respawned at the well.')")
+		end
+		-- OptiUI: End
 		Game.scoreboardInfo[index].respawnTime = cooldown
 		Game.scoreboardInfo[index].permaDead = permaDead
 	end
@@ -939,7 +947,7 @@ local function InitAllyInfo()
 				AllyRespawn(allyIndex, sourceWidget, tempRespawnTime, respawnDuration, respawnPercent, permaDead)
 			end
 			Game.lastAllyRespawnTime[allyIndex] = tempRespawnTime
-			Game.allyPermaDead = permaDead
+			Game.allyPermaDead[allyIndex] = permaDead
 		end
 	end
 
@@ -1038,24 +1046,39 @@ local function InitAllyInfo()
 	local function AllyAbilityInfo(allyIndex, slotIndex, sourceWidget, abilityValid, unLeveled, canActivate, isActive, isDisabled, needMana, abilityLevel, remainingCooldown, maxCooldown, null,       displayName, iconPath, isPassive, entityName, charges, maxCharges)
 		local unLeveled, isDisabled, isPassive, needMana, canActivate, isActive = AtoB(unLeveled), AtoB(isDisabled), AtoB(isPassive), AtoB(needMana), AtoB(canActivate), AtoB(isActive)
 		local remainingCooldown, maxCooldown = AtoB(remainingCooldown), AtoB(maxCooldown)
-		if (unLeveled) then
-			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetColor('silver')
-		elseif (isDisabled) then
-			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetColor('red')	
-		elseif (isPassive) then
-			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetColor('green')	
-		elseif (remainingCooldown and maxCooldown) then
-			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetColor('yellow')	
-		elseif (needMana) then
-			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetColor('blue')	
-		elseif (canActivate or isActive) then
-			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetColor('lime')	
-		else
-			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetColor('orange')
-		end	
 		-- OptiUI: Ally abilities level labels
 		GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetText(abilityLevel)
+		GetWidget('ally_ability_status_image_'..allyIndex..'_'..slotIndex):SetTexture(iconPath)
 		-- OptiUI: end
+		if (unLeveled) then
+			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetBorderColor('silver')
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetColor('silver')
+			GetWidget('ally_ability_status_image_'..allyIndex..'_'..slotIndex):SetRenderMode('grayscale')
+		elseif (isDisabled) then
+			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetBorderColor('red')
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetColor('red')
+			GetWidget('ally_ability_status_image_'..allyIndex..'_'..slotIndex):SetRenderMode('grayscale')
+		elseif (isPassive) then
+			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetBorderColor('green')
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetColor('green')
+			GetWidget('ally_ability_status_image_'..allyIndex..'_'..slotIndex):SetRenderMode('normal')
+		elseif (remainingCooldown and maxCooldown) then
+			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetBorderColor('yellow')
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetColor('yellow')
+			GetWidget('ally_ability_status_image_'..allyIndex..'_'..slotIndex):SetRenderMode('grayscale')
+		elseif (needMana) then
+			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetBorderColor('blue')
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetColor('blue')
+			GetWidget('ally_ability_status_image_'..allyIndex..'_'..slotIndex):SetRenderMode('grayscale')
+		elseif (canActivate or isActive) then
+			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetBorderColor('lime')
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetColor('lime')
+			GetWidget('ally_ability_status_image_'..allyIndex..'_'..slotIndex):SetRenderMode('normal')
+		else
+			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetBorderColor('orange')
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetColor('orange')
+			GetWidget('ally_ability_status_image_'..allyIndex..'_'..slotIndex):SetRenderMode('grayscale')
+		end	
 	end
 
 	for i=0,Game.MAX_ALLIES,1 do

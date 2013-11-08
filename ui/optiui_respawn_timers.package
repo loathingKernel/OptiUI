@@ -2,7 +2,7 @@
 <package>
 
 	<template name="respawn_timer_icon" >
-		<panel x="{x}" width="6h" color="invisible"
+		<panel name="respawn_timer_icon_{index}" x="{x}" width="6h" color="invisible"
 			watch="ScoreboardPlayerRespawn{index}"
 			ontriggerlua="self:SetVisible(tonumber(param) > 0)"
 		>
