@@ -2110,7 +2110,7 @@
 	<template name="ally_ability_status">
 		<panel y="{y}" width="{width}" height="{height}" group="{group}" >
 			<image name="ally_ability_status_image_{index}_{slot}" align="center" valign="center" texture="/ui/legion/empty_pack.tga" />
-			<frame name="ally_ability_status_dot_{index}_{slot}" align="center" valign="center" color="invisible" bordercolor="gray" borderthickness="1"/>
+			<frame name="ally_ability_status_dot_{index}_{slot}" align="center" valign="center" color="black" bordercolor="gray" borderthickness="1"/>
 			<label name="ally_ability_status_level_{index}_{slot}" textalign="center" textvalign="center" color="black" shadow="1" font="dyn_9" />
 		</panel>
 	</template>
