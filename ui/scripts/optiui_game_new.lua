@@ -1355,6 +1355,11 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_mana'):SetY('0.0h')
 			GetWidget('game_center_abilities'):SetY('-4.6h')
 		end
+		if GetCvarBool('optiui_ItemShopSignDisabled') then
+			GetWidget('item_shop_sign'):SetVisible(false)
+		else
+			GetWidget('item_shop_sign'):SetVisible(true)
+		end
 	end
 	interface:RegisterWatch('optiui_BottomCenterPosition', PositionBottomCenter)
 	PositionBottomCenter()
@@ -1622,7 +1627,7 @@ local function InitBottomCenterPanel()
 	-- Shop indicator (hanging sign thingy)
 	local function PlayerCanShop(sourceWidget, canShop)
 		local canShop = AtoB(canShop)
-		if (canShop) then
+		if ((canShop) and not GetCvarBool('optiui_ItemShopSignDisabled')) then
 			GetWidget('item_shop_sign'):SetVisible(true)
 			GetWidget('item_shop_sign'):Sleep(1, function() GetWidget('item_shop_sign'):FadeIn(100) end)
 			-- do the above sleep to interrupt any existing sleeps to set the sign invisible
