@@ -8,7 +8,7 @@
 	<childinterface file="/ui/tooltips.interface" />
 	<childinterface file="/ui/confirmations.interface" />
 	<include file="guides_form.package"/>
-	<include file="game_shop_v3_templates.package"/>
+	<include file="optiui_game_shop_v3_templates.package"/>
 	<childinterface file="game_shop_shared.interface" />
 	<trigger name="ShopItemDisplayType" />
 	
