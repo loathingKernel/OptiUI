@@ -13,6 +13,14 @@
 
 	<instance mod_id="optiui_options" name="mod_header" label="Bottom Center panel:" />
 	<instance mod_id="optiui_options" name="mod_checkbox"
+		cvar="optiui_ItemShopSignDisabled"
+		label="Disable Item Shop Sign popup"
+		default="false"
+		onchange="If(_game_phase ge 5, Trigger(\\\'optiui_BottomCenterPosition\\\'));"
+		tooltip="Disables Item Shop Sign popup when the hero is in the range of a Shop."
+		tooltip_width="43h"
+	/>
+	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_BottomCenterAbilitiesBelowBars"
 		label="Display Hero Abilities below Health/Mana bars"
 		default="false"

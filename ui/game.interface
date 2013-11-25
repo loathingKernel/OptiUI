@@ -7,7 +7,7 @@
 >
 	<!-- Search for 'UIScript' to find stuff that still needs to be replaced with LUA, also probably search for UICmd -->
 
-	<lua file="/ui/scripts/game_new.lua" />
+	<lua file="/ui/scripts/optiui_game_new.lua" />
 
 	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '35') Game:InitializeGameInterface()"/> 
 
@@ -17,7 +17,7 @@
 	<childinterface file="/ui/game_chat.interface" />
 	<childinterface file="/ui/game_vote.interface" />
 	<childinterface file="/ui/game_mentor.interface" />
-	<include file="stash.package"/>
+	<include file="optiui_stash.package"/>
 	<childinterface file="/ui/tooltips.interface" />
 	<childinterface file="/ui/confirmations.interface" />
 	<childinterface file="/ui/testpp/game_dev.interface" />
@@ -3023,7 +3023,7 @@
 				<image width="90%" height="90%" align="center" valign="center" texture="/ui/elements/options_icon_stats.tga" noclick="1"/>
 			</panel>
 
-			<include file="fastshare.package"/>
+			<include file="optiui_fastshare.package"/>
 
 			<label name="game_top_left_buyback_indicator" x="4.0h" width="4.9h" content="Buyback" color="white" font="dyn_9" textvalign="center" noclick="0" />
 

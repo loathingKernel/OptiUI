@@ -46,15 +46,15 @@
     <copyfile name="ui/legion/optiui_behind_bar.tga" overwrite="yes" />
 
     <!-- Packages -->
-    <copyfile name="ui/fastshare.package" overwrite="yes" />
-    <copyfile name="ui/stash.package" overwrite="yes" />
+    <copyfile name="ui/optiui_fastshare.package" overwrite="yes" />
+    <copyfile name="ui/optiui_stash.package" overwrite="yes" />
     <copyfile name="ui/optiui_respawn_timers.package" overwrite="yes" />
     
     <!-- Interfaces -->
     <copyfile name="ui/game.interface" overwrite="yes" />
 
     <!-- Scripts -->
-    <copyfile name="ui/scripts/game_new.lua" overwrite="yes" />
+    <copyfile name="ui/scripts/optiui_game_new.lua" overwrite="yes" />
 
     <!-- Mod Options -->
     <copyfile name="ui/optiui_options.package" overwrite="yes" />

@@ -539,9 +539,9 @@ local function InitScoreboard()
 
 	local function ScoreboardRespawn(index, widget, cooldown, permaDead)
 		-- OptiUI: Announce buybacks
-		if ((AtoN(Game.scoreboardInfo[index].respawnTime) > 2) and (AtoN(cooldown) == 0)) then
-			--widget:UICmd("TeamChat('^r" .. Game.scoreboardInfo[index].heroName .. "^* has bought back and respawned at the well.')")
-		end
+		-- if ((AtoN(Game.scoreboardInfo[index].respawnTime) > 2) and (AtoN(cooldown) == 0)) then
+		-- 	widget:UICmd("TeamChat('^r" .. Game.scoreboardInfo[index].heroName .. "^* has bought back and respawned at the well.')")
+		-- end
 		-- OptiUI: End
 		Game.scoreboardInfo[index].respawnTime = cooldown
 		Game.scoreboardInfo[index].permaDead = permaDead
