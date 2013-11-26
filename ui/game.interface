@@ -3680,7 +3680,7 @@
 	<!-- end of walkthrough stuff -->
 
 	<!-- Shop / Obsv -->
-	<childinterface file="optiui_game_shop_v3.interface" />
+	<childinterface file="game_shop_v3.interface" />
 	<!-- Doesn't exist yet
 		<include file="game_observatory.package"/>
 	-->
