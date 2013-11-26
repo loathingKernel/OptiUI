@@ -2908,23 +2908,24 @@
 				<!-- Recipe Display -->
 				<panel
 					name="recipe_display"
-					y="-0.1h"
+					y="0"
 					x="15.2h"
-					width="52.0h" height="52.0h"
+					width="33.0h" height="26.0h"
+					valign="bottom"
 					color="invisible"
 					noclick="true"
 					float="bottom"
-					watch="RecipeItemType" ontrigger="
-						if(!StringEmpty(param), SlideX(48.6h, 250), SlideX(18.0h, 250));
-						if(!StringEmpty(param), Call('recipe_gear', 'Rotate(270, 250);'), Call('recipe_gear', 'Rotate(-270, 250);'));
-
-						"
+					watch="RecipeItemType" ontrigger="if(!StringEmpty(param), SlideX(50.5h, 250), SlideX(18.0h, 250));"
 					watch1="ShopType"
 					ontrigger1="SetVisible(!StringEquals(param, ''));"
 				>
 
+					<frame texture="/ui/frames/tooltip_bg.tga" color=".3 .35 .4 1" noclick="true" >
+						<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="true"/>
+					</frame>
+
 					<!-- Recipe Icon -->
-					<panel x="3.8h" y="14.6h" width="5.8h" height="5.8h" noclick="1">
+					<panel x="0" y="0" width="5.8h" height="5.8h" noclick="1">
 						<image
 							watch="RecipeItem"
 							ontrigger="If(param6, SetRenderMode('normal'), SetRenderMode('grayscale'));"
@@ -2943,21 +2944,22 @@
 								);"
 							noclick="1"
 						/>
+						<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 					</panel>
 
 					<!-- Buy All Button -->
 					<instance
 						name="button2"
-						x="12.0h" y="19.1h"
+						x="0" y="4.0h"
 						width="14.8h" height="2.5h"
-						valign="top" align="left"
+						valign="top" align="center"
 						label="game_shop_label_buyremaining"
 						onclick="PurchaseRemainingComponents(GetActiveRecipe()));"
 						enabled="true"
 					/>
 
 					<!-- Buy All Tooltip -->
-					<panel x="28.3h" y="19.1h" width="2.4h" height="2.4h" valign="top" align="left" color="invisible" noclick="1">
+					<panel x="9.0h" y="4.0h" width="2.5h" height="2.5h" valign="top" align="center" color="invisible" noclick="1">
 						<button
 							color="invisible"
 							onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showwidget('shop_recipe_buyall_tip');"
@@ -2995,9 +2997,9 @@
 
 					<button
 						name="shop_min_btn"
-						x="30.2h" y="13.8h"
+						x="-1" y="1"
 						width="1.9h" height="1.9h"
-						valign="top" align="left"
+						valign="top" align="right"
 						color="invisible"
 						onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showWidget('shop_min');"
 						onmouseout="hideWidget('shop_min');"
@@ -3015,9 +3017,9 @@
 					<!-- Shop Close -->
 					<button
 						name="shop_close_btn"
-						x="33.0h" y="26.5h"
+						x="33.0h" y="0"
 						width="3.3h" height="3.3h"
-						valign="top" align="left"
+						valign="center" align="left"
 						color="invisible"
 						onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav');"
 						onclick="PlaySound('/shared/sounds/ui/button_close_01.wav'); CloseShop();"
@@ -3032,11 +3034,10 @@
 					</button>
 
 					<!-- Background Image -->
-					<image y="13.3h" texture="/ui/common/new_shop_interface/recipe_panel.tga" noclick="1" watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # param / 100);"/>
-
-
+					<!-- <image y="13.3h" texture="/ui/common/new_shop_interface/recipe_panel.tga" noclick="1" watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # param / 100);"/> -->
+					
 					<!-- Recipe Text -->
-					<panel x="11.2h" y="14.6h" width="18.0h" height="3.8h" valign="top" float="bottom" color="invisible" noclick="1">
+					<panel x="0" y="0" width="18.0h" height="3.8h" align="center" valign="top" float="bottom" color="invisible" noclick="1">
 						<label fity="true" fitypadding="0.2h" width="100%" textalign="left" textvalign="center" font="dyn_10" color="white" shadow="1" noclick="1" watch="RecipeItem" ontriggerlua="self:SetText(param1)" />
 						<panel color="invisible" float="right" noclick="1" grow="true">
 							<label fity="true" fitx="true" fitxpadding="0.5h" textalign="left" textvalign="center" color="white" shadow="1" noclick="1" font="dyn_10">game_shop_label_total_cost</label>
@@ -3045,7 +3046,7 @@
 					</panel>
 
 					<!-- Recipe Items -->
-					<panel x="2.8h" y="22.8h" width="28.7h" height="18.8h" color="invisible" noclick="1">
+					<panel x="0" y="0" width="28.7h" height="18.8h" valign="bottom" color="invisible" noclick="1">
 						<panel width="-1.0h" align="center" valign="top" float="bottom" color="invisible" noclick="1">
 							<!-- Requires -->
 							<panel height="2.5h" width="100%" color="invisible" noclick="1">
@@ -3070,7 +3071,7 @@
 								<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="2" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip" width="25%" />
 								<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="3" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip" width="25%" />
 								<!-- Optional Fifth Used In Item
-								<instance name="shop_item_component" watch="RecipeUsedIn" index="4" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip"  width="25%"/>
+								<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="4" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip"  width="25%"/>
 								-->
 							</panel>
 						</panel>
@@ -3093,23 +3094,26 @@
 				</panel>
 
 				<!-- Main Store Background -->
-				<image
+				<!-- <image
 					width="26.0h"
 					height="52.0h"
 					texture="/ui/common/new_shop_interface/shops_panel.tga"
 					noclick="1"
-				/>
+				/> -->
+				<frame texture="/ui/frames/tooltip_bg.tga" color=".3 .35 .4 1" noclick="true" >
+					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="true"/>
+				</frame>			
 
 				<panel
 					x="6.1h"
 					width="6.5h"
 					height="26.0h"
-					valign="center"
+					valign="top"
 					align="right"
 					color="invisible"
 					noclick="1"
 				>
-					<image texture="/ui/common/new_shop_interface/shops_panel_close.tga" noclick="1"/>
+					<!-- <image texture="/ui/common/new_shop_interface/shops_panel_close.tga" noclick="1"/> -->
 
 					<button
 						name="main_shop_close_btn"
@@ -3153,7 +3157,7 @@
 						</panel>
 						<!-- Recipes Col -->
 						<panel width="40%" color="invisible" noclick="1">
-							<panel x="-0.2h" y="2.5h" height="100%" valign="top" align="center" float="bottom" padding=".1h" color="invisible" noclick="1">
+							<panel y="2.5h" height="100%" valign="top" align="center" float="bottom" padding=".1h" color="invisible" noclick="1">
 								<instance name="shop_cats_button" iconfile="shop_recommended" label="game_shop_label_recommended" shopname="Shop_Recommended" slot="11" />
 								<instance name="shop_cats_button" iconfile="shop_recipes1" label="game_shop_label_recipe_one" shopname="Shop_Recipes1" slot="5" />
 								<instance name="shop_cats_button" iconfile="shop_recipes2" label="game_shop_label_recipe_two" shopname="Shop_Recipes2" slot="6" />
@@ -3192,13 +3196,16 @@
 						color="invisible"
 					>
 						<!-- Item BG -->
-						<image
+						<!-- <image
 							x="-14.2h"
 							width="52.0h"
 							height="52.0h"
 							texture="/ui/common/new_shop_interface/shop_items_panel.tga"
 							noclick="1"
-						/>
+						/> -->
+						<frame texture="/ui/frames/tooltip_bg.tga" color=".3 .35 .4 1" noclick="true" >
+							<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="true"/>
+						</frame>
 
 						<panel group="shop" width="100%" color="invisible" noclick="1">
 
@@ -3268,14 +3275,14 @@
 				</panel>
 
 				<!-- Recipe Gear -->
-				<image
+				<!-- <image
 					name="recipe_gear"
 					x="48.2h" y="42.5h"
 					width="3.3h" height="3.3h"
 					texture="/ui/common/new_shop_interface/gear.tga"
 					watch="ShopType"
 					ontrigger="SetVisible(!StringEquals(param, ''));"
-				/>
+				/> -->
 
 			</panel>
 		</if>

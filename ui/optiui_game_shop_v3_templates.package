@@ -348,16 +348,20 @@
 				<panel width="5.4h" height="5.4h" align="center">
 					<image texture="/items/shops/{iconfile}.tga" />
 					<button 
-						texture="/ui/elements/button_bevel_sml.tga"
+						texture="/ui/elements/optiui_button_bevel.tga"
 						onmouseover="PlaySound('/shared/sounds/ui/button_over_03.wav'); showWidget('shop_cat_tip{slot}');"
 						onmouseout="hideWidget('shop_cat_tip{slot}');"
 						onclick="PlaySound('/shared/sounds/ui/button_click_03.wav'); SetActiveShop('{shopname}');"
 						interactive="false"
 						name="shop_category_button_{slot}"
 					/>
-					<label x="0.5h" y="0.2h" width="100%" height="100%" textalign="left" textvalign="top" color="white" shadow="true" font="dyn_12" noclick="true" watch="ShopKey{slot}" ontrigger="SetText(Translate(param));" content="{slot}" />
+					<frame width="30%" height="30%" align="left" valign="top" color="0 0 0 .7" bordercolor="gray" borderthickness="1" noclick="true"
+						watch="ShopKey{slot}" ontriggerlua="if (param == '') then self:SetVisible(false) else self:SetVisible(true) end"
+					>
+						<label textalign="center" textvalign="center" color="white" shadow="true" font="dyn_10" noclick="true" watch="ShopKey{slot}" ontrigger="SetText(Translate(param));" content="{slot}" />
+					</frame>
 					<frame
-						borderthickness="3"
+						borderthickness="1"
 						bordercolor="yellow"
 						color="invisible"
 						visible="true"
@@ -367,7 +371,7 @@
 						noclick="true"
 						passivechildren="true"
 					>
-						<image x="3" y="3" width="-6" height="-6" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
+						<image x="1" y="1" width="-2" height="-2" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
 					</frame>
 				</panel>
 			</panel>
@@ -417,7 +421,7 @@
 					/>
 
 					<button
-						texture="/ui/elements/button_bevel_sml.tga"
+						texture="/ui/elements/optiui_button_bevel.tga"
 						onmouseout="HideWidget('shop_item_tooltip{index}'); HideWidget('shop_item_tooltip_short{index}');"
 						onclick="PlaySound('/shared/sounds/ui/button_click_02.wav'); Purchase('{index}');"
 						watch="ShopItem{index}"
@@ -439,15 +443,23 @@
 					/>
 
 					<!-- Cooldown -->
-					<piegraph start="270" end="-90" square="true" color="#000000cc" watch="ShopItem{index}" ontrigger="SetVisible(param21 gt 0); SetValue(param20);" noclick="true"/>
+					<piegraph x="1" y="1" width="-2" height="-2" start="270" end="-90" square="true" color="#000000cc" watch="ShopItem{index}" ontrigger="SetVisible(param21 gt 0); SetValue(param20);" noclick="true"/>
 
 					<!-- HotKey used to select this item -->
-					<label x="0.5h" y="0.2h" width="100%" height="100%" textalign="left" textvalign="top" color="white" shadow="true" font="dyn_12" noclick="true" watch="ShopItem{index}" ontriggerlua="self:SetText(Translate(param13));" content="{index}" />
+					<frame width="30%" height="30%" align="left" valign="top" color="0 0 0 .7" bordercolor="gray" borderthickness="1" noclick="true"
+						watch="ShopItem{index}" ontriggerlua="if (param13 == '') then self:SetVisible(false) else self:SetVisible(true) end"
+					>
+						<label textalign="center" textvalign="center" color="white" shadow="true" font="dyn_10" noclick="true" watch="ShopItem{index}" ontriggerlua="self:SetText(Translate(param13))" content="{index}"/>
+					</frame>
 
-					<label x="-0.5h" y="0.2h" width="100%" height="100%" textalign="right" textvalign="top" color="white" shadow="true" font="dyn_12" noclick="true" watch="ShopItem{index}" ontriggerlua="self:SetText(param19);"/>
+					<frame width="30%" height="30%" align="right" valign="top" color="0 0 0 .7" bordercolor="gray" borderthickness="1" noclick="true"
+						watch="ShopItem{index}" ontriggerlua="self:SetVisible(AtoN(param19))"
+					>
+						<label textalign="center" textvalign="center" color="white" shadow="true" font="dyn_10" noclick="true" watch="ShopItem{index}" ontriggerlua="self:SetText(param19)"/>
+					</frame>
 
 					<frame
-						borderthickness="4"
+						borderthickness="1"
 						bordercolor="yellow"
 						color="invisible"
 						visible="true"
@@ -456,7 +468,7 @@
 						noclick="true"
 						passivechildren="true"
 					>
-						<image x="3" y="3" width="-6" height="-6" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
+						<image x="1" y="1" width="-2" height="-2" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
 					</frame>
 
 					<image
@@ -472,12 +484,17 @@
 						noclick="true"
 					/>
 
+					<!-- Cost -->
+					<panel x="1" y="-1" width="-2" height="25%" color="0 0 0 .7" valign="bottom" noclick="true">
+						<label textalign="center" textvalign="center" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontriggerlua="self:SetText(param4);" />
+					</panel>
+
 					<image
 						texture="/ui/common/new_shop_interface/magnify.tga"
-						x="10%"
-						y="10%"
-						height="40%"
-						width="40%"
+						x="-1"
+						y="-15%"
+						height="30%"
+						width="30%"
 						align="right"
 						valign="bottom"
 						watch="ShopItem{index}"
@@ -488,8 +505,6 @@
 					<!-- Cooldown timer -->
 					<label noclick="1" valign="center" align="center" textvalign="center" textalign="center" color="#87CEEB" shadow="1" font="dyn_12" watch="ShopItem{index}" ontrigger="SetVisible(param21 gt 0); SetText(FtoT(param21, 1, 0, '-'));" />
 				</panel>
-				<!-- Cost -->
-				<label y="5.2h" height="1.0h" align="center" valign="top" textalign="center" textvalign="top" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontriggerlua="self:SetText(param4);" />
 			</panel>
 		</template>
 		
@@ -515,7 +530,7 @@
 					</panel>
 
 					<button
-						texture="/ui/elements/button_bevel_sml.tga"
+						texture="/ui/elements/optiui_button_bevel.tga"
 						onmouseoverlua="PlaySound('/shared/sounds/ui/button_over_03.wav') Trigger('shopGlobalItemTooltipIcon', Shop.recipe.cur.Texture) ShowWidget('{tooltip}{index}') ShowWidget('{tooltip}_short{index}')"
 						onmouseout="HideWidget('{tooltip}{index}'); HideWidget('{tooltip}_short{index}');"
 						onclick="PlaySound('/shared/sounds/ui/button_click_02.wav');
@@ -543,7 +558,7 @@
 
 					<!-- Owned Item Indicator -->
 					<frame
-						borderthickness="0.2h"
+						borderthickness="1"
 						color="invisible"
 						watch="{watch}{index}"
 						ontrigger="
@@ -571,12 +586,19 @@
 						ontrigger="SetVisible(param15 and !param17 and !param18);"
 						noclick="true"
 					/>
+
+					<!-- Cost -->
+					<panel x="1" y="-1" width="-2" height="25%" color="0 0 0 .7" valign="bottom" noclick="true">
+						<label textalign="center" textvalign="center" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontrigger="SetVisible(param8 and !param12); SetText(param4);" />
+						<label textalign="center" textvalign="center" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontrigger="SetVisible(param12); SetText(param5);" />
+					</panel>
+
 					<image
 						texture="/ui/common/new_shop_interface/magnify.tga"
-						x="10%"
-						y="10%"
-						height="40%"
-						width="40%"
+						x="-1"
+						y="-15%"
+						height="30%"
+						width="30%"
 						align="right"
 						valign="bottom"
 						watch="{watch}{index}"
@@ -585,14 +607,13 @@
 					/>
 
 					<!-- Hot Key -->
-					<label x="0.5h" y="0.2h" width="100%" height="100%" textalign="left" textvalign="top" color="white" shadow="true" font="dyn_11" noclick="true" watch="{watch}{index}" ontrigger="SetText(Translate(param13));" />
+					<frame width="30%" height="30%" align="left" valign="top" color="0 0 0 .7" bordercolor="gray" borderthickness="1" noclick="true">
+						<label textalign="center" textvalign="center" color="white" shadow="true" font="dyn_10" noclick="true" watch="{watch}{index}" ontrigger="SetText(Translate(param13));" />
+					</frame>
 
 					<!-- Cooldown timer -->
 					<label noclick="1" valign="center" align="center" textvalign="center" textalign="center" color="#87CEEB" shadow="1" font="dyn_12" watch="{watch}{index}" ontrigger="SetVisible(param21 gt 0); SetText(FtoT(param21, 1, 0, '-'));" />
 				</panel>
-				<!-- Cost -->
-				<label y="5.4h" height="1.0h" align="center" valign="top" textalign="center" textvalign="top" color="white" shadow="1" font="dyn_9" watch="{watch}{index}" ontrigger="SetVisible(param8 and !param12); SetText(param4);" />
-				<label y="5.4h" height="1.0h" align="center" valign="top" textalign="center" textvalign="top" color="white" shadow="1" font="dyn_9" watch="{watch}{index}" ontrigger="SetVisible(param12); SetText(param5);" />
 			</panel>
 		</template>
 	</if>
