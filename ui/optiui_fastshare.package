@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
 	<trigger name="sharing_update"/>
-	<panel x="2.0h" y="0" width="1.5h" height="1.5h" color="invisible">
+	<panel x="2.0h" y="0" width="90@" height="90%" color="invisible">
 		<image
 			width="90%" height="90%"
 			align="center" valign="center"

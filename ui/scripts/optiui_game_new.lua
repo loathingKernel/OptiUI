@@ -1444,9 +1444,9 @@ local function InitBottomCenterPanel()
 			--GetWidget('game_center_large_gear'):Rotate(30, 250)
 		end
 		if (skillPoints >= 1) then
-			GetWidget('game_center_levelup_btn_holder'):SetBorderColor("purple")
+			GetWidget('game_center_levelup_btn_holder_frame'):SetBorderColor("purple")
 		else
-			GetWidget('game_center_levelup_btn_holder'):SetBorderColor("gray")
+			GetWidget('game_center_levelup_btn_holder_frame'):SetBorderColor("gray")
 		end
 		GetWidget('game_center_portrait_glow'):SetVisible(skillPoints >= 1)
 		GetWidget('game_center_level_label'):SetText(currentLevel)
@@ -1784,9 +1784,9 @@ local function InitBottomSection()
 			--GetWidget('game_selected_info_building_stats'):SetX('-14.9h')
 			
 			GetWidget('game_selected_info_mult'):SetAlign('right')
-			GetWidget('game_selected_info_mult_backer'):SetAlign('right')
-			GetWidget('game_selected_info_mult_units'):SetAlign('right')
-			GetWidget('game_selected_info_mult_units'):SetX('0.0h')
+			-- GetWidget('game_selected_info_mult_backer'):SetAlign('right')
+			-- GetWidget('game_selected_info_mult_units'):SetAlign('right')
+			-- GetWidget('game_selected_info_mult_units'):SetX('-2')
 			
 			GetWidget('stash_parent'):SetAlign('right')
 			GetWidget('stash'):SetAlign('right')
@@ -1900,9 +1900,9 @@ local function InitBottomSection()
 			--GetWidget('game_selected_info_building_stats'):SetX('16.6h')
 
 			GetWidget('game_selected_info_mult'):SetAlign('left')
-			GetWidget('game_selected_info_mult_backer'):SetAlign('left')
-			GetWidget('game_selected_info_mult_units'):SetAlign('left')
-			GetWidget('game_selected_info_mult_units'):SetX('0.0h')
+			-- GetWidget('game_selected_info_mult_backer'):SetAlign('left')
+			-- GetWidget('game_selected_info_mult_units'):SetAlign('left')
+			-- GetWidget('game_selected_info_mult_units'):SetX('2')
 				
 			GetWidget('stash_parent'):SetAlign('left')
 			GetWidget('stash'):SetAlign('left')
