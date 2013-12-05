@@ -52,7 +52,7 @@
 					/>
 
 					<!-- Cooldown -->
-					<piegraph start="270" end="-90" square="true" color="#000000cc" watch="StashCooldown{slot}" ontrigger="SetVisible(param1 > 0); SetValue(param2);" noclick="true"/>
+					<piegraph x="-1" y="-1" width="-2" height="-2" start="270" end="-90" square="true" color="#000000cc" watch="StashCooldown{slot}" ontrigger="SetVisible(param1 > 0); SetValue(param2);" noclick="true"/>
 
 					<!-- Accessability Overlay -->
 					<image
@@ -161,7 +161,10 @@
 				);
 			"
 		>		
-			<frame name="stash" texture="/ui/frames/tooltip_bg.tga" color=".3 .35 .4 1" />			
+			<frame name="stash" texture="/ui/frames/tooltip_bg.tga" borderthickness=".6h" color=".3 .35 .4 1" noclick="true" >
+				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
+			</frame>
+
 			<panel name="game_stash_buttons" x="1.2h" y="-0.5h" width="15.5h" height="10.1h" align="left" valign="bottom" noclick="1" >
 				<instance name="stash_button" width="4.9h" height="4.9h" align="left"   valign="top"    slot="0" />
 				<instance name="stash_button" width="4.9h" height="4.9h" align="center" valign="top"    slot="1" />
@@ -287,12 +290,11 @@
 				<image texture="/ui/common/new_shop_interface/stash.tga" noclick="1" />
 				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
 			</panel> -->
-			<panel name="game_stash_label_parent" x="1.2h" y="0.0" width="15.5h" height="3.0h" align="left" color="black">
-				<panel name="game_stash_icon" width="100@" height="100%" align="left" noclick="1" color="black">
+			<frame name="game_stash_label_parent" x="1.2h" y="0.0" width="15.5h" height="3.0h" align="left" color="0 0 0 .7" bordercolor="gray" borderthickness="1" noclick="1">
+				<panel name="game_stash_icon" width="85@" height="85%" align="left" valign="center" noclick="1" color="invisible">
 					<image texture="/ui/common/new_shop_interface/stash.tga" noclick="1" />
 				</panel>
 				<label name="game_stash_label" textalign="center" textvalign="center" font="dyn_12" color="white" noclick="1">game_label_stash</label>
-				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
 				<!-- Tip Marks-->
 				<button name="game_stash_tip_stash"
 					width="85@" height="85%"
@@ -309,8 +311,7 @@
 						<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_over.tga" />
 					</widgetstate>
 				</button>
-			</panel>
-			<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>						
+			</frame>
 		</panel>
 	</template>
 	
