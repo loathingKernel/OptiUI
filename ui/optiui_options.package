@@ -72,4 +72,31 @@
 		onchange="If(_game_phase ge 5, Trigger(\\\'MiniMapPosition\\\'));"
 	/>
 
+	<!-- OptiShop -->
+	<instance mod_id="optiui_options" name="mod_header" label="Shop:" />
+	<instance mod_id="optiui_options" name="mod_checkbox"
+		cvar="cg_useNewShop2"
+		label="Use the new shop interface"
+		default="false"
+		tooltip="Disable this if you want to use OptiShop version of the old shop."
+		tooltip_width="43h"
+	/>
+	<!-- <instance mod_id="optiui_options" name="mod_slider"
+		cvar="optiui_OldShopAlpha"
+		label="Size (default size is 50%):"
+		layout="default"
+		cvartype="int"
+		default="50"
+		slider_step="1"
+		maxlabel="Max"
+		maxvalue="100"
+		minlabel="Min"
+		minvalue="0"
+		showpercent="true"
+		decimal="0"
+		showstep="true"
+		button_step="1"
+		onchange="If(_game_phase ge 5, Trigger(\\\'MiniMapPosition\\\'));"
+	/> -->
+
 </package>

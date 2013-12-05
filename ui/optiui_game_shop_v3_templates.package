@@ -353,6 +353,7 @@
 						onmouseover="PlaySound('/shared/sounds/ui/button_over_03.wav'); showWidget('shop_cat_tip{slot}');"
 						onmouseout="hideWidget('shop_cat_tip{slot}');"
 						onclick="PlaySound('/shared/sounds/ui/button_click_03.wav'); SetActiveShop('{shopname}');"
+						onrightclick="PlaySound('/shared/sounds/ui/button_click_03.wav'); SetActiveShop('{shopname}');"
 						interactive="false"
 						name="shop_category_button_{slot}"
 					/>
@@ -436,6 +437,15 @@
 						onclick="PlaySound('/shared/sounds/ui/button_click_02.wav'); Purchase('{index}');"
 						onrightclick=""
 						watch="ShopItem{index}"
+						ontrigger="
+							SetOnRightClick(
+								'PlaySound(\'/shared/sounds/ui/button_click_03.wav\');' #
+								If(param8,
+									'PurchaseRemainingComponents(\'' # param28 # '\')',
+									'PurchaseByName(\'' # param28 # '\');'
+								)
+							);
+						"
 						onmouseover="PlaySound('/shared/sounds/ui/button_over_03.wav');
 								ShowWidget('shop_item_tooltip{index}'); ShowWidget('shop_item_tooltip_short{index}');"
 						interactive="false"
@@ -560,8 +570,18 @@
 						texture="/ui/elements/optiui_button_bevel.tga"
 						onmouseoverlua="PlaySound('/shared/sounds/ui/button_over_03.wav') Trigger('shopGlobalItemTooltipIcon', Shop.recipe.cur.Texture) ShowWidget('{tooltip}{index}') ShowWidget('{tooltip}_short{index}')"
 						onmouseout="HideWidget('{tooltip}{index}'); HideWidget('{tooltip}_short{index}');"
-						onclick="PlaySound('/shared/sounds/ui/button_click_02.wav');
-							{cmd}('{index}');"
+						onclick="PlaySound('/shared/sounds/ui/button_click_02.wav'); {cmd}('{index}');"
+						onrightclick=""
+						watch="{watch}{index}"
+						ontrigger="
+							SetOnRightClick(
+								'PlaySound(\'/shared/sounds/ui/button_click_03.wav\');' #
+								If(param8,
+									'PurchaseRemainingComponents(\'' # param28 # '\')',
+									'PurchaseByName(\'' # param28 # '\');'
+								)
+							);
+						"
 						interactive="false"
 						name="shop_component_{usedin}{index}"
 					/><!-- The 'usedin' bit is just so that it has a unique name for things such as highlighting this exact icon in the tutorial - Merc -->
