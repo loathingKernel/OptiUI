@@ -72,4 +72,5 @@
 		onchange="If(_game_phase ge 5, Trigger(\\\'MiniMapPosition\\\'));"
 	/>
 
+	<!-- OptiShop -->
 </package>
