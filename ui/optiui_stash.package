@@ -161,7 +161,7 @@
 				);
 			"
 		>		
-			<frame name="stash" texture="/ui/frames/tooltip_bg.tga" borderthickness=".6h" color=".3 .35 .4 1" noclick="true" >
+			<frame name="stash" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 1" noclick="true" >
 				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 			</frame>
 

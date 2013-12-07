@@ -592,7 +592,10 @@ local function InitPlayerTopLeftInfo()
 	local function PlayerInfo(sourceWidget, _, playerColor)
 		-- OptiUI: Made icon_bg a frame and added level_bg color
 		GetWidget('game_top_left_hero_icon_bg'):SetBorderColor(playerColor)
+		GetWidget('game_top_left_hero_icon_bg'):SetColor(playerColor)
+		GetWidget('game_top_left_hero_icon_frame'):SetBorderColor(playerColor)
 		GetWidget('game_top_left_hero_level_bg'):SetColor(playerColor)
+		GetWidget('game_top_left_hero_level_bg'):SetBorderColor(playerColor)
 	end
 	interface:RegisterWatch('PlayerInfo', PlayerInfo)
 
@@ -969,8 +972,12 @@ local function InitAllyInfo()
 	local function AllyPlayerInfo(allyIndex, sourceWidget, playerName, playerColor, playerClient)
 		-- OptiUI: Set border color and bg color
 		--GetWidget('game_top_left_ally_parent_'..allyIndex):SetColor(playerColor)
+		GetWidget('game_top_left_ally_image_bg_'..allyIndex):SetColor(playerColor)
 		GetWidget('game_top_left_ally_image_bg_'..allyIndex):SetBorderColor(playerColor)
+		GetWidget('game_top_left_ally_image_frame_'..allyIndex):SetBorderColor(playerColor)
 		GetWidget('game_top_left_ally_level_bg_'..allyIndex):SetColor(playerColor)
+		GetWidget('game_top_left_ally_level_bg_'..allyIndex):SetBorderColor(playerColor)
+
 		Game.PlayerColorsByIndex = Game.PlayerColorsByIndex or {}
 		Game.PlayerColorsByIndex[allyIndex] = playerColor
 		
