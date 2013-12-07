@@ -853,29 +853,40 @@ local function InitAllyInfo()
 			GetWidget('game_ally_display_holder'):SetX("0.0h")
 			GetWidget('game_ally_display_holder'):SetY("-0.5h")
 
+			GetWidget('game_ally_display_holder'):SetWidth("107.0h")
+			GetWidget('game_ally_display_holder'):SetHeight("10.1h")
+
 			if GetCvarBoolMem('optiui_AllyFramesWide') then
-				GetWidget('game_ally_display_holder'):SetWidth("105.0h")
-				GetWidget('game_ally_display_holder'):SetHeight("10.1h")
+				GetWidget('game_top_left_ally_parent_1'):SetVAlign("bottom")
+				GetWidget('game_top_left_ally_parent_1'):SetX('0.0h')
+
+				GetWidget('game_top_left_ally_parent_2'):SetX('0.0h')
+
+				GetWidget('game_top_left_ally_parent_3'):SetVAlign("bottom")
 			else
-				GetWidget('game_ally_display_holder'):SetWidth("90.0h")
-				GetWidget('game_ally_display_holder'):SetHeight("13.5h")
+				GetWidget('game_top_left_ally_parent_1'):SetVAlign("top")
+				GetWidget('game_top_left_ally_parent_1'):SetX('8.0h')
+
+				GetWidget('game_top_left_ally_parent_2'):SetX('-8.0h')
+	
+				GetWidget('game_top_left_ally_parent_3'):SetVAlign("top")
+			end
+
+			for i=0,Game.MAX_ALLIES,1 do
+				GetWidget('game_top_left_ally_parent_'..i):SetY('0.0h')
 			end
 
 			GetWidget('game_top_left_ally_parent_0'):SetAlign("left")
 			GetWidget('game_top_left_ally_parent_0'):SetVAlign("top")
-			GetWidget('game_top_left_ally_parent_0'):SetY(0)
+			GetWidget('game_top_left_ally_parent_0'):SetX('0.0h')
 			
 			GetWidget('game_top_left_ally_parent_1'):SetAlign("left")
-			GetWidget('game_top_left_ally_parent_1'):SetVAlign("bottom")
-			GetWidget('game_top_left_ally_parent_1'):SetY(0)
 
 			GetWidget('game_top_left_ally_parent_2'):SetAlign("right")
 			GetWidget('game_top_left_ally_parent_2'):SetVAlign("top")
-			GetWidget('game_top_left_ally_parent_2'):SetY(0)
 
 			GetWidget('game_top_left_ally_parent_3'):SetAlign("right")
-			GetWidget('game_top_left_ally_parent_3'):SetVAlign("bottom")
-			GetWidget('game_top_left_ally_parent_3'):SetY(0)
+			GetWidget('game_top_left_ally_parent_3'):SetX('0.0h')
 		else
 			GetWidget('game_ally_display_holder'):SetAlign("top")
 			GetWidget('game_ally_display_holder'):SetVAlign("left")
@@ -884,28 +895,20 @@ local function InitAllyInfo()
 
 			if GetCvarBoolMem('optiui_AllyFramesWide') then
 				GetWidget('game_ally_display_holder'):SetWidth("13.5h")
-				GetWidget('game_ally_display_holder'):SetHeight("19.0h")
+				GetWidget('game_ally_display_holder'):SetHeight("21.0h")
 			else
 				GetWidget('game_ally_display_holder'):SetWidth("6.0h")
 				GetWidget('game_ally_display_holder'):SetHeight("28.0h")
 			end
 
-			GetWidget('game_top_left_ally_parent_0'):SetAlign("left")
-			GetWidget('game_top_left_ally_parent_0'):SetVAlign("top")
-			GetWidget('game_top_left_ally_parent_0'):SetY('0%')
-
-			GetWidget('game_top_left_ally_parent_1'):SetAlign("left")
-			GetWidget('game_top_left_ally_parent_1'):SetVAlign("top")
-			GetWidget('game_top_left_ally_parent_1'):SetY('25%')
-
-			GetWidget('game_top_left_ally_parent_2'):SetAlign("left")
-			GetWidget('game_top_left_ally_parent_2'):SetVAlign("top")
-			GetWidget('game_top_left_ally_parent_2'):SetY('50%')
-
-			GetWidget('game_top_left_ally_parent_3'):SetAlign("left")
-			GetWidget('game_top_left_ally_parent_3'):SetVAlign("top")
-			GetWidget('game_top_left_ally_parent_3'):SetY('75%')
+			for i=0,Game.MAX_ALLIES,1 do
+				GetWidget('game_top_left_ally_parent_'..i):SetX('0.0h')
+				GetWidget('game_top_left_ally_parent_'..i):SetAlign("left")
+				GetWidget('game_top_left_ally_parent_'..i):SetVAlign("top")
+				GetWidget('game_top_left_ally_parent_'..i):SetY(25*i..'%')
+			end
 		end
+
 	end
 	interface:RegisterWatch('optiui_AllyInfoPosition', PositionAllyInfo)
 	PositionAllyInfo()
