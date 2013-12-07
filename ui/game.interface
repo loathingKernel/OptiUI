@@ -2200,6 +2200,169 @@
 		</frame>
 	</template>
 
+	<template name="team_member_icon_panel_button" >
+		<panel name="game_top_left_ally_buttons_show_{index}" visible="true" >
+			<image texture="/ui/info/combobox_button_up.tga" rotation="270" />
+			<button 
+				color="invisible"
+				onclicklua="
+					GetWidget('game_top_left_ally_buttons_parent_{index}', 'game'):SetVisible(true)
+					GetWidget('game_top_left_ally_buttons_hide_{index}', 'game'):SetVisible(true)
+					GetWidget('game_top_left_ally_buttons_show_{index}', 'game'):SetVisible(false)
+				"
+			>
+			</button>
+		</panel>
+		<panel name="game_top_left_ally_buttons_hide_{index}" visible="false" >
+			<image texture="/ui/info/combobox_button_over.tga" rotation="270" />
+			<button 
+				color="invisible"
+				onclicklua="
+					GetWidget('game_top_left_ally_buttons_parent_{index}', 'game'):SetVisible(false)
+					GetWidget('game_top_left_ally_buttons_show_{index}', 'game'):SetVisible(true)
+					GetWidget('game_top_left_ally_buttons_hide_{index}', 'game'):SetVisible(false)
+				"
+			>
+			</button>
+		</panel>
+	</template>
+
+	<template name="team_member_icon_menu" >
+		<!-- Right Click Menu -->
+		<!-- UIScript -->
+		<menu
+			name="ally_right_click_menu_{index}"
+			width="0" height="0"
+			color="red"
+			listwidth="16.0h"
+			listpaddingy="1.0h"
+			itemoffsetx="0.5h"
+			itemoffsety="0.5h"
+			itemheight="2.2h"
+			itemwidth="94%"
+			highlight="under"
+			exteriorscrollbars="false"
+			onevent="	OpenMenu(true);
+						MoveToCursor();
+						UpdateMenuConditions();
+						BringToFront();"
+			onmouseoverlua="PlaySound('/shared/sounds/ui/ccpanel/button_over_02.wav')"
+			onloadlua="Set('right_click_ally_player_name_{index}', 'DefaultName', 'string');"
+			watch="AllyPlayerInfo{index}"
+			ontriggerlua="Set('right_click_ally_player_name_{index}', param0)"
+		>
+			<widgetstate statename="listbg">
+				<frame texture="/ui/frames/glass_header_big.tga" color="#233749" />
+				<frame color="invisible" bordercolor="#455166" borderthickness="3" />
+				<frame color="invisible" bordercolor="black" borderthickness="2" />
+			</widgetstate>
+			<widgetstate statename="itemhighlight">
+				<panel color="#263e51" />
+			</widgetstate>
+
+			<instance name="rightclick_menu_item2" index="0" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Trigger('show_rap_panel', GetCvarString('right_click_ally_player_name_{index}'))" label="game_menu_report_a_player" condition="ally_rap_available_{index}" />
+			<instance name="rightclick_menu_item2" index="1" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Game:ToggleIgnore(GetCvarString('right_click_ally_player_name_{index}'))" label="chat_opt_mute_player" condition="(!ChatIsIgnored(right_click_ally_player_name_{index}))" />
+			<instance name="rightclick_menu_item2" index="2" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Game:ToggleIgnore(GetCvarString('right_click_ally_player_name_{index}'))" label="chat_opt_unmute_player" condition="(ChatIsIgnored(right_click_ally_player_name_{index}))" />
+		</menu>
+	</template>
+
+	<template name="team_member_icon_portrait">
+		<panel width="{width}" height="{height}" noclick="true" >
+			<frame name="game_top_left_ally_image_bg_{index}" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" bordercolor="gray" color="gray" noclick="true" />
+			<frame name="game_top_left_ally_image_frame_{index}" texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="gray" color="invisible" noclick="true"/>
+
+			<panel width="-6" height="-6" align="center" valign="center" color="invisible" >
+				<image name="game_top_left_ally_image_{index}" />
+				<panel name="game_top_left_ally_dead_{index}" >
+					<image texture="/ui/legion/dead.tga" />
+					<label name="game_top_left_ally_respawn_{index}" font="dyn_16" color="yellow" shadow="true" textalign="center" textvalign="center" />
+				</panel>
+
+				<!--  Voip Mic  -->
+				<panel name="game_top_left_ally_voip_{index}" noclick="1" width="90%" height="90%" color="invisible" align="center" valign="center" visible="1">
+					<modelpanel
+						visible="1"
+						width="100%"
+						height="100%"
+						noclick="true"
+						model="/ui/common/models/arcade_text/invis.mdf"
+						anim="idle"
+						camerapos="-5 200 25"
+						cameraangles="0 0 180"
+						camerafov="10"
+						cameranear="1"
+						carmerafar="5000"
+						depthclear="false"
+						depthcompress="true"
+						sunazimuth="-90"
+						sunaltitude="180"
+						suncolor="2 2 2"
+						onshow="SetAnim('idle'); SetEffect('/shared/effects/talking.effect');"
+					/>
+				</panel>
+				
+				<panel name="game_top_left_ally_afk_{index}" >
+					<label
+						width="100%" height="100%"
+						textalign="center" textvalign="center"
+						color="white" shadow="true"
+						font="dyn_14"
+						content="AFK"
+					/>
+				</panel>
+
+				<panel name="game_top_left_ally_dc_{index}" >
+					<panel color="0 0 0 .5"/>
+					<image width="90%" height="90%" align="center" valign="center" texture="/ui/elements/disconnect.tga" />
+					<label name="game_top_left_ally_dc_label_{index}"
+						width="100%" height="100%"
+						textalign="center" textvalign="bottom"
+						color="white" shadow="true"
+						font="dyn_10"
+					/>
+				</panel>
+
+				<panel name="game_top_left_ally_load_{index}" >
+					<panel color="0 0 0 .5"/>
+					<image width="90%" height="90@" align="center" valign="center" texture="/ui/elements/lobby/icon_loading.tga" />
+					<label name="game_top_left_ally_load_label_{index}"
+						width="100%" height="100%"
+						textalign="center" textvalign="center"
+						color="white" outline="true"
+						font="dyn_10"
+					/>
+				</panel>
+
+				<!-- UIScript -->
+				<button name="ally_right_click_menu_button_{index}"
+					color="invisible"
+					onclick="SelectUnit(AllyIndex{index});"
+					onmouseoverlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(0)"
+					interactive="false"
+				/>
+
+				<!-- Item catcher -->
+				<!-- UIScript -->
+				<panel
+					color="invisible"
+					texture="/ui/info/drop.tga"
+					watch="ItemCursorVisible"
+					ontrigger="SetVisible(ItemCursorVisible); RefreshCursor();"
+					onmouseoverlua="self:SetColor('white')"
+					onmouseoutlua="self:SetColor('invisible')"
+					onclick="ItemPlaceEntity(AllyIndex{index});"
+					onrightclick="ItemPlaceEntity(AllyIndex{index});"
+				/>
+			</panel>
+
+			<!-- Ally Level -->
+			<frame name="game_top_left_ally_level_bg_{index}" height="35%" width="35%" align="right" valign="bottom" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".2h" noclick="true">
+				<label name="game_top_left_ally_level_label_{index}" width="100%" height="100%" textalign="center" textvalign="center" font="dyn_9" color="yellow" outline="true" noclick="true" />
+			</frame>
+		</panel>
+	</template>
+
 	<template name="team_member_icon">
 		<!-- OptiUI: Added x position variable -->
 		<panel name="game_top_left_ally_parent_{index}" x="{x}" y="{y}" width="6.0h" height="6.7h" align="{align}" valign="{valign}" noclick="true" sticky="true" stickytoinvis="false" group="{group}">
@@ -2208,101 +2371,9 @@
 
 			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .75" noclick="true" >
 				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
-				<!-- Portrait Icon -->
-				<panel width="4.0h" height="4.0h" noclick="true" >
-					<frame name="game_top_left_ally_image_bg_{index}" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" bordercolor="gray" color="gray" noclick="true" />
-					<frame name="game_top_left_ally_image_frame_{index}" texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="gray" color="invisible" noclick="true"/>
-
-					<panel width="-6" height="-6" align="center" valign="center" color="invisible" >
-						<image name="game_top_left_ally_image_{index}" />
-						<panel name="game_top_left_ally_dead_{index}" >
-							<image texture="/ui/legion/dead.tga" />
-							<label name="game_top_left_ally_respawn_{index}" font="dyn_16" color="yellow" shadow="true" textalign="center" textvalign="center" />
-						</panel>
-
-						<!--  Voip Mic  -->
-						<panel name="game_top_left_ally_voip_{index}" noclick="1" width="90%" height="90%" color="invisible" align="center" valign="center" visible="1">
-							<modelpanel
-								visible="1"
-								width="100%"
-								height="100%"
-								noclick="true"
-								model="/ui/common/models/arcade_text/invis.mdf"
-								anim="idle"
-								camerapos="-5 200 25"
-								cameraangles="0 0 180"
-								camerafov="10"
-								cameranear="1"
-								carmerafar="5000"
-								depthclear="false"
-								depthcompress="true"
-								sunazimuth="-90"
-								sunaltitude="180"
-								suncolor="2 2 2"
-								onshow="SetAnim('idle'); SetEffect('/shared/effects/talking.effect');"
-							/>
-						</panel>
-						
-						<panel name="game_top_left_ally_afk_{index}" >
-							<label
-								width="100%" height="100%"
-								textalign="center" textvalign="center"
-								color="white" shadow="true"
-								font="dyn_14"
-								content="AFK"
-							/>
-						</panel>
-
-						<panel name="game_top_left_ally_dc_{index}" >
-							<panel color="0 0 0 .5"/>
-							<image width="90%" height="90%" align="center" valign="center" texture="/ui/elements/disconnect.tga" />
-							<label name="game_top_left_ally_dc_label_{index}"
-								width="100%" height="100%"
-								textalign="center" textvalign="bottom"
-								color="white" shadow="true"
-								font="dyn_10"
-							/>
-						</panel>
-
-						<panel name="game_top_left_ally_load_{index}" >
-							<panel color="0 0 0 .5"/>
-							<image width="90%" height="90@" align="center" valign="center" texture="/ui/elements/lobby/icon_loading.tga" />
-							<label name="game_top_left_ally_load_label_{index}"
-								width="100%" height="100%"
-								textalign="center" textvalign="center"
-								color="white" outline="true"
-								font="dyn_10"
-							/>
-						</panel>
-
-						<!-- UIScript -->
-						<button name="ally_right_click_menu_button_{index}"
-							color="invisible"
-							onclick="SelectUnit(AllyIndex{index});"
-							onmouseoverlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(1)"
-							onmouseoutlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(0)"
-							interactive="false"
-						/>
-
-						<!-- Item catcher -->
-						<!-- UIScript -->
-						<panel
-							color="invisible"
-							texture="/ui/info/drop.tga"
-							watch="ItemCursorVisible"
-							ontrigger="SetVisible(ItemCursorVisible); RefreshCursor();"
-							onmouseoverlua="self:SetColor('white')"
-							onmouseoutlua="self:SetColor('invisible')"
-							onclick="ItemPlaceEntity(AllyIndex{index});"
-							onrightclick="ItemPlaceEntity(AllyIndex{index});"
-						/>
-					</panel>
-
-					<!-- Ally Level -->
-					<frame name="game_top_left_ally_level_bg_{index}" height="35%" width="35%" align="right" valign="bottom" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".2h" noclick="true">
-						<label name="game_top_left_ally_level_label_{index}" width="100%" height="100%" textalign="center" textvalign="center" font="dyn_9" color="yellow" outline="true" noclick="true" />
-					</frame>
-				</panel>
+				
+				<!-- OptiUI: Portrait -->
+				<instance name="team_member_icon_portrait" width="4.0h" height="4.0h" index="{index}" />
 
 				<!-- Ally Ability Status Lights -->
 				<panel name="game_top_left_ally_status_light_{index}" x="-1" y="1" width="1.3h" height="4.5h" align="right" float="bottom" padding="1%" color="invisible" noclick="1" passivechildren="true">
@@ -2329,70 +2400,14 @@
 
 				<!-- OptiUI: Open ally buttons panel button. This is ugly and needs fixing. -->
 				<panel name="game_top_left_ally_button_{index}" x="-1" y="-1" width="1.5h" height="1.5h" align="right" valign="bottom" color="invisible">
-					<panel name="game_top_left_ally_buttons_show_{index}" visible="true" >
-						<image texture="/ui/info/combobox_button_up.tga" rotation="270" />
-						<button 
-							color="invisible"
-							onclicklua="
-								GetWidget('game_top_left_ally_buttons_parent_{index}', 'game'):SetVisible(true)
-								GetWidget('game_top_left_ally_buttons_hide_{index}', 'game'):SetVisible(true)
-								GetWidget('game_top_left_ally_buttons_show_{index}', 'game'):SetVisible(false)
-							"
-						>
-						</button>
-					</panel>
-					<panel name="game_top_left_ally_buttons_hide_{index}" visible="false" >
-						<image texture="/ui/info/combobox_button_over.tga" rotation="270" />
-						<button 
-							color="invisible"
-							onclicklua="
-								GetWidget('game_top_left_ally_buttons_parent_{index}', 'game'):SetVisible(false)
-								GetWidget('game_top_left_ally_buttons_show_{index}', 'game'):SetVisible(true)
-								GetWidget('game_top_left_ally_buttons_hide_{index}', 'game'):SetVisible(false)
-							"
-						>
-						</button>
-					</panel>
+					<instance name="team_member_icon_panel_button" index="{index}" />
 				</panel>
 				<!-- OptiUI: end -->
-
-				<!-- Right Click Menu -->
-				<!-- UIScript -->
-				<menu
-					name="ally_right_click_menu_{index}"
-					width="0" height="0"
-					color="red"
-					listwidth="16.0h"
-					listpaddingy="1.0h"
-					itemoffsetx="0.5h"
-					itemoffsety="0.5h"
-					itemheight="2.2h"
-					itemwidth="94%"
-					highlight="under"
-					exteriorscrollbars="false"
-					onevent="	OpenMenu(true);
-								MoveToCursor();
-								UpdateMenuConditions();
-								BringToFront();"
-					onmouseoverlua="PlaySound('/shared/sounds/ui/ccpanel/button_over_02.wav')"
-					onloadlua="Set('right_click_ally_player_name_{index}', 'DefaultName', 'string');"
-					watch="AllyPlayerInfo{index}"
-					ontriggerlua="Set('right_click_ally_player_name_{index}', param0)"
-				>
-					<widgetstate statename="listbg">
-						<frame texture="/ui/frames/glass_header_big.tga" color="#233749" />
-						<frame color="invisible" bordercolor="#455166" borderthickness="3" />
-						<frame color="invisible" bordercolor="black" borderthickness="2" />
-					</widgetstate>
-					<widgetstate statename="itemhighlight">
-						<panel color="#263e51" />
-					</widgetstate>
-
-					<instance name="rightclick_menu_item2" index="0" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Trigger('show_rap_panel', GetCvarString('right_click_ally_player_name_{index}'))" label="game_menu_report_a_player" condition="ally_rap_available_{index}" />
-					<instance name="rightclick_menu_item2" index="1" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Game:ToggleIgnore(GetCvarString('right_click_ally_player_name_{index}'))" label="chat_opt_mute_player" condition="(!ChatIsIgnored(right_click_ally_player_name_{index}))" />
-					<instance name="rightclick_menu_item2" index="2" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Game:ToggleIgnore(GetCvarString('right_click_ally_player_name_{index}'))" label="chat_opt_unmute_player" condition="(ChatIsIgnored(right_click_ally_player_name_{index}))" />
-				</menu>
 			</frame>
+
+			<!-- Right Click Menu -->
+			<instance name="team_member_icon_menu" index="{index}" />
+
 		</panel>
 	</template>
 
@@ -2406,101 +2421,8 @@
 			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .75" noclick="true" >
 				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 				
-				<!-- Portrait Icon -->
-				<panel width="4.5h" height="4.5h" noclick="true" >
-					<frame name="game_top_left_ally_image_bg_{index}" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" bordercolor="gray" color="gray" noclick="true" />
-					<frame name="game_top_left_ally_image_frame_{index}" texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="gray" color="invisible" noclick="true"/>
-
-					<panel width="-6" height="-6" align="center" valign="center" color="invisible" >
-						<image name="game_top_left_ally_image_{index}" />
-						<panel name="game_top_left_ally_dead_{index}" >
-							<image texture="/ui/legion/dead.tga" />
-							<label name="game_top_left_ally_respawn_{index}" font="dyn_16" color="yellow" shadow="true" textalign="center" textvalign="center" />
-						</panel>
-
-						<!--  Voip Mic  -->
-						<panel name="game_top_left_ally_voip_{index}" noclick="1" width="90%" height="90%" color="invisible" align="center" valign="center" visible="1">
-							<modelpanel
-								visible="1"
-								width="100%"
-								height="100%"
-								noclick="true"
-								model="/ui/common/models/arcade_text/invis.mdf"
-								anim="idle"
-								camerapos="-5 200 25"
-								cameraangles="0 0 180"
-								camerafov="10"
-								cameranear="1"
-								carmerafar="5000"
-								depthclear="false"
-								depthcompress="true"
-								sunazimuth="-90"
-								sunaltitude="180"
-								suncolor="2 2 2"
-								onshow="SetAnim('idle'); SetEffect('/shared/effects/talking.effect');"
-							/>
-						</panel>
-						
-						<panel name="game_top_left_ally_afk_{index}" >
-							<label
-								width="100%" height="100%"
-								textalign="center" textvalign="center"
-								color="white" shadow="true"
-								font="dyn_14"
-								content="AFK"
-							/>
-						</panel>
-
-						<panel name="game_top_left_ally_dc_{index}" >
-							<panel color="0 0 0 .5"/>
-							<image width="90%" height="90%" align="center" valign="center" texture="/ui/elements/disconnect.tga" />
-							<label name="game_top_left_ally_dc_label_{index}"
-								width="100%" height="100%"
-								textalign="center" textvalign="bottom"
-								color="white" shadow="true"
-								font="dyn_10"
-							/>
-						</panel>
-
-						<panel name="game_top_left_ally_load_{index}" >
-							<panel color="0 0 0 .5"/>
-							<image width="90%" height="90@" align="center" valign="center" texture="/ui/elements/lobby/icon_loading.tga" />
-							<label name="game_top_left_ally_load_label_{index}"
-								width="100%" height="100%"
-								textalign="center" textvalign="center"
-								color="white" outline="true"
-								font="dyn_10"
-							/>
-						</panel>
-
-						<!-- UIScript -->
-						<button name="ally_right_click_menu_button_{index}"
-							color="invisible"
-							onclick="SelectUnit(AllyIndex{index});"
-							onmouseoverlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(1)"
-							onmouseoutlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(0)"
-							interactive="false"
-						/>
-
-						<!-- Item catcher -->
-						<!-- UIScript -->
-						<panel
-							color="invisible"
-							texture="/ui/info/drop.tga"
-							watch="ItemCursorVisible"
-							ontrigger="SetVisible(ItemCursorVisible); RefreshCursor();"
-							onmouseoverlua="self:SetColor('white')"
-							onmouseoutlua="self:SetColor('invisible')"
-							onclick="ItemPlaceEntity(AllyIndex{index});"
-							onrightclick="ItemPlaceEntity(AllyIndex{index});"
-						/>
-					</panel>
-
-					<!-- Ally Level -->
-					<frame name="game_top_left_ally_level_bg_{index}" height="35%" width="35%" align="right" valign="bottom" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".2h" noclick="true">
-						<label name="game_top_left_ally_level_label_{index}" width="100%" height="100%" textalign="center" textvalign="center" font="dyn_9" color="yellow" outline="true" noclick="true" />
-					</frame>
-				</panel>
+				<!-- OptiUI: Portrait -->
+				<instance name="team_member_icon_portrait" width="4.5h" height="4.5h" index="{index}" />
 
 				<!-- Ally Ability Status Lights -->
 				<panel name="game_top_left_ally_status_light_{index}" x="-1.4h" y="0" width="7.4h" height="1.5h" align="right" valign="bottom" float="right" padding="1%" color="invisible" noclick="1" passivechildren="true">
@@ -2529,71 +2451,16 @@
 
 				<!-- OptiUI: Open ally buttons panel button. This is ugly and needs fixing. -->
 				<panel name="game_top_left_ally_button_{index}" x="0" y="0" width="1.2h" height="1.5h" align="right" valign="bottom" color="invisible">
-					<panel name="game_top_left_ally_buttons_show_{index}" visible="true" >
-						<image height="90%" texture="/ui/common/ability_toggle_up.tga" rotation="90" />
-						<button 
-							color="invisible"
-							onclicklua="
-								GetWidget('game_top_left_ally_buttons_parent_{index}', 'game'):SetVisible(true)
-								GetWidget('game_top_left_ally_buttons_hide_{index}', 'game'):SetVisible(true)
-								GetWidget('game_top_left_ally_buttons_show_{index}', 'game'):SetVisible(false)
-							"
-						/>
-					</panel>
-					<panel name="game_top_left_ally_buttons_hide_{index}" visible="false" >
-						<image height="90%" texture="/ui/common/ability_toggle_down.tga" rotation="90" />
-						<button 
-							color="invisible"
-							onclicklua="
-								GetWidget('game_top_left_ally_buttons_parent_{index}', 'game'):SetVisible(false)
-								GetWidget('game_top_left_ally_buttons_show_{index}', 'game'):SetVisible(true)
-								GetWidget('game_top_left_ally_buttons_hide_{index}', 'game'):SetVisible(false)
-							"
-						/>
-					</panel>
+					<instance name="team_member_icon_panel_button" index="{index}" />
 				</panel>
+				<!-- OptiUI: end -->
 			</frame>
-			<!-- OptiUI: end -->
 
 			<!-- Right Click Menu -->
-			<!-- UIScript -->
-			<menu
-				name="ally_right_click_menu_{index}"
-				width="0" height="0"
-				color="red"
-				listwidth="16.0h"
-				listpaddingy="1.0h"
-				itemoffsetx="0.5h"
-				itemoffsety="0.5h"
-				itemheight="2.2h"
-				itemwidth="94%"
-				highlight="under"
-				exteriorscrollbars="false"
-				onevent="	OpenMenu(true);
-							MoveToCursor();
-							UpdateMenuConditions();
-							BringToFront();"
-				onmouseoverlua="PlaySound('/shared/sounds/ui/ccpanel/button_over_02.wav')"
-				onloadlua="Set('right_click_ally_player_name_{index}', 'DefaultName', 'string');"
-				watch="AllyPlayerInfo{index}"
-				ontriggerlua="Set('right_click_ally_player_name_{index}', param0)"
-			>
-				<widgetstate statename="listbg">
-					<frame texture="/ui/frames/glass_header_big.tga" color="#233749" />
-					<frame color="invisible" bordercolor="#455166" borderthickness="3" />
-					<frame color="invisible" bordercolor="black" borderthickness="2" />
-				</widgetstate>
-				<widgetstate statename="itemhighlight">
-					<panel color="#263e51" />
-				</widgetstate>
+			<instance name="team_member_icon_menu" index="{index}" />
 
-				<instance name="rightclick_menu_item2" index="0" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Trigger('show_rap_panel', GetCvarString('right_click_ally_player_name_{index}'))" label="game_menu_report_a_player" condition="ally_rap_available_{index}" />
-				<instance name="rightclick_menu_item2" index="1" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Game:ToggleIgnore(GetCvarString('right_click_ally_player_name_{index}'))" label="chat_opt_mute_player" condition="(!ChatIsIgnored(right_click_ally_player_name_{index}))" />
-				<instance name="rightclick_menu_item2" index="2" commandlua="PlaySound('/shared/sounds/ui/ccpanel/button_click_01.wav') Game:ToggleIgnore(GetCvarString('right_click_ally_player_name_{index}'))" label="chat_opt_unmute_player" condition="(ChatIsIgnored(right_click_ally_player_name_{index}))" />
-			</menu>
 		</panel>
 	</template>
-
 
 	<template name="minimap_inventory_item">
 		<panel width="100@" height="100%" noclick="true">
