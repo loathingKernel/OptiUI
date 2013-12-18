@@ -330,19 +330,57 @@
 			noclick="1"
 		>
 			<panel x="0" y="0" align="center" valign="center" height="4.0h" width="4.0h" >
-				<instance name="shared_ability_button" slot="{slot}"/>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+				<instance name="shared_ability_button" slot="{slot}" bordercolor="{bordercolor}"/>
 			</panel>
-			<!-- <image width="7.0h" height="7.0h" align="center" valign="center" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
 		</panel>
+	</template>
+
+	<!-- OptiUI: Manacost label -->
+	<template name="ability_frame_manacost">
+		<label x="{x}" fitx="1" align="right" textalign="center" textvalign="center" color="gray" font="{font=dyn_10}" outline="1"
+			watch="ActiveInventoryDescription{slot}"
+			ontriggerlua="
+				if (tonumber(param2) and (tonumber(param2) > 0.0)) then
+					self:SetColor('cyan')
+					self:SetText(round(param2))
+				else
+					self:SetText('-')
+					self:SetColor('gray')
+				end
+				Game.manaCost{slot} = tonumber(param2)
+			"
+			watch2="ActiveInventoryExists{slot}"
+			ontrigger2lua="
+				if (not AtoB(param)) then
+					self:SetText('-')
+					self:SetColor('gray')
+				elseif ((Game.manaCost{slot} ~= nil) and (Game.manaCost{slot} > 0.0)) then
+					self:SetColor('cyan')
+					self:SetText(round(Game.manaCost{slot}))
+				end
+			"
+			onshowlua="
+				local widget = self
+				widget:SetColor('gray')
+				local f = function(_, mana)
+					if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
+						widget:SetColor('cyan')
+					else
+						widget:SetColor('gray')
+					end
+				end
+				self:RegisterWatch('ActiveMana', f)
+			"
+			onhidelua="self:UnregisterWatch('ActiveMana')"
+		/>
 	</template>
 
 	<!-- ability frame templates-->
 	<template name="ability_frame_single">
 		<!-- SINGLE-->
 		<panel
-			width="5.5h"
-			height="100%"
+			width="9.0h"
+			height="5.5h"
 			align="center"
 			valign="center"
 			color="invisible"
@@ -351,49 +389,29 @@
 			sticky="true"
 			stickytoinvis="false"
 			visible="false"
-			noclick="1"
+			noclick="true"
 		>
-			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="5.5h" color="black">
+			<panel align="center" width="100@" height="100%" color="invisible" noclick="true">
+				<frame borderthickness="1" bordercolor="gray" color="black" noclick="true" />
+
 				<instance name="ability_button" slot="{slot}"/>
-			</panel>
-			<!-- mana cost -->
-			<!-- OptiUI: Added ability lvl label next to mana cost -->
-			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="5.5h" noclick="true"
-				watch="ActiveInventoryExists{slot}"
-				ontriggerlua="self:SetVisible(AtoB(param))"
-			>
-				<panel x="0h" y="0h" align="center" valign="bottom" height="33.3%" width="100%" color="0 0 0 0.6" noclick="1" 
-					watch="ActiveInventoryStatus{slot}"
-					ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetVisible(1) else self:SetVisible(0) end"
+
+				<!-- mana cost -->
+				<panel x="1" y="-1" width="-2" height="30.0%" valign="bottom" passivechildren="true" noclick="true"
+					watch="ActiveInventoryExists{slot}"
+					ontriggerlua="self:SetVisible(AtoB(param))"
 				>
-					<!-- <image width="8.9h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
-					<label x="0.5h" y="0h" fitx="1" fity="1" align="left" valign="center" textalign="left" textvalign="center" color="yellow" font="dyn_10" outline="1" noclick="1"
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 0 0 .7" />
+
+					<label x="0h" fitx="1" align="left" textalign="center" textvalign="center" color="yellow" font="dyn_10" outline="1"
 						watch="ActiveInventoryStatus{slot}"
-						ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetText(AtoN(param5)) end"
+						ontriggerlua="self:SetText(AtoN(param5)) self:SetVisible(AtoN(param5))"
 					/>
-					<label x="-0.5h" y="0h" fitx="1" fity="1" align="right" valign="center" textalign="right" textvalign="center" color="cyan" font="dyn_10" outline="1" noclick="1"
-						watch="ActiveInventoryDescription{slot}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
-						watch2="ActiveInventoryExists{slot}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot} ~= nil) and (Game.manaCost{slot} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot})) end"
-						onshowlua="
-							local widget = self
-							widget:SetColor('cyan')
-							local f = function(_, mana)
-								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('cyan')
-								else
-									widget:SetColor('gray')
-								end
-							end
-							self:RegisterWatch('ActiveMana', f)
-						"
-						onhidelua="self:UnregisterWatch('ActiveMana')"
-					/>
+					<instance name="ability_frame_manacost" slot="{slot}" x="-05%" font="dyn_10" />
 				</panel>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
-			<frame width="5.5h" height="5.5h" align="center" valign="center" color="invisible" bordercolor="#00FF00" borderthickness="0.1h" visible="false" watch="HeroLevelupMode" ontriggerlua="self:SetVisible(AtoB(param))" noclick="true"/>
+			<frame width="100@" height="100%" align="center" valign="center" color="invisible" bordercolor="#00FF00" borderthickness="0.1h" visible="false" watch="HeroLevelupMode" ontriggerlua="self:SetVisible(AtoB(param))" noclick="true"/>
 		</panel>
 	</template>
 
@@ -401,7 +419,7 @@
 		<!-- SINGLE plus ONE-->
 		<panel
 			width="9.0h"
-			height="100%"
+			height="5.5h"
 			align="center"
 			valign="center"
 			color="invisible"
@@ -410,68 +428,33 @@
 			sticky="true"
 			stickytoinvis="false"
 			visible="false"
+			noclick="true"
 		>
-			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="9h" noclick="1" color="black">
-				<panel x="0h" y="0h" valign="center" height="5.5h" width="5.5h" noclick="1">
+			<panel align="center" width="100%" height="100%" color="invisible" noclick="true">
+				<frame borderthickness="1" bordercolor="gray" color="black" noclick="true" />
+
+				<panel width="50%" height="50@" noclick="true">
 					<instance name="ability_button" slot="{slot_a}"/>
 				</panel>
-				<panel x="5.5h" y="0h" valign="top" height="3.5h" width="3.5h" noclick="1">
+				<panel width="50%" height="50@" align="right" noclick="true">
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
-				<!-- <image width="14.9h" height="7.45h" texture="/ui/common/ability_frame_1.tga" noclick="1" /> -->
-			</panel>
-			<!-- mana cost -->
-			<!-- OptiUI: Added ability lvl label next to mana cost -->
-			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="9h" noclick="1"
-				watch="ActiveInventoryExists{slot}"
-				ontriggerlua="self:SetVisible(AtoB(param))"
-			>
-				<panel x="0h" y="0h" align="center" valign="bottom" height="33.3%" width="100%" color="0 0 0 0.6" noclick="1">
-					<!-- <image x="2.2h" width="14.9h" align="center" valign="bottom" texture="/ui/common/mana_frame2.tga" noclick="1"/> -->
-					<label x="0.5h" y="0h" fitx="1" fity="1" align="left" valign="center" textalign="left" textvalign="center" color="yellow" font="dyn_10" outline="1" noclick="1"
+
+				<!-- mana cost -->
+				<panel x="1" y="-1" width="-2" height="30.0%" valign="bottom" passivechildren="true" noclick="true"
+					watch="ActiveInventoryExists{slot}"
+					ontriggerlua="self:SetVisible(AtoB(param))"
+				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 0 0 .7" />
+
+					<label x="0h" fitx="1" align="left" textalign="center" textvalign="center" color="yellow" font="dyn_10" outline="1"
 						watch="ActiveInventoryStatus{slot}"
-						ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetVisible(1) self:SetText(AtoN(param5)) else self:SetVisible(0) end"
+						ontriggerlua="self:SetText(AtoN(param5)) self:SetVisible(AtoN(param5))"
 					/>
-					<label x="-4.0h" y="0h" fitx="1" fity="1" align="right" valign="center" textalign="right" textvalign="center" font="dyn_10" color="white" outline="1" noclick="1"
-						watch="ActiveInventoryDescription{slot_a}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
-						watch2="ActiveInventoryExists{slot_a}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_a} ~= nil) and (Game.manaCost{slot_a} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot_a})) end"
-						onshowlua="
-							local widget = self
-							widget:SetColor('white')
-							local f = function(_, mana)
-								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('cyan')
-								else
-									widget:SetColor('gray')
-								end
-							end
-							self:RegisterWatch('ActiveMana', f)
-						"
-						onhidelua="self:UnregisterWatch('ActiveMana')"
-					/>
-					<label x="-0.5h" y="0h" fitx="1" fity="1" align="right" valign="center" textalign="right" textvalign="center" font="dyn_9" color="white" outline="1" noclick="1"
-						watch="ActiveInventoryDescription{slot_b}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
-						watch2="ActiveInventoryExists{slot_b}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_b} ~= nil) and (Game.manaCost{slot_b} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot_b})) end"
-						onshowlua="
-							local widget = self
-							widget:SetColor('white')
-							local f = function(_, mana)
-								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('cyan')
-								else
-									widget:SetColor('gray')
-								end
-							end
-							self:RegisterWatch('ActiveMana', f)
-						"
-						onhidelua="self:UnregisterWatch('ActiveMana')"
-					/>
+					<instance name="ability_frame_manacost" slot="{slot_a}" x="-55%" font="dyn_10" />
+					<instance name="ability_frame_manacost" slot="{slot_b}" x="-05%" font="dyn_9" />
 				</panel>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
 		</panel>
 	</template>
@@ -479,8 +462,8 @@
 	<template name="ability_frame_double">
 		<!-- double-->
 		<panel
-			width="8.0h"
-			height="100%"
+			width="9.0h"
+			height="5.5h"
 			align="center"
 			valign="center"
 			color="invisible"
@@ -489,69 +472,33 @@
 			sticky="true"
 			stickytoinvis="false"
 			visible="false"
+			noclick="true"
 		>
-			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="8.0h" noclick="1" color="black">
-				<panel x="0.0h" y="0h" height="4.00h" width="4.00h" >
+			<panel align="center" width="100%" height="100%" color="invisible" noclick="true">
+				<frame borderthickness="1" bordercolor="gray" color="black" noclick="true" />
+
+				<panel width="50%"  height="50@" >
 					<instance name="ability_button_small" slot="{slot_a}"/>
 				</panel>
-				<panel x="4.0h" y="0h" height="4.00h" width="4.00h">
+				<panel width="50%" height="50@" align="right" >
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
-				<!-- <image x="0h" y="0.5h" width="3.90h" height="3.90h" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
-				<!-- <image x="3.25h" y="0.5h" width="3.90h" height="3.90h" texture="/ui/common/ability_frame.tga" noclick="1" /> -->
-			</panel>
 
-			<!-- mana cost -->
-			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="8.0h" noclick="1"
-				watch="ActiveInventoryExists{slot}"
-				ontriggerlua="self:SetVisible(AtoB(param))"
-			>
-				<panel x="0h" y="0h" align="center" valign="bottom" height="33.3%" width="100%" color="0 0 0 0.6" noclick="1">
-					<!-- <image width="7.8h" align="center" valign="bottom" texture="/ui/common/mana_frame3.tga" noclick="1" visible="1"/> -->
-					<label x="0.5h" y="0h" fitx="1" fity="1" align="left" valign="center" textalign="left" textvalign="center" color="yellow" font="dyn_9" outline="1" noclick="1"
+				<!-- mana cost -->
+				<panel x="1" y="-1" width="-2" height="30.0%" valign="bottom" passivechildren="true" noclick="true"
+					watch="ActiveInventoryExists{slot}"
+					ontriggerlua="self:SetVisible(AtoB(param))"
+				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 0 0 .7" />
+
+					<label x="0h" fitx="1" align="left" textalign="center" textvalign="center" color="yellow" font="dyn_10" outline="1"
 						watch="ActiveInventoryStatus{slot}"
-						ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetVisible(1) self:SetText(AtoN(param5)) else self:SetVisible(0) end"
+						ontriggerlua="self:SetText(AtoN(param5)) self:SetVisible(AtoN(param5))"
 					/>
-					<label x="-4.25h" y="0h" fitx="1" fity="1" align="right" valign="center" textalign="right" textvalign="center" font="dyn_9" color="cyan" outline="1" noclick="1"
-						watch="ActiveInventoryDescription{slot_a}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_a} = tonumber(param2)"
-						watch2="ActiveInventoryExists{slot_a}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_a} ~= nil) and (Game.manaCost{slot_a} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot_a})) end"
-						onshowlua="
-							local widget = self
-							widget:SetColor('cyan')
-							local f = function(_, mana)
-								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('cyan')
-								else
-									widget:SetColor('gray')
-								end
-							end
-							self:RegisterWatch('ActiveMana', f)
-						"
-						onhidelua="self:UnregisterWatch('ActiveMana')"
-					/>
-					<label x="-0.25h" y="0h" fitx="1" fity="1" align="right" valign="center" textalign="right" textvalign="center" font="dyn_9" color="cyan" outline="1" noclick="1"
-						watch="ActiveInventoryDescription{slot_b}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot_b} = tonumber(param2)"
-						watch2="ActiveInventoryExists{slot_b}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot_b} ~= nil) and (Game.manaCost{slot_b} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot_b})) end"
-						onshowlua="
-							local widget = self
-							widget:SetColor('cyan')
-							local f = function(_, mana)
-								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('cyan')
-								else
-									widget:SetColor('gray')
-								end
-							end
-							self:RegisterWatch('ActiveMana', f)
-						"
-						onhidelua="self:UnregisterWatch('ActiveMana')"
-					/>
+					<instance name="ability_frame_manacost" slot="{slot_a}" x="-55%" font="dyn_9" />
+					<instance name="ability_frame_manacost" slot="{slot_b}" x="-05%" font="dyn_9" />
 				</panel>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
 		</panel>
 	</template>
@@ -559,8 +506,9 @@
 	<template name="ability_frame_single_plus_two">
 		<!-- SINGLE plus TWO-->
 		<panel
-			width="7.0h"
-			height="100%"
+			width="9.0h"
+			height="5.5h"
+			align="center"
 			valign="center"
 			color="invisible"
 			watch="ActiveInventoryInterface{slot}"
@@ -593,7 +541,7 @@
 		<!-- Triple-->
 		<panel
 			width="9.0h"
-			height="100%"
+			height="5.5h"
 			align="center"
 			valign="center"
 			color="invisible"
@@ -602,52 +550,37 @@
 			sticky="true"
 			stickytoinvis="false"
 			visible="false"
+			noclick="true"
 		>
-			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="9.0h" noclick="1" color="black">
-				<panel x="0.0h" y="0h" height="3.0h" width="3.0h">
+			<panel align="center" width="100%" height="100%" color="invisible" noclick="true">
+				<frame borderthickness="1" bordercolor="gray" color="black" noclick="true" />
+
+				<panel width="33.0%" height="33.0@" >
 					<instance name="ability_button_small" slot="{slot_a}"/>
 				</panel>
 
-				<panel x="3.0h" y="0h" height="3.0h" width="3.0h">
+				<panel width="33.0%" height="33.0@" align="center" >
 					<instance name="ability_button_small" slot="{slot_b}"/>
 				</panel>
 
-				<panel x="6.0h" y="0h" height="3.0h" width="3.0h">
+				<panel width="33.0%" height="33.0@" align="right" >
 					<instance name="ability_button_small" slot="{slot_c}"/>
 				</panel>
-				<!-- <image align="center" y="-1.5h" height="8h" width="8h" texture="/ui/common/ability_frame_3.tga" noclick="1" /> -->
-			</panel>
-			<panel x="0" y="0" align="center" valign="center" height="5.5h" width="9.0h" noclick="1"
-				watch="ActiveInventoryExists{slot}"
-				ontriggerlua="self:SetVisible(AtoB(param))"
-			>
-				<panel x="0h" y="0h" align="center" valign="bottom" height="33.3%" width="100%" color="0 0 0 0.6" noclick="1" watch="ActiveInventoryDescription{slot}" ontriggerlua="self:SetVisible(tonumber(param2) > 0.0)">
-					<!-- <image width="9.4h" align="center" valign="bottom" texture="/ui/common/mana_frame.tga" noclick="1" /> -->
-					<label x="0.5h" y="0h" fitx="1" fity="1" align="left" valign="center" textalign="left" textvalign="center" color="yellow" font="dyn_10" outline="1" noclick="1"
+
+				<!-- mana cost -->
+				<panel x="1" y="-1" width="-2" height="30.0%" valign="bottom" passivechildren="true" noclick="true"
+					watch="ActiveInventoryExists{slot}"
+					ontriggerlua="self:SetVisible(AtoB(param))"
+				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 0 0 .7" />
+
+					<label x="0h" fitx="1" align="left" textalign="center" textvalign="center" color="yellow" font="dyn_10" outline="1"
 						watch="ActiveInventoryStatus{slot}"
-						ontriggerlua="if (AtoN(param5) and (AtoN(param5) > 0.0)) then self:SetVisible(1) self:SetText(AtoN(param5)) else self:SetVisible(0) end"
+						ontriggerlua="self:SetText(AtoN(param5)) self:SetVisible(AtoN(param5))"
 					/>
-					<label x="-0.5h"  y="0h" fitx="1" fity="1" align="right" valign="center" textalign="right" textvalign="center" font="dyn_10" color="cyan" outline="1" noclick="1"
-						watch="ActiveInventoryDescription{slot}"
-						ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetColor('cyan') self:SetText(round(param2)) else self:SetText('-') self:SetColor('gray') end Game.manaCost{slot} = tonumber(param2)"
-						watch2="ActiveInventoryExists{slot}"
-						ontrigger2lua="if (not AtoB(param)) then self:SetText('-') self:SetColor('gray') elseif ((Game.manaCost{slot} ~= nil) and (Game.manaCost{slot} > 0.0)) then self:SetColor('cyan') self:SetText(round(Game.manaCost{slot})) end"
-						onshowlua="
-							local widget = self
-							widget:SetColor('cyan')
-							local f = function(_, mana)
-								if ((tonumber(widget:GetValue()) ~= nil) and (tonumber(mana) >= tonumber(widget:GetValue()))) then
-									widget:SetColor('cyan')
-								else
-									widget:SetColor('gray')
-								end
-							end
-							self:RegisterWatch('ActiveMana', f)
-						"
-						onhidelua="self:UnregisterWatch('ActiveMana')"
-					/>
+					<instance name="ability_frame_manacost" slot="{slot}" x="-05%" font="dyn_10" />
 				</panel>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
 		</panel>
 	</template>
@@ -659,7 +592,6 @@
 				ontriggerlua="self:SetVisible(not AtoB(param))"
 			>
 				<image texture="/ui/legion/ability_coverup.tga"/>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
 			<!-- UIScript -->
 			<panel
@@ -691,14 +623,10 @@
 				<!-- Ability Icon -->
 				<image noclick="true" onloadlua="Game:RegisterAbilityIcon(self, {slot})" />
 
-				<piegraph
-					start="270"
-					end="-90"
-					square="true"
-					color="#000000cc"
-					noclick="true"
+				<piegraph start="270" end="-90" square="true" color="#000000cc" noclick="true"
 					onloadlua="Game:RegisterAbilityPie(self, {slot})"
 				/>
+
 				<!-- Ability Cooldown -->
 				<label noclick="1" valign="center" align="center" textvalign="center" textalign="center" color="#87CEEB" outline="1" font="dyn_12"
 					onloadlua="Game:RegisterAbilityCooldown(self, {slot})"
@@ -706,7 +634,7 @@
 				
 				<!-- Ability Timer -->
 				<label
-					y="0h"
+					y="0%"
 					width="100%"
 					height="33%"
 					valign="top"
@@ -720,6 +648,7 @@
 					watch="ActiveInventoryCharges{slot}"
 					ontriggerlua="if (tonumber(param) > 0) then self:SetVAlign('center') else self:SetVAlign('top') end"
 				/>
+
 				<!-- UIScript -->
 				<panel
 					onmouseoverlua="
@@ -749,13 +678,14 @@
 							self:SetColor('invisible')
 						end"
 				/>
+
 				<!-- UIScript -->
 				<button
 					rendermode="overlay"
-					onclicklua="PlaySound('/shared/sounds/ui/ability_select.wav')"
 					onclick="PrimaryAction({slot}); ActivateTool({slot});"
-					onrightclicklua="PlaySound('/shared/sounds/ui/ability_select.wav')"
 					onrightclick="SecondaryAction({slot}); ActivateToolSecondary({slot});"
+					onclicklua="PlaySound('/shared/sounds/ui/ability_select.wav')"
+					onrightclicklua="PlaySound('/shared/sounds/ui/ability_select.wav')"
 					onmouseoverlua="
 						if (GetCvarBool('cg_useLongTooltips')) then
 							GetWidget('ability_tooltip{slot}', 'game'):SetVisible(1)
@@ -796,10 +726,9 @@
 				<image align="center" valign="center" width="90%" height="90%" texture="elements/silence.tga" watch="Silenced" ontriggerlua="self:SetVisible(AtoB(param))" color="1 1 1 1" noclick="1" visible="0"/>
 
 				<!-- Ability Charges -->
-				<!-- OptiUI: Move charges indicator to top right corner to not interfere with the mana panel -->
 				<panel
-					width="33.3%"
-					height="33.3%"
+					width="35%"
+					height="35%"
 					align="right"
 					valign="top"
 					watch="ActiveInventoryCharges{slot}"
@@ -811,74 +740,18 @@
 					<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_8"
 						watch="ActiveInventoryCharges{slot}"
 						ontriggerlua="self:SetText(param)"/>
-					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
+					<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1" />
 				</panel>
 
-				<!-- Ability Refresh effect -->
-				<!-- UIScript -->
-				<modelpanel
-					visible="0"
-					noclick="true"
-					model="common/models/refresh/refresh.mdf"
-					anim="idle"
-					effect="common/models/refresh/refresh.effect"
-					camerapos="0 1 0"
-					cameraangles="0 0 180"
-					camerafov="45"
-					cameranear="1"
-					carmerafar="100"
-					depthclear="false"
-					depthcompress="true"
-					watch="EventActiveInventoryReady{slot}"
-					ontrigger="SetVisible(true); SetAnim('idle'); SetEffect('/ui/common/models/refresh/refresh.effect'); SleepWidget(1333, 'SetVisible(false);');"
-					onshowlua="PlaySound('/shared/sounds/ui/ability_refresh.wav')"
-				/>
-
-				<!-- Ability Targeting -->
-				<frame
-					borderthickness="1"
-					bordercolor="orange"
-					color="invisible"
-					visible="false"
-					watch="ActiveInventoryStatus{slot}"
-					ontriggerlua="self:SetVisible(AtoB(param8))"
-					noclick="true"
-					passivechildren="true"
-				>
-					<image x="1" y="1" width="-2" height="-2" color="orange" texture="/ui/fps/selected.tga" rendermode="additive"/>
-
+				<panel x="2" y="2" width="-4" height="-4" noclick="true" passivechildren="true" >
+					<!-- Ability Refresh effect -->
+					<!-- UIScript -->
 					<modelpanel
+						visible="0"
 						noclick="true"
-						model="effects/portrait_lvlup/portrait_emitter.mdf"
+						model="common/models/refresh/refresh.mdf"
 						anim="idle"
-						effect="effects/portrait_lvlup/ability_active.effect"
-						camerapos="-1 10 0"
-						cameraangles="0 0 180"
-						camerafov="60"
-						depthclear="false"
-						depthcompress="true"
-						onshow="SetEffect('/ui/effects/portrait_lvlup/ability_active.effect');"
-					/>
-				</frame>
-
-				<!-- Ability Toggle active -->
-				<frame
-					borderthickness="1"
-					bordercolor="orange"
-					color="invisible"
-					visible="false"
-					watch="ActiveInventoryStatus{slot}"
-					ontriggerlua="self:SetVisible(AtoB(param1))"
-					noclick="true"
-					passivechildren="true"
-				>
-					<!--<image x="2" y="2" width="-4" height="-4" color="orange" texture="/ui/fps/selected.tga" rendermode="additive"/>-->
-					<modelpanel
-						visible="1"
-						noclick="true"
-						model="common/models/toggle/toggle.mdf"
-						anim="idle"
-						effect="common/models/toggle/toggle.effect"
+						effect="common/models/refresh/refresh.effect"
 						camerapos="0 1 0"
 						cameraangles="0 0 180"
 						camerafov="45"
@@ -886,26 +759,335 @@
 						carmerafar="100"
 						depthclear="false"
 						depthcompress="true"
-						onshow="SetAnim('idle'); SetEffect('/ui/common/models/toggle/toggle.effect');"
+						watch="EventActiveInventoryReady{slot}"
+						ontrigger="SetVisible(true); SetAnim('idle'); SetEffect('/ui/common/models/refresh/refresh.effect'); SleepWidget(1333, 'SetVisible(false);');"
+						onshowlua="PlaySound('/shared/sounds/ui/ability_refresh.wav')"
 					/>
-				</frame>
 
-				<!-- Ability Activating -->
-				<frame
-					borderthickness="2"
-					bordercolor="yellow"
-					color="invisible"
-					visible="false"
-					watch="ActiveInventoryStatus{slot}"
-					ontriggerlua="self:SetVisible(AtoB(param4))"
+					<!-- Ability Targeting -->
+					<frame
+						borderthickness="1"
+						bordercolor="orange"
+						color="invisible"
+						visible="false"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetVisible(AtoB(param8))"
+						noclick="true"
+						passivechildren="true"
+					>
+						<image x="2" y="2" width="-4" height="-4" color="orange" texture="/ui/fps/selected.tga" rendermode="additive" />
+						<!-- <modelpanel
+							noclick="true"
+							model="effects/portrait_lvlup/portrait_emitter.mdf"
+							anim="idle"
+							effect="effects/portrait_lvlup/ability_active.effect"
+							camerapos="-1 10 0"
+							cameraangles="0 0 180"
+							camerafov="60"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetEffect('/ui/effects/portrait_lvlup/ability_active.effect');"
+						/> -->
+					</frame>
+
+					<!-- Ability Toggle active -->
+					<frame
+						borderthickness="1"
+						bordercolor="orange"
+						color="invisible"
+						visible="false"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetVisible(AtoB(param1))"
+						noclick="true"
+						passivechildren="true"
+					>
+						<!-- <image x="2" y="2" width="-4" height="-4" color="orange" texture="/ui/fps/selected.tga" rendermode="additive" /> -->
+						<modelpanel x="2" y="2" width="-4" height="-4"
+							visible="1"
+							noclick="true"
+							model="common/models/toggle/toggle.mdf"
+							anim="idle"
+							effect="common/models/toggle/toggle.effect"
+							camerapos="0 1 0"
+							cameraangles="0 0 180"
+							camerafov="45"
+							cameranear="1"
+							carmerafar="100"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetAnim('idle'); SetEffect('/ui/common/models/toggle/toggle.effect');"
+						/>
+					</frame>
+
+					<!-- Ability Activating -->
+					<frame
+						borderthickness="1"
+						bordercolor="yellow"
+						color="invisible"
+						visible="false"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetVisible(AtoB(param4))"
+						noclick="true"
+						passivechildren="true"
+					>
+						<image x="2" y="2" width="-4" height="-4" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
+					</frame>
+				</panel>
+			</panel>
+			<frame borderthickness="1" bordercolor="{bordercolor=gray}" color="invisible" noclick="true" />
+		</panel>
+	</template>
+
+	<template name="ability_button_small">
+		<panel>
+			<panel
+				watch="ActiveInventoryExists{slot}"
+				ontriggerlua="self:SetVisible(not AtoB(param))"
+			>
+				<image texture="/ui/legion/ability_coverup.tga"/>
+			</panel>
+			<!-- UIScript -->
+			<panel
+				watch="ActiveInventoryExists{slot}"
+				ontriggerlua="self:SetVisible(AtoB(param))"
+				onclick="PrimaryAction({slot});"
+				onrightclick="SecondaryAction({slot});"
+				onmouseoverlua="
+						if (GetCvarBool('cg_useLongTooltips')) then
+							GetWidget('ability_tooltip{slot}', 'game'):SetVisible(1)
+						else
+							GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(1)
+						end
+
+						if (GetCvarBool('cg_showAreaCast')) then
+							self:UICmd('ShowRangeIndicator(Evaluate(\'cvar_ability_tooltip{slot}_def\'), Evaluate(\'cvar_ability_tooltip{slot}_level\'));')
+						end"
+				onmouseoutlua="
+					if (GetCvarBool('cg_useLongTooltips')) then
+						GetWidget('ability_tooltip{slot}', 'game'):SetVisible(0)
+					else
+						GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0)
+					end
+					if (GetCvarBool('cg_showAreaCast')) then self:UICmd('HideRangeIndicator()') end"
+			>
+
+				<!-- OptiUI: Ability Icon -->
+				<image noclick="true" onloadlua="Game:RegisterAbilityIcon(self, {slot})" />
+
+				<piegraph start="270" end="-90" square="true" color="#000000cc" noclick="true"
+					onloadlua="Game:RegisterAbilityPie(self, {slot})"
+				/>
+
+				<!-- OptiUI: Ability Cooldown -->
+				<label noclick="1" valign="center" align="center" textvalign="center" textalign="center" color="#87CEEB" outline="1" font="dyn_10"
+					onloadlua="Game:RegisterAbilityCooldown(self, {slot})"
+				/>
+				
+				<!-- Ability Timer -->
+				<label
+					y="10%"
+					width="100%"
+					height="33%"
+					valign="top"
+					textvalign="center"
+					textalign="center"
+					color="white"
+					outline="true"
+					font="dyn_10"
+					noclick="true"
+					onloadlua="Game:RegisterAbilityTimer(self, {slot})"
+					watch="ActiveInventoryCharges{slot}"
+					ontriggerlua="if (tonumber(param) > 0) then self:SetVAlign('center') else self:SetVAlign('top') end"
+				/>
+
+				<!-- UIScript -->
+				<button
+					rendermode="overlay"
+					onclick="PrimaryAction({slot}); ActivateTool({slot});"
+					onrightclick="SecondaryAction({slot});"
+					onmouseoverlua="
+						if (GetCvarBool('cg_useLongTooltips')) then
+							GetWidget('ability_tooltip{slot}', 'game'):SetVisible(1)
+						else
+							GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(1)
+						end
+
+						if (GetCvarBool('cg_showAreaCast')) then
+							self:UICmd('ShowRangeIndicator(Evaluate(\'cvar_ability_tooltip{slot}_def\'), Evaluate(\'cvar_ability_tooltip{slot}_level\'));')
+						end"
+					onmouseoutlua="
+						if (GetCvarBool('cg_useLongTooltips')) then
+							GetWidget('ability_tooltip{slot}', 'game'):SetVisible(0)
+						else
+							GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0)
+						end
+						if (GetCvarBool('cg_showAreaCast')) then self:UICmd('HideRangeIndicator()') end"
+					onhidelua="
+						if (GetCvarBool('cg_useLongTooltips')) then
+							GetWidget('ability_tooltip{slot}', 'game'):SetVisible(0)
+						else
+							GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0)
+						end"
+					watch="ActiveInventoryCanActivate{slot}"
+					ontriggerlua="self:SetVisible(AtoB(param))"
+					watch1="ActiveInventoryStatus{slot}"
+					ontrigger1lua="
+						if ((tonumber(param5) > 0) or (tonumber(param7) == 0)) then
+							self:SetEnabled(1)
+						else
+							self:SetEnabled(0)
+						end"
+					interactive="false"
+				/>
+
+				<image
+					texture="$white"
+					rendermode="overlay"
+					noclick="true"
+					onloadlua="Game:RegisterAbilityOverlay(self, {slot})"
+				/>
+
+				<!-- OptiUI: Ability Charges -->
+				<panel
+					width="40%"
+					height="40%"
+					align="right"
+					valign="top"
+					watch="ActiveInventoryCharges{slot}"
+					ontriggerlua="self:SetVisible(tonumber(param) > 0)"
 					noclick="true"
 					passivechildren="true"
+					color="0 0 0 .6"
 				>
-					<image x="2" y="2" width="-4" height="-4" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
-				</frame>
+					<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_8"
+						watch="ActiveInventoryCharges{slot}"
+						ontriggerlua="self:SetText(param)"/>
+					<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1" />
+				</panel>
 
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+				<panel x="2" y="2" width="-4" height="-4" noclick="true" passivechildren="true" >
+					<!-- Ability Refresh effect -->
+					<!-- UIScript -->
+					<modelpanel
+						visible="0"
+						noclick="true"
+						model="common/models/refresh/refresh.mdf"
+						anim="idle"
+						effect="common/models/refresh/refresh.effect"
+						camerapos="0 1 0"
+						cameraangles="0 0 180"
+						camerafov="45"
+						cameranear="1"
+						carmerafar="100"
+						depthclear="false"
+						depthcompress="true"
+						watch="EventActiveInventoryReady{slot}"
+						ontrigger="SetVisible(true); SetAnim('idle'); SetEffect('/ui/common/models/refresh/refresh.effect'); SleepWidget(1333, 'SetVisible(false);');"
+						onshowlua="PlaySound('/shared/sounds/ui/ability_refresh.wav')"
+					/>
+
+					<!-- Ability Targeting -->
+					<frame
+						borderthickness="1"
+						bordercolor="orange"
+						color="invisible"
+						visible="false"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetVisible(AtoB(param8))"
+						noclick="true"
+						passivechildren="true"
+					>
+						<image x="2" y="2" width="-4" height="-4" color="orange" texture="/ui/fps/selected.tga" rendermode="additive" />
+						<!-- <modelpanel
+							noclick="true"
+							model="effects/portrait_lvlup/portrait_emitter.mdf"
+							anim="idle"
+							effect="effects/portrait_lvlup/ability_active.effect"
+							camerapos="-1 10 0"
+							cameraangles="0 0 180"
+							camerafov="60"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetEffect('/ui/effects/portrait_lvlup/ability_active.effect');"
+						/> -->
+					</frame>
+
+					<!-- Ability Toggle active -->
+					<frame
+						borderthickness="1"
+						bordercolor="orange"
+						color="invisible"
+						visible="false"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetVisible(AtoB(param1))"
+						noclick="true"
+						passivechildren="true"
+					>
+						<modelpanel x="2" y="2" width="-4" height="-4"
+							visible="1"
+							noclick="true"
+							model="common/models/toggle/toggle.mdf"
+							anim="idle"
+							effect="common/models/toggle/toggle.effect"
+							camerapos="0 1 0"
+							cameraangles="0 0 180"
+							camerafov="45"
+							cameranear="1"
+							carmerafar="100"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetAnim('idle'); SetEffect('/ui/common/models/toggle/toggle.effect');"
+						/>
+					</frame>
+
+					<!-- Ability Activating -->
+					<frame
+						borderthickness="1"
+						bordercolor="yellow"
+						color="invisible"
+						visible="false"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetVisible(AtoB(param4))"
+						noclick="true"
+						passivechildren="true"
+					>
+						<image x="2" y="2" width="-4" height="-4" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
+					</frame>
+				</panel>
 			</panel>
+			<!-- UIScript -->
+			<!-- <panel
+				color="invisible"
+				texture="/ui/info/drop.tga"
+				watch="ItemCursorVisible"
+				ontrigger="SetVisible(param); RefreshCursor();"
+				onmouseoverlua="self:SetColor('white');"
+				onmouseoutlua="self:SetColor('invisible');"
+				onclick="ItemPlace({slot});"
+				onrightclick="ItemPlace({slot});"
+			/> -->
+			<frame borderthickness="1" bordercolor="{bordercolor=gray}" color="invisible" noclick="true" />
+		</panel>
+	</template>
+
+	<template name="ability_button_lvlup">
+		<panel>
+			<!-- OptiUI: New effect is silly and it lags. Remove it -->
+			<image texture="/ui/legion/ability_coverup.tga"/>
+			<panel name="ability_lvlup_button_{slot}">
+				<image name="ability_lvlup_button_icon_{slot}" noclick="1" />
+				<button  name="ability_lvlup_button_button_{slot}"
+					color="invisible"
+					onmouseoverlua="if (GetCvarBool('cg_useLongTooltips')) then GetWidget('ability_levelup_tooltip{slot}', 'game'):SetVisible(1) else GetWidget('ability_levelup_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(1) end"
+					onmouseoutlua="if (GetCvarBool('cg_useLongTooltips')) then GetWidget('ability_levelup_tooltip{slot}', 'game'):SetVisible(0) else GetWidget('ability_levelup_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0) end"
+					onhidelua="if (GetCvarBool('cg_useLongTooltips')) then GetWidget('ability_levelup_tooltip{slot}', 'game'):SetVisible(0) else GetWidget('ability_levelup_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0) end"
+					interactive="false"
+				/>
+				<panel name="ability_lvlup_button_label_parent_{slot}" y="-0.23h" width="1.7h" height="1.4h" align="center" valign="bottom" color="invisible" noclick="true" passivechildren="true" >
+					<label name="ability_lvlup_button_label_{slot}" width="100%" height="100%" textalign="center" textvalign="center" color="white" font="dyn_9" outline="1" />
+				</panel>
+			</panel>
+			<frame name="level_up_effect_{slot}" borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 		</panel>
 	</template>
 
@@ -916,7 +1098,6 @@
 				ontriggerlua="self:SetVisible(not AtoB(param))"
 			>
 				<image texture="/ui/legion/ability_coverup.tga"/>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 			</panel>
 			<!-- UIScript -->
 			<panel
@@ -958,8 +1139,7 @@
 				/>
 				<!-- UIScript -->
 				<button
-					texture="/ui/common/button_gloss.tga"
-					rendermode="additive"
+					rendermode="overlay"
 					onclicklua="PlaySound('/shared/sounds/ui/ability_select.wav')"
 					onclick="ActivateSharedTool({slot});"
 					onrightclicklua="PlaySound('/shared/sounds/ui/ability_select.wav')"
@@ -972,10 +1152,8 @@
 					ontrigger1lua="
 						if (tonumber(param5) > 0 or tonumber(param7) == 0) then
 							self:SetEnabled(1)
-							self:SetColor('cccccc')
 						else
 							self:SetEnabled(0)
-							self:SetColor('invisible')
 						end"
 					interactive="false"
 				/>
@@ -988,85 +1166,30 @@
 				/>
 
 				<panel
-					width="38.5%"
-					height="38.5%"
+					width="35%"
+					height="35%"
 					align="right"
 					valign="top"
 					watch="ActiveInventoryCharges{slot}"
 					ontriggerlua="self:SetVisible(tonumber(param) > 0)"
 					noclick="true"
 					passivechildren="true"
-					color="0 0 0 .7"
+					color="0 0 0 .6"
 				>
 					<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_9" watch="ActiveInventoryCharges{slot}" ontriggerlua="self:SetText(param);"/>
-					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
+					<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1" />
 				</panel>
 
-				<!-- Refresh effect -->
-				<!-- UIScript -->
-				<modelpanel
-					visible="0"
-					noclick="true"
-					model="common/models/refresh/refresh.mdf"
-					anim="idle"
-					effect="common/models/refresh/refresh.effect"
-					camerapos="0 1 0"
-					cameraangles="0 0 180"
-					camerafov="45"
-					cameranear="1"
-					carmerafar="100"
-					depthclear="false"
-					depthcompress="true"
-					watch="EventActiveInventoryReady{slot}"
-					ontrigger="SetVisible(true); SetAnim('idle'); SetEffect('/ui/common/models/refresh/refresh.effect'); SleepWidget(1333, 'SetVisible(false);');"
-					onshow="PlaySound('/shared/sounds/ui/ability_refresh.wav'); "
-				/>
+				<panel x="2" y="2" width="-4" height="-4" noclick="true" passivechildren="true" >
 
-				<!-- Targeting -->
-				<frame
-					borderthickness="4"
-					bordercolor="orange"
-					color="invisible"
-					visible="false"
-					watch="ActiveInventoryStatus{slot}"
-					ontriggerlua="self:SetVisible(AtoB(param8))"
-					noclick="true"
-					passivechildren="true"
-				>
-					<image x="3" y="3" width="-6" height="-6" color="orange" texture="/ui/fps/selected.tga" rendermode="additive"/>
-
+					<!-- Refresh effect -->
+					<!-- UIScript -->
 					<modelpanel
+						visible="0"
 						noclick="true"
-						model="effects/portrait_lvlup/portrait_emitter.mdf"
+						model="common/models/refresh/refresh.mdf"
 						anim="idle"
-						effect="effects/portrait_lvlup/ability_active.effect"
-						camerapos="-1 10 0"
-						cameraangles="0 0 180"
-						camerafov="60"
-						depthclear="false"
-						depthcompress="true"
-						onshow="SetEffect('/ui/effects/portrait_lvlup/ability_active.effect');"
-					/>
-				</frame>
-
-				<!-- Toggle active -->
-				<frame
-					borderthickness="1"
-					bordercolor="orange"
-					color="invisible"
-					visible="false"
-					watch="ActiveInventoryStatus{slot}"
-					ontriggerlua="self:SetVisible(AtoB(param1))"
-					noclick="true"
-					passivechildren="true"
-				>
-					<!--<image x="2" y="2" width="-4" height="-4" color="orange" texture="/ui/fps/selected.tga" rendermode="additive"/>-->
-					<modelpanel
-						visible="1"
-						noclick="true"
-						model="common/models/toggle/toggle.mdf"
-						anim="idle"
-						effect="common/models/toggle/toggle.effect"
+						effect="common/models/refresh/refresh.effect"
 						camerapos="0 1 0"
 						cameraangles="0 0 180"
 						camerafov="45"
@@ -1074,23 +1197,79 @@
 						carmerafar="100"
 						depthclear="false"
 						depthcompress="true"
-						onshow="SetAnim('idle'); SetEffect('/ui/common/models/toggle/toggle.effect');"
+						watch="EventActiveInventoryReady{slot}"
+						ontrigger="SetVisible(true); SetAnim('idle'); SetEffect('/ui/common/models/refresh/refresh.effect'); SleepWidget(1333, 'SetVisible(false);');"
+						onshow="PlaySound('/shared/sounds/ui/ability_refresh.wav'); "
 					/>
-				</frame>
 
-				<!-- Activating -->
-				<frame
-					borderthickness="2"
-					bordercolor="yellow"
-					color="invisible"
-					visible="false"
-					watch="ActiveInventoryStatus{slot}"
-					ontriggerlua="self:SetVisible(AtoB(param4))"
-					noclick="true"
-					passivechildren="true"
-				>
-					<image x="2" y="2" width="-4" height="-4" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
-				</frame>
+					<!-- Targeting -->
+					<frame
+						borderthickness="1"
+						bordercolor="orange"
+						color="invisible"
+						visible="false"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetVisible(AtoB(param8))"
+						noclick="true"
+						passivechildren="true"
+					>
+						<image x="2" y="2" width="-4" height="-4" color="orange" texture="/ui/fps/selected.tga" rendermode="additive"/>
+						<!-- <modelpane
+							noclick="true"
+							model="effects/portrait_lvlup/portrait_emitter.mdf"
+							anim="idle"
+							effect="effects/portrait_lvlup/ability_active.effect"
+							camerapos="-1 10 0"
+							cameraangles="0 0 180"
+							camerafov="60"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetEffect('/ui/effects/portrait_lvlup/ability_active.effect');"
+						/> -->
+					</frame>
+
+					<!-- Toggle active -->
+					<frame
+						borderthickness="1"
+						bordercolor="orange"
+						color="invisible"
+						visible="false"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetVisible(AtoB(param1))"
+						noclick="true"
+						passivechildren="true"
+					>
+						<modelpanel x="2" y="2" width="-4" height="-4"
+							visible="1"
+							noclick="true"
+							model="common/models/toggle/toggle.mdf"
+							anim="idle"
+							effect="common/models/toggle/toggle.effect"
+							camerapos="0 1 0"
+							cameraangles="0 0 180"
+							camerafov="45"
+							cameranear="1"
+							carmerafar="100"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetAnim('idle'); SetEffect('/ui/common/models/toggle/toggle.effect');"
+						/>
+					</frame>
+
+					<!-- Activating -->
+					<frame
+						borderthickness="1"
+						bordercolor="yellow"
+						color="invisible"
+						visible="false"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetVisible(AtoB(param4))"
+						noclick="true"
+						passivechildren="true"
+					>
+						<image x="2" y="2" width="-4" height="-4" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
+					</frame>
+				</panel>
 
 				<panel color="invisible" noclick="1" >
 					<label noclick="1" valign="center" align="center" textvalign="center" textalign="center" color="#87CEEB" shadow="1" font="dyn_10"
@@ -1098,9 +1277,10 @@
 					/>
 				</panel>
 			</panel>
+			<frame borderthickness="1" bordercolor="{bordercolor=gray}" color="invisible" noclick="true" />
 		</panel>
 	</template>
-	<!-- UIScript -->
+
 	<template name="inventory_button">
 		<panel noclick="1">
 			<panel name="inventory_button_bg_empty_{slot}" color="invisible" noclick="1">
@@ -1206,21 +1386,21 @@
 				<!-- Color overlay -->
 				<image name="inventory_button_color_overlay_{slot}" texture="$white" rendermode="overlay" noclick="true" />
 
-				<!-- Shared -->
-				<image name="inventory_button_shared_{slot}" width="40%" height="40%" texture="/ui/icons/shared.tga" noclick="true" />
-
 				<!-- Purchased Recently -->
 				<!-- OptiUI: Moved icon to the top left -->
-				<image name="inventory_button_recent_{slot}" align="left" valign="top" width="40%" height="40%" texture="/ui/icons/purchased_recently.tga" noclick="true" />
+				<image name="inventory_button_recent_{slot}" width="33%" height="33%" texture="/ui/icons/purchased_recently.tga" noclick="true" />
+
+				<!-- Shared -->
+				<image name="inventory_button_shared_{slot}" width="33%" height="33%" texture="/ui/icons/shared.tga" noclick="true" />
 
 				<!-- Muted -->
-				<image name="inventory_button_muted_{slot}" width="40%" height="40%" texture="/ui/icons/muted.tga" noclick="true" />
+				<image name="inventory_button_muted_{slot}"  width="33%" height="33%" texture="/ui/icons/muted.tga" noclick="true" />
 
 				<!-- Inventory Charges -->
 				<!-- OptiUI: Move charges counter to the top right -->
 				<panel name="inventory_button_charges_parent_{slot}"
-					width="33.3%"
-					height="33.3%"
+					width="33%"
+					height="33%"
 					align="right"
 					valign="top"
 					noclick="true"
@@ -1235,57 +1415,17 @@
 						textvalign="center"
 						color="white"
 						shadow="true"
-						font="dyn_8"
+						font="dyn_9"
 					/>
-					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
+					<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1" />
 				</panel>
 
-				<!-- Refresh effect -->
-				<modelpanel name="inventory_button_refresh_{slot}" visible="0" noclick="true"
-					model="common/models/refresh/refresh.mdf"
-					anim="idle"
-					effect="common/models/refresh/refresh.effect"
-					camerapos="0 1 0"
-					cameraangles="0 0 180"
-					camerafov="45"
-					cameranear="1"
-					carmerafar="100"
-					depthclear="false"
-					depthcompress="true"
-				/>
-
-				<!-- Targeting -->
-				<frame name="inventory_button_target_parent_{slot}" borderthickness="4" bordercolor="orange" color="invisible" visible="false" noclick="true" passivechildren="true" >
-					<image x="3" y="3" width="-6" height="-6" color="orange" texture="/ui/fps/selected.tga" rendermode="additive"/>
-					<modelpanel
-						noclick="true"
-						model="effects/portrait_lvlup/portrait_emitter.mdf"
+				<panel x="2" y="2" width="-4" height="-4" noclick="true" passivechildren="true" >
+					<!-- Refresh effect -->
+					<modelpanel name="inventory_button_refresh_{slot}" visible="0" noclick="true"
+						model="common/models/refresh/refresh.mdf"
 						anim="idle"
-						effect="effects/portrait_lvlup/ability_active.effect"
-						camerapos="-1 10 0"
-						cameraangles="0 0 180"
-						camerafov="60"
-						depthclear="false"
-						depthcompress="true"
-						onshow="SetEffect('/ui/effects/portrait_lvlup/ability_active.effect');"
-					/>
-				</frame>
-
-				<!-- Toggle active -->
-				<frame name="inventory_button_toggle_{slot}"
-					borderthickness="1"
-					bordercolor="orange"
-					color="invisible"
-					visible="false"
-					noclick="true"
-					passivechildren="true"
-				>
-					<modelpanel
-						visible="1"
-						noclick="true"
-						model="common/models/toggle/toggle.mdf"
-						anim="idle"
-						effect="common/models/toggle/toggle.effect"
+						effect="common/models/refresh/refresh.effect"
 						camerapos="0 1 0"
 						cameraangles="0 0 180"
 						camerafov="45"
@@ -1293,28 +1433,72 @@
 						carmerafar="100"
 						depthclear="false"
 						depthcompress="true"
-						onshow="SetAnim('idle'); SetEffect('/ui/common/models/toggle/toggle.effect');"
 					/>
-				</frame>
 
-				<!-- Activating -->
-				<frame name="inventory_button_activating_{slot}" borderthickness="2" bordercolor="yellow" color="invisible" visible="false" noclick="true" passivechildren="true" >
-					<image x="2" y="2" width="-4" height="-4" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
-				</frame>
+					<!-- Targeting -->
+					<frame name="inventory_button_target_parent_{slot}" borderthickness="1" bordercolor="orange" color="invisible" visible="false" noclick="true" passivechildren="true" >
+						<image x="2" y="2" width="-4" height="-4" color="orange" texture="/ui/fps/selected.tga" rendermode="additive"/>
+						<!-- <modelpanel
+							noclick="true"
+							model="effects/portrait_lvlup/portrait_emitter.mdf"
+							anim="idle"
+							effect="effects/portrait_lvlup/ability_active.effect"
+							camerapos="-1 10 0"
+							cameraangles="0 0 180"
+							camerafov="60"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetEffect('/ui/effects/portrait_lvlup/ability_active.effect');"
+						/> -->
+					</frame>
+
+					<!-- Toggle active -->
+					<frame name="inventory_button_toggle_{slot}"
+						borderthickness="1"
+						bordercolor="orange"
+						color="invisible"
+						visible="false"
+						noclick="true"
+						passivechildren="true"
+					>
+						<modelpanel x="2" y="2" width="-4" height="-4"
+							visible="1"
+							noclick="true"
+							model="common/models/toggle/toggle.mdf"
+							anim="idle"
+							effect="common/models/toggle/toggle.effect"
+							camerapos="0 1 0"
+							cameraangles="0 0 180"
+							camerafov="45"
+							cameranear="1"
+							carmerafar="100"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetAnim('idle'); SetEffect('/ui/common/models/toggle/toggle.effect');"
+						/>
+					</frame>
+
+					<!-- Activating -->
+					<frame name="inventory_button_activating_{slot}" borderthickness="1" bordercolor="yellow" color="invisible" visible="false" noclick="true" passivechildren="true" >
+						<image x="2" y="2" width="-4" height="-4" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
+					</frame>
+				</panel>
 
 				<!-- OptiUI: Level, Mana and Status labels for items -->
-				<frame name="inventory_button_level_parent_{slot}" x="0h" y="0h" align="left" valign="bottom" height="33.3%" width="33.3%" color="0 0 0 0.6" noclick="1" bordercolor="gray" borderthickness="1" visible="0">
-					<label name="inventory_button_level_label_{slot}" x="0h" y="0h" fity="1" textalign="center" textvalign="center" color="yellow" font="dyn_9" outline="1" noclick="1"/>
-				</frame>
-				<frame x="0h" y="0h" align="right" valign="bottom" height="33.3%" width="60%" color="0 0 0 0.6" noclick="1" bordercolor="gray" borderthickness="1"
-					watch="ActiveInventoryDescription{slot}"
-					ontriggerlua="if (tonumber(param2) and (tonumber(param2) > 0.0)) then self:SetVisible(1) else self:SetVisible(0) end"
-				>
-					<label x="0h" y="0h" fity="1" textalign="center" textvalign="center" color="cyan" font="dyn_9" outline="1" noclick="1"
+				<panel height="33%" valign="bottom" noclick="true" passivechildren="true" >
+					<frame name="inventory_button_level_parent_{slot}" width="33%" color="0 0 0 .6" bordercolor="gray" borderthickness="1" >
+						<label name="inventory_button_level_label_{slot}" textalign="center" textvalign="center" color="yellow" font="dyn_9" outline="1" />
+					</frame>
+					<frame width="60%" align="right" color="0 0 0 .6" bordercolor="gray" borderthickness="1"
 						watch="ActiveInventoryDescription{slot}"
-						ontriggerlua="self:SetText(round(param2))"
-					/>
-				</frame>
+						ontriggerlua="self:SetVisible(AtoN(param2))"
+					>
+						<label textalign="center" textvalign="center" color="cyan" font="dyn_9" outline="1"
+							watch="ActiveInventoryDescription{slot}"
+							ontriggerlua="self:SetText(round(param2))"
+						/>
+					</frame>
+				</panel>
 			</panel>
 			<!-- UIScript -->
 			<panel name="inventory_button_item_cursor_{slot}" visible="0"
@@ -1328,7 +1512,7 @@
 				ontriggerlua="self:SetVisible(AtoB(param)) self:UICmd('RefreshCursor();')"
 			/>
 			<panel color="invisible" noclick="true" name="player_inventory_slot_{slot}" />
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1"/>
+			<frame borderthickness="1" bordercolor="{bordercolor=gray}" color="invisible" noclick="1"/>
 		</panel>
 	</template>
 	
@@ -1366,8 +1550,8 @@
 
 			<!-- charges -->
 			<panel
-				width="33.3%"
-				height="33.3%"
+				width="33.0%"
+				height="33.0%"
 				align="right"
 				valign="top"
 				noclick="true"
@@ -1388,7 +1572,7 @@
 					shadow="true"
 					font="dyn_8"
 				/>
-				<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
+				<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1" />
 			</panel>
 
 			<!-- cover -->
@@ -1421,7 +1605,7 @@
 				textalign="center"
 				textvalign="center"
 			/>
-
+			<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1" />
 		</panel>
 	</template>
 
@@ -1436,177 +1620,7 @@
 				onmouseoverlua="{onmouseoverlua}"
 				onmouseoutlua="{onmouseoutlua}"
 			/>
-
-			<frame
-				borderthickness="1"
-				color="invisible"
-				bordercolor="gray"
-				noclick="1"
-			/>
-			<!-- <image
-				texture="/ui/elements/button_bevel_up.tga"
-				noclick="1"
-			/> -->
-		</panel>
-	</template>
-
-	<template name="ability_button_small">
-		<panel>
-			<panel
-				watch="ActiveInventoryExists{slot}"
-				ontriggerlua="self:SetVisible(not AtoB(param))"
-			>
-				<image texture="/ui/legion/empty_pack.tga"/>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
-			</panel>
-			<!-- UIScript -->
-			<panel
-				watch="ActiveInventoryExists{slot}"
-				ontriggerlua="self:SetVisible(AtoB(param))"
-				onclick="PrimaryAction({slot});"
-				onrightclick="SecondaryAction({slot});"
-				onmouseoverlua="
-						if (GetCvarBool('cg_useLongTooltips')) then
-							GetWidget('ability_tooltip{slot}', 'game'):SetVisible(1)
-						else
-							GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(1)
-						end
-
-						if (GetCvarBool('cg_showAreaCast')) then
-							self:UICmd('ShowRangeIndicator(Evaluate(\'cvar_ability_tooltip{slot}_def\'), Evaluate(\'cvar_ability_tooltip{slot}_level\'));')
-						end"
-				onmouseoutlua="
-					if (GetCvarBool('cg_useLongTooltips')) then
-						GetWidget('ability_tooltip{slot}', 'game'):SetVisible(0)
-					else
-						GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0)
-					end
-					if (GetCvarBool('cg_showAreaCast')) then self:UICmd('HideRangeIndicator()') end"
-			>
-				<image
-					noclick="true" texture="$invis"
-					onloadlua="Game:RegisterAbilityIcon(self, {slot})"
-				/>
-				<piegraph start="270" end="-90" square="true" color="#000000cc" noclick="true"
-					onloadlua="Game:RegisterAbilityPie(self, {slot})"
-				/>
-
-				<!-- Small Ability Timer -->
-				<label
-					y="10%"
-					width="100%"
-					height="33%"
-					valign="center"
-					textvalign="center"
-					textalign="center"
-					color="white"
-					outline="true"
-					font="dyn_10"
-					noclick="true"
-					onloadlua="Game:RegisterAbilityTimer(self, {slot})"
-				/>
-				<!-- UIScript -->
-				<button
-					texture="/ui/elements/optiui_button_bevel.tga"
-					onclick="PrimaryAction({slot}); ActivateTool({slot});"
-					onrightclick="SecondaryAction({slot});"
-					onmouseoverlua="
-						if (GetCvarBool('cg_useLongTooltips')) then
-							GetWidget('ability_tooltip{slot}', 'game'):SetVisible(1)
-						else
-							GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(1)
-						end
-
-						if (GetCvarBool('cg_showAreaCast')) then
-							self:UICmd('ShowRangeIndicator(Evaluate(\'cvar_ability_tooltip{slot}_def\'), Evaluate(\'cvar_ability_tooltip{slot}_level\'));')
-						end"
-					onmouseoutlua="
-						if (GetCvarBool('cg_useLongTooltips')) then
-							GetWidget('ability_tooltip{slot}', 'game'):SetVisible(0)
-						else
-							GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0)
-						end
-						if (GetCvarBool('cg_showAreaCast')) then self:UICmd('HideRangeIndicator()') end"
-					onhidelua="
-						if (GetCvarBool('cg_useLongTooltips')) then
-							GetWidget('ability_tooltip{slot}', 'game'):SetVisible(0)
-						else
-							GetWidget('ability_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0)
-						end"
-					watch="ActiveInventoryCanActivate{slot}"
-					ontriggerlua="self:SetVisible(AtoB(param))"
-					watch1="ActiveInventoryStatus{slot}"
-					ontrigger1lua="
-						if ((tonumber(param5) > 0) or (tonumber(param7) == 0)) then
-							self:SetEnabled(1)
-							self:SetColor('white')
-						else
-							self:SetEnabled(0)
-							self:SetColor('invisible')
-						end"
-					interactive="false"
-				/>
-				<image
-					texture="$white"
-					rendermode="overlay"
-					noclick="true"
-					onloadlua="Game:RegisterAbilityOverlay(self, {slot})"
-				/>
-
-				<!--Small Ability Charges -->
-				<panel
-					width="40%"
-					height="40%"
-					align="right"
-					valign="top"
-					watch="ActiveInventoryCharges{slot}"
-					ontriggerlua="self:SetVisible(tonumber(param) > 0)"
-					noclick="true"
-					passivechildren="true"
-					color="0 0 0 .6"
-				>
-					<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_8"
-						watch="ActiveInventoryCharges{slot}"
-						ontriggerlua="self:SetText(param);"/>
-					<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1" />
-				</panel>
-
-				<frame
-					borderthickness="4"
-					bordercolor="cyan"
-					color="invisible"
-					visible="false"
-					watch="ActiveInventoryStatus{slot}"
-					ontriggerlua="self:SetVisible(AtoB(param8))"
-					noclick="true"
-					passivechildren="true"
-				>
-					<image x="3" y="3" width="-6" height="-6" color="cyan" texture="/ui/fps/selected.tga" rendermode="additive"/>
-				</frame>
-				<frame
-					borderthickness="4"
-					bordercolor="yellow"
-					color="invisible"
-					visible="false"
-					watch="ActiveInventoryStatus{slot}"
-					ontriggerlua="self:SetVisible(AtoB(param1) or AtoB(param4))"
-					noclick="true"
-					passivechildren="true"
-				>
-					<image x="3" y="3" width="-6" height="-6" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
-				</frame>
-			</panel>
-			<!-- UIScript -->
-			<panel
-				color="invisible"
-				texture="/ui/info/drop.tga"
-				watch="ItemCursorVisible"
-				ontrigger="SetVisible(param); RefreshCursor();"
-				onmouseoverlua="self:SetColor('white');"
-				onmouseoutlua="self:SetColor('invisible');"
-				onclick="ItemPlace({slot});"
-				onrightclick="ItemPlace({slot});"
-			/>
+			<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1" />
 		</panel>
 	</template>
 
@@ -1652,9 +1666,7 @@
 				</panel>
 
 				<!-- Bevel -->
-				<image
-					texture="/ui/elements/optiui_button_bevel_up.tga"
-				/>
+				<image texture="/ui/elements/optiui_button_bevel_up.tga" />
 
 				<!-- Info Cooldown overlay-->
 				<piegraph start="270" end="-90" square="true" color="#000000cc" watch="SelectedInventoryCooldown{slot}" ontriggerlua="self:SetVisible(tonumber(param1) > 0) self:SetValue(param2)" noclick="true"/>
@@ -1756,7 +1768,7 @@
 						watch="SelectedInventoryCharges{slot}"
 						ontriggerlua="self:SetText(param);"
 					/>
-					<frame borderthickness="1" bordercolor="gray" color="invisible"/>
+					<frame borderthickness="1" bordercolor="{bordercolor=gray}" color="invisible"/>
 				</panel>
 
 				<!-- OptiUI: Added item level indicator (yeah parasite/fayde, this is for you, luvs) -->
@@ -1775,32 +1787,11 @@
 						watch="SelectedInventoryStatus{slot}" 
 						ontriggerlua="self:SetText(param3);"
 					/>
-					<frame borderthickness="1" bordercolor="gray" color="invisible"/>
+					<frame borderthickness="1" bordercolor="{bordercolor=gray}" color="invisible"/>
 				</panel>				
 
 			</panel>
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
-		</panel>
-	</template>
-
-	<template name="ability_button_lvlup">
-		<panel>
-			<!-- OptiUI: New effect is silly and it lags. Remove it -->
- 			<image texture="/ui/legion/empty_pack.tga"/>
-			<panel name="ability_lvlup_button_{slot}">
-				<image name="ability_lvlup_button_icon_{slot}" noclick="1" />
-				<button  name="ability_lvlup_button_button_{slot}"
-					color="invisible"
-					onmouseoverlua="if (GetCvarBool('cg_useLongTooltips')) then GetWidget('ability_levelup_tooltip{slot}', 'game'):SetVisible(1) else GetWidget('ability_levelup_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(1) end"
-					onmouseoutlua="if (GetCvarBool('cg_useLongTooltips')) then GetWidget('ability_levelup_tooltip{slot}', 'game'):SetVisible(0) else GetWidget('ability_levelup_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0) end"
-					onhidelua="if (GetCvarBool('cg_useLongTooltips')) then GetWidget('ability_levelup_tooltip{slot}', 'game'):SetVisible(0) else GetWidget('ability_levelup_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0) end"
-					interactive="false"
-				/>
-				<panel name="ability_lvlup_button_label_parent_{slot}" y="-0.23h" width="1.7h" height="1.4h" align="center" valign="bottom" color="invisible" noclick="true" passivechildren="true" >
-					<label name="ability_lvlup_button_label_{slot}" width="100%" height="100%" textalign="center" textvalign="center" color="white" font="dyn_9" outline="1" />
-				</panel>
-			</panel>
-			<frame name="level_up_effect_{slot}" borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+			<frame borderthickness="1" bordercolor="{bordercolor=gray}" color="invisible" noclick="true" />
 		</panel>
 	</template>
 
@@ -2103,7 +2094,7 @@
 	<template name="statusbar_overlay">
 		<image texture="/ui/legion/{barimage=optiui_behind_bar.tga}" rendermode="{rendermode=overlay}" color="{barcolor=1 1 1 1}"/>
 		<image align="center" valign="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
-		<frame color="invisible" bordercolor="gray" borderthickness="1" noclick="1"/>
+		<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1"/>
 	</template>
 
 	<!-- Team Member Icon -->
@@ -2111,13 +2102,15 @@
 		<panel width="{width}" height="{height}" align="{align}" valign="{valign}" group="{group}" >
 			<image name="ally_ability_status_image_{index}_{slot}" texture="/ui/legion/empty_pack.tga" />
 			<frame name="ally_ability_status_dot_{index}_{slot}" color="invisible" bordercolor="gray" borderthickness="1"/>
-			<label name="ally_ability_status_level_{index}_{slot}" textalign="right" textvalign="bottom" color="white" outline=".1" font="dyn_8" />
+			<label name="ally_ability_status_level_{index}_{slot}" textalign="right" textvalign="bottom" color="gray" outline="1" font="dyn_8" />
+			<label name="ally_ability_status_cooldown_{index}_{slot}" textalign="center" textvalign="center" color="white" outline="1" font="dyn_10" visible="false" />
 		</panel>
 	</template>
 
 	<template name="team_member_icon_buttons_panel">
-		<frame name="game_top_left_ally_buttons_parent_{index}" x="1.0h" y="0" width="6.0h" height="4.0h" align="right" valign="bottom" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .75" visible="true">
-			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
+		<panel name="game_top_left_ally_buttons_parent_{index}" x="1.0h" y="0" width="6.0h" height="4.0h" align="right" valign="bottom" >
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" />
 
 			<panel width="100@" height="100%" align="center" noclick="true" >
 				<!-- Ally Share -->
@@ -2201,7 +2194,7 @@
 
 			<panel x="0.0h" width="1.0h" height="100%" align="right" >
 				<panel name="game_top_left_ally_buttons_show_{index}" visible="true" >
-					<image width="1.0h" height="1.0h" texture="/ui/info/combobox_button_up.tga" rotation="270" valign="center" />
+					<!-- <image width="1.0h" height="1.0h" texture="/ui/info/combobox_button_up.tga" rotation="270" valign="center" /> -->
 					<button 
 						color="invisible"
 						onclicklua="
@@ -2211,10 +2204,19 @@
 							PlaySound('/shared/sounds/ui/popup.wav')
 						"
 					>
+						<widgetstate statename="up">
+							<image width="95%" height="95@" texture="/ui/info/combobox_button_up.tga" rotation="270" valign="center" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="over">
+							<image width="95%" height="95@" texture="/ui/info/combobox_button_over.tga" rotation="270" valign="center" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="down">
+							<image y="1" x="1" width="95%" height="95@" texture="/ui/info/combobox_button_up.tga" rotation="270" valign="center" noclick="true" />
+						</widgetstate>
 					</button>
 				</panel>
 				<panel name="game_top_left_ally_buttons_hide_{index}" visible="false" >
-					<image width="1.0h" height="1.0h" texture="/ui/info/combobox_button_over.tga" rotation="90" valign="center" />
+					<!-- <image width="1.0h" height="1.0h" texture="/ui/info/combobox_button_over.tga" rotation="90" valign="center" /> -->
 					<button 
 						color="invisible"
 						onclicklua="
@@ -2224,10 +2226,19 @@
 							PlaySound('/shared/sounds/ui/popup.wav')
 						"
 					>
+						<widgetstate statename="up">
+							<image width="95%" height="95@" texture="/ui/info/combobox_button_up.tga" rotation="90" valign="center" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="over">
+							<image width="95%" height="95@" texture="/ui/info/combobox_button_over.tga" rotation="90" valign="center" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="down">
+							<image y="1" x="1" width="95%" height="95@" texture="/ui/info/combobox_button_up.tga" rotation="90" valign="center" noclick="true" />
+						</widgetstate>
 					</button>
 				</panel>
 			</panel>
-		</frame>
+		</panel>
 	</template>
 
 	<template name="team_member_icon_menu" >
@@ -2270,203 +2281,191 @@
 	</template>
 
 	<template name="team_member_icon_portrait">
-		<frame name="game_top_left_ally_image_bg_{index}" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" bordercolor="gray" color="gray" noclick="true" />
-		<frame name="game_top_left_ally_image_frame_{index}" texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="gray" color="invisible" noclick="true"/>
+		<panel x="{x}" y="{y}" width="{width}" height="{height}" noclick="true" >
+			<frame name="game_top_left_ally_image_parent_{index}" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" bordercolor="gray" color="invisible" noclick="true" />
+			<frame name="game_top_left_ally_image_frame_{index}" texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="gray" color="invisible" noclick="true"/>
 
-		<panel width="-6" height="-6" align="center" valign="center" color="invisible" >
-			<image name="game_top_left_ally_image_{index}" />
-			<panel name="game_top_left_ally_dead_{index}" >
-				<image texture="/ui/legion/dead.tga" />
-				<label name="game_top_left_ally_respawn_{index}" font="dyn_14" color="yellow" shadow="true" textalign="center" textvalign="center" />
+			<panel name="game_top_left_ally_image_bg_{index}" width="100@" height="100%" align="right" noclick="true" color="gray" >
+				<panel x="1" y="1" width="-2" height="-2" color="invisible" >
+					<image name="game_top_left_ally_image_{index}" />
+					<panel name="game_top_left_ally_dead_{index}" >
+						<!-- <image texture="/ui/legion/dead.tga" /> -->
+						<label name="game_top_left_ally_respawn_{index}" font="dyn_14" color="yellow" shadow="true" textalign="center" textvalign="center" />
+					</panel>
+
+					<panel name="game_top_left_ally_gold_{index}" height="33%" valign="bottom" color="0 0 0 .6" noclick="true" >
+						<label width="70%" align="right" textalign="center" textvalign="center" color="white" font="dyn_8" watch="AllyGold{index}" ontriggerlua="self:SetText(param)" />
+					</panel>
+
+					<!--  Voip Mic  -->
+					<panel name="game_top_left_ally_voip_{index}" >
+						<panel color="0 0 0 .1"/>
+						<image texture="/ui/elements/optiui_voip_talking.tga" />
+					</panel>
+
+					<panel name="game_top_left_ally_afk_{index}" >
+						<label
+							width="100%" height="100%"
+							textalign="center" textvalign="top"
+							color="white" shadow="true"
+							font="dyn_14"
+							content="AFK"
+						/>
+					</panel>
+
+					<panel name="game_top_left_ally_dc_{index}" >
+						<panel color="0 0 0 .5"/>
+						<image texture="/ui/elements/disconnect.tga" />
+						<label name="game_top_left_ally_dc_label_{index}"
+							width="100%" height="100%"
+							textalign="center" textvalign="center"
+							color="white" shadow="true"
+							font="dyn_10"
+						/>
+					</panel>
+
+					<panel name="game_top_left_ally_load_{index}" >
+						<panel color="0 0 0 .5"/>
+						<image texture="/ui/elements/lobby/icon_loading.tga" />
+						<label name="game_top_left_ally_load_label_{index}"
+							width="100%" height="100%"
+							textalign="center" textvalign="center"
+							color="white" outline="true"
+							font="dyn_10"
+							content="20%"
+						/>
+					</panel>
+
+					<!-- UIScript -->
+					<button name="ally_right_click_menu_button_{index}"
+						color="invisible"
+						onclick="SelectUnit(AllyIndex{index});"
+						onmouseoverlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(0)"
+						interactive="false"
+					/>
+
+					<!-- Item catcher -->
+					<!-- UIScript -->
+					<panel
+						color="invisible"
+						texture="/ui/info/drop.tga"
+						watch="ItemCursorVisible"
+						ontrigger="SetVisible(ItemCursorVisible); RefreshCursor();"
+						onmouseoverlua="self:SetColor('white')"
+						onmouseoutlua="self:SetColor('invisible')"
+						onclick="ItemPlaceEntity(AllyIndex{index});"
+						onrightclick="ItemPlaceEntity(AllyIndex{index});"
+					/>
+
+					<!-- Black Framing -->
+					<frame color="invisible" bordercolor="black" borderthickness="1" noclick="true" />
+				</panel>
 			</panel>
 
-			<!--  Voip Mic  -->
-			<panel name="game_top_left_ally_voip_{index}" noclick="1" width="90%" height="90%" color="invisible" align="center" valign="center" visible="1">
-				<modelpanel
-					visible="1"
-					width="100%"
-					height="100%"
-					noclick="true"
-					model="/ui/common/models/arcade_text/invis.mdf"
-					anim="idle"
-					camerapos="-5 200 25"
-					cameraangles="0 0 180"
-					camerafov="10"
-					cameranear="1"
-					carmerafar="5000"
-					depthclear="false"
-					depthcompress="true"
-					sunazimuth="-90"
-					sunaltitude="180"
-					suncolor="2 2 2"
-					onshow="SetAnim('idle'); SetEffect('/shared/effects/talking.effect');"
-				/>
+			<!-- Ally Level -->
+			<panel width="38@" height="38%" align="left" valign="bottom" noclick="true" passivechildren="true" >
+				<frame name="game_top_left_ally_level_bg_{index}" texture="/ui/frames/rounded_bg_white.tga" borderthickness="{lvl_borderthickness=.2h}" >
+					<label name="game_top_left_ally_level_label_{index}" textalign="center" textvalign="center" font="dyn_9" color="yellow" outline="true" />
+				</frame>
 			</panel>
-			
-			<panel name="game_top_left_ally_afk_{index}" >
-				<label
-					width="100%" height="100%"
-					textalign="center" textvalign="top"
-					color="white" shadow="true"
-					font="dyn_14"
-					content="AFK"
-				/>
-			</panel>
-
-			<panel name="game_top_left_ally_dc_{index}" >
-				<panel color="0 0 0 .5"/>
-				<image width="90%" height="90%" align="center" valign="center" texture="/ui/elements/disconnect.tga" />
-				<label name="game_top_left_ally_dc_label_{index}"
-					width="100%" height="100%"
-					textalign="center" textvalign="center"
-					color="white" shadow="true"
-					font="dyn_10"
-				/>
-			</panel>
-
-			<panel name="game_top_left_ally_load_{index}" >
-				<panel color="0 0 0 .5"/>
-				<image width="90%" height="90@" align="center" valign="center" texture="/ui/elements/lobby/icon_loading.tga" />
-				<label name="game_top_left_ally_load_label_{index}"
-					width="100%" height="100%"
-					textalign="center" textvalign="center"
-					color="white" outline="true"
-					font="dyn_10"
-					content="20%"
-				/>
-			</panel>
-
-			<!-- UIScript -->
-			<button name="ally_right_click_menu_button_{index}"
-				color="invisible"
-				onclick="SelectUnit(AllyIndex{index});"
-				onmouseoverlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('ally_tooltip{index}', 'game'):SetVisible(0)"
-				interactive="false"
-			/>
-
-			<!-- Item catcher -->
-			<!-- UIScript -->
-			<panel
-				color="invisible"
-				texture="/ui/info/drop.tga"
-				watch="ItemCursorVisible"
-				ontrigger="SetVisible(ItemCursorVisible); RefreshCursor();"
-				onmouseoverlua="self:SetColor('white')"
-				onmouseoutlua="self:SetColor('invisible')"
-				onclick="ItemPlaceEntity(AllyIndex{index});"
-				onrightclick="ItemPlaceEntity(AllyIndex{index});"
-			/>
 		</panel>
-
-		<!-- Ally Level -->
-		<frame name="game_top_left_ally_level_bg_{index}" height="35%" width="35%" align="right" valign="bottom" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".2h" noclick="true">
-			<label name="game_top_left_ally_level_label_{index}" width="100%" height="100%" textalign="center" textvalign="center" font="dyn_9" color="yellow" outline="true" noclick="true" />
-		</frame>
 	</template>
 
 	<template name="team_member_icon">
 		<!-- OptiUI: Added x position variable -->
-		<panel name="game_top_left_ally_parent_{index}" x="{x}" y="{y}" width="6.0h" height="6.7h" align="{align}" valign="{valign}" noclick="true" sticky="true" stickytoinvis="false" group="{group}">
+		<panel name="game_top_left_ally_parent_{index}" x="{x}" y="{y}" width="6.3h" height="6.8h" align="{align}" valign="{valign}" sticky="true" stickytoinvis="false" group="{group}">
 			
+			<!-- Side panel -->
 			<instance name="team_member_icon_buttons_panel" index="{index}" />
 
-			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 1" >
-				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
-				
-				<!-- OptiUI: Portrait -->
-				<panel width="4.3h" height="4.3h" noclick="true" >
-					<instance name="team_member_icon_portrait" index="{index}" />
+			<!-- Framing -->
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 1" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true" />
+
+			<panel float="right" color="invisible" padding="0" noclick="true" >	
+				<panel width="4.3h" float="bottom" color="invisible" padding="0" noclick="true" >	
+					<!-- OptiUI: Portrait -->
+					<instance name="team_member_icon_portrait" width="100%" height="100@" index="{index}" />
+
+					<!-- Health / Mana Bars -->
+					<!-- OptiUI: Fixed width to fully cover background -->
+					<panel name="game_top_left_ally_bar_parent_{index}" height="2.5h" color="black" passivechildren="true" noclick="true" >
+						<frame height="50%" valign="top" color="0 .1 0 .7" bordercolor="gray" borderthickness="1">
+							<panel name="game_top_left_ally_health_{index}" color="0 1 0 0" >
+								<instance name="statusbar_overlay" />
+							</panel>
+							<label name="game_top_left_ally_health_label_{index}" textalign="center" textvalign="center" font="dyn_8" color="white" shadow="true"/>
+						</frame>
+						<frame height="49%" valign="bottom" color="0 .0 .1 .7" bordercolor="gray" borderthickness="1">
+							<panel name="game_top_left_ally_mana_{index}" color="0 .4 1 1" >
+								<instance name="statusbar_overlay" />
+							</panel>
+							<label name="game_top_left_ally_mana_label_{index}" textalign="center" textvalign="center" font="dyn_8" color="white" shadow="true"/>
+						</frame>
+					</panel>
 				</panel>
 
 				<!-- Ally Ability Status Lights -->
-				<panel name="game_top_left_ally_status_light_{index}" x="0" y="0" width="1.8h" height="-6" align="right" valign="center" float="bottom" padding="0" color="invisible" noclick="1" passivechildren="true">
-					<instance name="ally_ability_status" width="25@" height="25%" align="right" group="{group}" slot="0" index="{index}" />
-					<instance name="ally_ability_status" width="25@" height="25%" align="right" group="{group}" slot="1" index="{index}" />
-					<instance name="ally_ability_status" width="25@" height="25%" align="right" group="{group}" slot="2" index="{index}" />
-					<instance name="ally_ability_status" width="25@" height="25%" align="right" group="{group}" slot="3" index="{index}" />
+				<panel name="game_top_left_ally_status_light_{index}" width="1.6h" float="bottom" padding="1" color="invisible" noclick="1" passivechildren="true">
+					<instance name="ally_ability_status" width="100%" height="100@" group="{group}" slot="0" index="{index}" />
+					<instance name="ally_ability_status" width="100%" height="100@" group="{group}" slot="1" index="{index}" />
+					<instance name="ally_ability_status" width="100%" height="100@" group="{group}" slot="2" index="{index}" />
+					<instance name="ally_ability_status" width="100%" height="100@" group="{group}" slot="3" index="{index}" />
 				</panel>
-
-				<!-- Health / Mana Bars -->
-				<!-- OptiUI: Fixed width to fully cover background -->
-				<panel name="game_top_left_ally_bar_parent_{index}" x="0" y="0" width="4.3h" height="2.2h" valign="bottom" color="invisible" passivechildren="true" noclick="true" >
-					<frame height="50%" valign="top" color="0 0 0 .7" bordercolor="gray" borderthickness="1">
-						<panel name="game_top_left_ally_health_{index}" color="0 1 0 0" >
-							<instance name="statusbar_overlay" />
-						</panel>
-						<label name="game_top_left_ally_health_label_{index}" textalign="center" textvalign="center" font="dyn_8" color="white" shadow="true"/>
-					</frame>
-					<frame height="49%" valign="bottom" color="0 0 0 .7" bordercolor="gray" borderthickness="1">
-						<panel name="game_top_left_ally_mana_{index}" color="0 .4 1 1" >
-							<instance name="statusbar_overlay" />
-						</panel>
-						<label name="game_top_left_ally_mana_label_{index}" textalign="center" textvalign="center" font="dyn_8" color="white" shadow="true"/>
-					</frame>
-				</panel>
-
-				<!-- OptiUI: Open ally buttons panel button. This is ugly and needs fixing. -->
-				<!-- <panel name="game_top_left_ally_button_{index}" x="0" y="0" width="1.3h" height="1.3h" align="right" valign="bottom" color="invisible">
-					<instance name="team_member_icon_panel_button" index="{index}" />
-				</panel> -->
-				<!-- OptiUI: end -->
-			</frame>
+			</panel>
 
 			<!-- Right Click Menu -->
 			<instance name="team_member_icon_menu" index="{index}" />
-
 		</panel>
 	</template>
 
 	<!-- OptiUI: Wide Ally Info frames -->
 	<template name="team_member_icon_wide">
 		<!-- OptiUI: Added x position variable -->
-		<panel name="game_top_left_ally_parent_{index}" x="{x}" y="{y}" width="13.5h" height="4.5h" align="{align}" valign="{valign}" noclick="1" sticky="true" stickytoinvis="false" group="{group}">
+		<panel name="game_top_left_ally_parent_{index}" x="{x}" y="{y}" width="13.5h" height="4.5h" align="{align}" valign="{valign}" sticky="true" stickytoinvis="false" group="{group}">
 
+			<!-- Side panel -->
 			<instance name="team_member_icon_buttons_panel" index="{index}" />
 
-			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 1" >
-				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
-				
+			<!-- Framing -->
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 1" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true" />
+
+			<panel float="right" color="invisible" padding="1" noclick="true" >
 				<!-- OptiUI: Portrait -->
-				<panel width="4.5h" height="4.5h" noclick="true" >
-					<instance name="team_member_icon_portrait"  index="{index}" />
-				</panel>
+				<instance name="team_member_icon_portrait" width="115@" height="100%" index="{index}" lvl_borderthickness=".6h" />
 
-				<!-- Ally Ability Status Lights -->
-				<panel name="game_top_left_ally_status_light_{index}" x="-1.4h" y="0" width="7.4h" height="1.5h" align="right" valign="bottom" float="right" padding="1%" color="invisible" noclick="1" passivechildren="true">
-					<instance name="ally_ability_status" group="{group}" width="24%" height="24@" slot="0" index="{index}" />
-					<instance name="ally_ability_status" group="{group}" width="24%" height="24@" slot="1" index="{index}" />
-					<instance name="ally_ability_status" group="{group}" width="24%" height="24@" slot="2" index="{index}" />
-					<instance name="ally_ability_status" group="{group}" width="24%" height="24@" slot="3" index="{index}" />
-				</panel>
+				<panel width="7.7h" float="bottom" color="invisible" padding="1" noclick="true" >
+					<!-- Health / Mana Bars -->
+					<!-- OptiUI: Fixed width to fully cover background -->
+					<panel name="game_top_left_ally_bar_parent_{index}" height="2.9h" color="black" passivechildren="true" noclick="true" >
+						<frame height="50%" valign="top" color="0 .1 0 .7" bordercolor="gray" borderthickness="1">
+							<panel name="game_top_left_ally_health_{index}" color="0 1 0 0">
+								<instance name="statusbar_overlay" />
+							</panel>
+							<label name="game_top_left_ally_health_label_{index}" textalign="center" textvalign="center" font="dyn_7" color="white" outline="true"/>
+						</frame>
+						<frame height="50%" valign="bottom" color="0 0 .1 .7" bordercolor="gray" borderthickness="1">
+							<panel name="game_top_left_ally_mana_{index}" color="0 .4 1 1">
+								<instance name="statusbar_overlay" />
+							</panel>
+							<label name="game_top_left_ally_mana_label_{index}" textalign="center" textvalign="center" font="dyn_7" color="white" outline="true"/>
+						</frame>
+					</panel>
 
-				<!-- Health / Mana Bars -->
-				<!-- OptiUI: Fixed width to fully cover background -->
-				<panel name="game_top_left_ally_bar_parent_{index}" x="0" y="0" width="8.9h" height="2.9h" align="right" valign="top" color="invisible" passivechildren="true" noclick="true" >
-					<frame height="50%" valign="top" color="0 0 0 .7" bordercolor="gray" borderthickness="1">
-						<panel name="game_top_left_ally_health_{index}" color="0 1 0 0">
-							<instance name="statusbar_overlay" />
-						</panel>
-						<label name="game_top_left_ally_health_label_{index}" textalign="center" textvalign="center" font="dyn_7" color="white" outline="true"/>
-					</frame>
-					<frame height="50%" valign="bottom" color="0 0 0 .7" bordercolor="gray" borderthickness="1">
-						<panel name="game_top_left_ally_mana_{index}" color="0 0.4 1 1">
-							<instance name="statusbar_overlay" />
-						</panel>
-						<label name="game_top_left_ally_mana_label_{index}" textalign="center" textvalign="center" font="dyn_7" color="white" outline="true"/>
-					</frame>
+					<!-- Ally Ability Status Lights -->
+					<panel name="game_top_left_ally_status_light_{index}" height="1.5h" float="right" padding="1" color="invisible" noclick="1" passivechildren="true">
+						<instance name="ally_ability_status" group="{group}" width="25%" height="25@" slot="0" index="{index}" />
+						<instance name="ally_ability_status" group="{group}" width="25%" height="25@" slot="1" index="{index}" />
+						<instance name="ally_ability_status" group="{group}" width="25%" height="25@" slot="2" index="{index}" />
+						<instance name="ally_ability_status" group="{group}" width="25%" height="25@" slot="3" index="{index}" />
+					</panel>
 				</panel>
-
-				<!-- OptiUI: Open ally buttons panel button. This is ugly and needs fixing. -->
-				<!-- <panel name="game_top_left_ally_button_{index}" x="0" y="0" width="1.3h" height="1.3h" align="right" valign="bottom" color="invisible">
-					<instance name="team_member_icon_panel_button" index="{index}" />
-				</panel> -->
-				<!-- OptiUI: end -->
-			</frame>
+			</panel>
 
 			<!-- Right Click Menu -->
 			<instance name="team_member_icon_menu" index="{index}" />
-
 		</panel>
 	</template>
 
@@ -2683,157 +2682,171 @@
 	<!-- OptiUI: Moved ally icons above other elements to autodetect their position -->
 
 	<!-- Hero Info -->
-	<frame name="game_tl_hero_info" x="0.0h" y="0.0h" width="15.5h" height="4.5h" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .75" noclick="true" >
+	<panel name="game_tl_hero_info" x="0" y="0" width="15.5h" height="4.5h" noclick="true" >
+
+		<!-- Framing -->
+		<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" />
 		<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true" />
 
-		<!-- Icon / Lvl -->
-		<panel height="4.5h" width="4.5h" noclick="true" >
-			<frame name="game_top_left_hero_icon_bg" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" bordercolor="gray" color="gray" noclick="true"/>
-			<frame name="game_top_left_hero_icon_frame" texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="gray" color="invisible" noclick="true"/>
+		<panel float="right" color="invisible" padding="1" noclick="true" >
+			<!-- Icon / Lvl -->
+			<panel width="115@" height="100%" noclick="true" >
+				<!-- Framing -->
+				<frame name="game_top_left_hero_icon_parent" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" bordercolor="gray" color="invisible" noclick="true"/>
+				<frame name="game_top_left_hero_icon_frame" texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="gray" color="invisible" noclick="true"/>
 
-			<panel width="-6" height="-6" align="center" valign="center" color="invisible" >
-				<image name="game_top_left_hero_icon" noclick="true" />
-				<panel name="game_top_left_hero_icon_dead" noclick="true" >
-					<image texture="/ui/legion/dead.tga" noclick="true" />
-					<!-- Respawn Timer -->
-					<label name="game_top_left_respawn_timer" textalign="center" textvalign="center" font="dyn_14" color="yellow" shadow="true" noclick="true" />
+				<!-- Icon/Buttons -->
+				<panel name="game_top_left_hero_icon_bg" width="100@" height="100%" align="right" noclick="true" color="invisible" >
+					<panel x="1" y="1" width="-2" height="-2" color="invisible" >
+						<image name="game_top_left_hero_icon" />
+						<panel name="game_top_left_hero_icon_dead" >
+							<!-- <image texture="/ui/legion/dead.tga" noclick="true" /> -->
+							<!-- Respawn Timer -->
+							<label name="game_top_left_respawn_timer" textalign="center" textvalign="center" font="dyn_14" color="yellow" shadow="true" />
+						</panel>
+
+						<!-- LvlUp Effect -->
+						<!-- OptiUI: Level up texture instead of effect -->
+						<image name="game_top_left_hero_lvlup" texture="/ui/legion/optiui_lvl_up_glow.tga" rendermode="additive" />
+
+						<!-- UIScript -->
+						<!-- OptiUI: Removed gloss from the Hero portraits -->
+						<button
+							color="invisible"
+							onclick="SelectHero();"
+							onmouseoverlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(1) Game:SelfHover()"
+							onmouseoutlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(0) GetWidget('genericGameFloatingTip', 'game'):SetVisible(0)"
+							interactive="false"
+						/>
+
+						<!-- Item catcher -->
+						<!-- UIScript -->
+						<panel
+							color="invisible"
+							texture="/ui/info/drop.tga"
+							watch="ItemCursorVisible"
+							ontrigger="SetVisible(ItemCursorVisible); RefreshCursor();"
+							onmouseoverlua="self:SetColor('white')"
+							onmouseoutlua="self:SetColor('invisible')"
+							onclick="ItemPlaceHero();"
+							onrightclick="ItemPlaceHero();"
+						/>
+
+						<!-- Black Framing -->
+						<frame color="invisible" bordercolor="black" borderthickness="1" noclick="true" />
+					</panel>
 				</panel>
-				<!-- LvlUp Effect -->
-				<!-- OptiUI: Level up texture instead of effect -->
-				<panel name="game_top_left_hero_lvlup" color="1 1 1 1" texture="/ui/legion/optiui_lvl_up_glow.tga" rendermode="additive" noclick="true" />
 
-				<!-- UIScript -->
-				<!-- OptiUI: Removed gloss from the Hero portraits -->
-				<button
-					color="invisible"
-					onclick="SelectHero();"
-					onmouseoverlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(1) Game:SelfHover()"
-					onmouseoutlua="GetWidget('unit_tooltip_hero', 'game'):SetVisible(0) GetWidget('genericGameFloatingTip', 'game'):SetVisible(0)"
-					interactive="false"
-				/>
-
-				<!-- Item catcher -->
-				<!-- UIScript -->
-				<panel
-					color="invisible"
-					texture="/ui/info/drop.tga"
-					watch="ItemCursorVisible"
-					ontrigger="SetVisible(ItemCursorVisible); RefreshCursor();"
-					onmouseoverlua="self:SetColor('white')"
-					onmouseoutlua="self:SetColor('invisible')"
-					onclick="ItemPlaceHero();"
-					onrightclick="ItemPlaceHero();"
-				/>
+				<!-- Level -->
+				<panel width="38@" height="38%" align="left" valign="bottom" noclick="true" passivechildren="true" >
+					<frame name="game_top_left_hero_level_bg"  texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" >
+						<label name="game_top_left_hero_level_label" textalign="center" height="100%" textvalign="center" font="dyn_9" color="yellow" outline="true" />
+					</frame>
+				</panel>
 			</panel>
-			
-			<!-- Level -->
-			<frame name="game_top_left_hero_level_bg" height="35%" width="35%" align="right" valign="bottom" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".2h" noclick="true">
-				<label name="game_top_left_hero_level_label" width="100%" textalign="center" height="100%" textvalign="center" font="dyn_9" color="yellow" outline="true" noclick="true" />
-			</frame>
+
+			<panel width="9.7h" float="bottom" color="invisible" padding="1" noclick="true" >
+				<!-- Health / Mana Bars -->
+				<panel height="2.9h" color="black" noclick="true">
+					<panel height="50%" valign="top" color="black"
+						onmouseoverlua="GetWidget('health_tooltip_hero', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('health_tooltip_hero', 'game'):SetVisible(0)"
+						passivechildren="true"
+					>
+						<panel name="game_top_left_health_lerp" color="1 0 0 1" />
+						<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
+						<panel name="game_top_left_health_bar" onload="SetVScale(GetHeight() # 'p'); DoEvent();" color=".2 1 .3 1" noclick="1">
+							<instance name="statusbar_overlay" />
+						</panel>
+						<label name="game_top_left_health_label" font="dyn_8" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+					</panel>
+					
+					<panel height="50%" valign="bottom" color="black"
+						onmouseoverlua="GetWidget('mana_tooltip_hero', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('mana_tooltip_hero', 'game'):SetVisible(0)"
+						passivechildren="true"
+					>
+						<panel name="game_top_left_mana_lerp" color=".2 .2 .2 1" />
+						<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
+						<panel name="game_top_left_mana_bar" oneventlua="self:SetUScale((self:GetHeight() * 32)..'p')" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" color="0 .4 1 1" noclick="1">
+							<instance name="statusbar_overlay" />
+						</panel>
+						<label name="game_top_left_mana_label" font="dyn_8" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+					</panel>
+
+					<!-- Buyback Button -->
+					<panel name="game_top_left_buyback_parent" x="1" y="1" width="-2" height="-2" color="0 0 0 .8" >
+						<!-- UIScript -->
+						<instance
+							name="button_game"
+							width="-1.0h"
+							height="2h"
+							align="center"
+							valign="center"
+							borderthickness="0.6h"
+							button_name="dev_buyback"
+							font="dyn_9"
+							onclick="BuyBack();"
+						/>
+						<label name="game_top_left_buyback_exhausted_label" width="57%" height="100%" font="dyn_8" shadow="true" shadowoffset="2" color="white" textvalign="center" textalign="right" noclick="1" content="game_label_buy_back" />
+						<label name="game_top_left_buyback_label" x="61%" width="40%" height="100%" font="dyn_9" shadow="true" shadowoffset="2" color="yellow" textvalign="center" textalign="left" noclick="1" />
+					</panel>
+				</panel>
+
+				<panel height="1.5h" color="invisible" float="right" padding=".5h" noclick="true">
+					<!-- Stats Icon -->
+					<panel width="90@" height="90%" color="invisible" onmouseoverlua="GetWidget('attribute_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attribute_tooltip', 'game'):SetVisible(0)">
+						<image texture="/ui/elements/options_icon_stats.tga" noclick="true"/>
+					</panel>
+
+					<label name="game_top_left_buyback_indicator" width="90@" height="90%" content="Bb" color="white" font="dyn_9" textvalign="top" noclick="true" />
+
+					<include file="optiui_fastshare.package"/>
+				</panel>
+			</panel>
 		</panel>
+		
 
-
-		<!-- Health / Mana Bars -->
-		<panel x="0h" y="0h" width="10.9h" height="2.9h" align="right" color="black" noclick="true">
-			<panel height="50%" valign="top" color="black"
-				onmouseoverlua="GetWidget('health_tooltip_hero', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('health_tooltip_hero', 'game'):SetVisible(0)"
-				passivechildren="true"
-			>
-				<panel name="game_top_left_health_lerp" color="1 0 0 1" />
-				<panel name="game_top_left_health_bar" onload="SetVScale(GetHeight() # 'p'); DoEvent();" color=".2 1 .3 1" noclick="1">
-					<instance name="statusbar_overlay"/>
-				</panel>
-				<label name="game_top_left_health_label" font="dyn_8" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-			</panel>
-			
-			<panel height="50%" valign="bottom" color="black"
-				onmouseoverlua="GetWidget('mana_tooltip_hero', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('mana_tooltip_hero', 'game'):SetVisible(0)"
-				passivechildren="true"
-			>
-				<panel name="game_top_left_mana_lerp" color="0.5 0.5 0.5 1" />
-				<panel name="game_top_left_mana_bar" oneventlua="self:SetUScale((self:GetHeight() * 32)..'p')" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" color="0 .4 1 1" noclick="1">
-					<instance name="statusbar_overlay"/>
-				</panel>
-				<label name="game_top_left_mana_label" font="dyn_8" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
-			</panel>
-
-			<!-- Buyback Button -->
-			<panel name="game_top_left_buyback_parent" x="0" y="0" width="-1" height="-1" align="left" valign="bottom" color="0 0 0 .7" >
-				<!-- UIScript -->
-				<instance
-					name="button_game"
-					width="-1.0h"
-					height="2h"
-					align="center"
-					valign="center"
-					borderthickness="0.6h"
-					button_name="dev_buyback"
-					font="dyn_9"
-					onclick="BuyBack();"
-				/>
-				<label name="game_top_left_buyback_exhausted_label" width="57%" height="100%" font="dyn_9" shadow="true" shadowoffset="2" color="white" textvalign="center" textalign="right" noclick="1" content="game_label_buy_back" />
-				<label name="game_top_left_buyback_label" x="61%" width="40%" height="100%" font="dyn_9" shadow="true" shadowoffset="2" color="yellow" textvalign="center" textalign="left" noclick="1" />
-			</panel>
-		</panel>
-
-		<panel x="0h" y="0h" width="10.9h" height="1.5h" align="right" valign="bottom" color="invisible" noclick="true">
+		<panel width="1.3h" height="1.3h" align="right" valign="bottom" color="invisible" noclick="true">
 			<!-- Collapse Team Icons Button -->
-			<panel x="-1" width="90@" height="100%" align="right" color="invisible">
-				<!-- UIScript -->
-				<button
-					color="invisible"
-					onclick="ToggleAllies();"
-					interactive="false"
-				>
-					<widgetstate statename="up">
-						<image texture="/ui/common/ally_hide_up.tga"  />
-					</widgetstate>
-					<widgetstate statename="over">
-						<image texture="/ui/common/ally_hide_over.tga" />
-					</widgetstate>
-					<widgetstate statename="down">
-						<image y="1" x="1" texture="/ui/common/ally_hide_up.tga" />
-					</widgetstate>
-				</button>
-			</panel>
-
+			<!-- UIScript -->
+			<button
+				color="invisible"
+				onclick="ToggleAllies();"
+				interactive="false"
+			>
+				<widgetstate statename="up">
+					<image texture="/ui/info/combobox_button_up.tga" rotation="180" />
+				</widgetstate>
+				<widgetstate statename="over">
+					<image texture="/ui/info/combobox_button_over.tga" rotation="180" />
+				</widgetstate>
+				<widgetstate statename="down">
+					<image y="1" x="1" texture="/ui/info/combobox_button_up.tga" rotation="180" />
+				</widgetstate>
+			</button>
 			<!-- Expand Team Icons Button -->
-			<panel x="-1" name="game_top_left_ally_expand_btn" width="90@" height="100%" align="right" color="invisible" >
-				<!-- UIScript -->
-				<button
-					color="invisible"
-					onclick="ToggleAllies();"
-					interactive="false"
-				>
-					<widgetstate statename="up">
-						<image texture="/ui/common/ally_show_up.tga"  />
-					</widgetstate>
-					<widgetstate statename="over">
-						<image texture="/ui/common/ally_show_over.tga" />
-					</widgetstate>
-					<widgetstate statename="down">
-						<image y="1" x="1" texture="/ui/common/ally_show_up.tga" />
-					</widgetstate>
-				</button>
-			</panel>
-
-			<!-- Stats Icon -->
-			<panel width="90@" height="90%" color="invisible" onmouseoverlua="GetWidget('attribute_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attribute_tooltip', 'game'):SetVisible(0)">
-				<image width="90%" height="90%" align="center" valign="center" texture="/ui/elements/options_icon_stats.tga" noclick="1"/>
-			</panel>
-
-			<include file="optiui_fastshare.package"/>
-
-			<label name="game_top_left_buyback_indicator" x="4.0h" width="4.9h" content="Buyback" color="white" font="dyn_9" textvalign="top" noclick="true" />
+			<!-- UIScript -->
+			<button
+				name="game_top_left_ally_expand_btn"
+				color="invisible"
+				onclick="ToggleAllies();"
+				interactive="false"
+			>
+				<widgetstate statename="up">
+					<image texture="/ui/info/combobox_button_up.tga"  />
+				</widgetstate>
+				<widgetstate statename="over">
+					<image texture="/ui/info/combobox_button_over.tga" />
+				</widgetstate>
+				<widgetstate statename="down">
+					<image y="1" x="1" texture="/ui/info/combobox_button_up.tga" />
+				</widgetstate>
+			</button>
 		</panel>
+	</panel>
 
-	</frame>
-
-
+	<!-- OptiUI: Respawn timer tabs -->
 	<include file="optiui_respawn_timers.package" />
 
 	<!-- Middle Section -->
@@ -2886,29 +2899,34 @@
 	
 
 		<!-- Hero K/D/A -->
-		<panel y="0" width="11.0h" height="1.6h" align="left" color="0 0 0 0.4" noclick="1">
+		<panel y="0" width="11.0h" height="1.6h" align="left" noclick="true">
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 			<label x="0.3h" width="40%" height="100%" textalign="left" textvalign="center" font="dyn_10" color="white" content="game_label_hero_kd_hero" noclick="1" />
 			<label name="game_player_score_1" width="75%" height="100%" align="right" textalign="center" textvalign="center" font="dyn_10" color="white" noclick="1" />
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1"/>
 		</panel>
 
 		<!-- Creep Kills -->
-		<panel y="0" width="11.0h" height="1.6h" align="left" valign="bottom" color="0 0 0 0.4" noclick="1">
+		<panel y="0" width="11.0h" height="1.6h" align="left" valign="bottom" noclick="true">
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>			
 			<label x="0.3h" width="40%" height="100%" textalign="left" textvalign="center" font="dyn_10" color="white" content="game_label_creep_kills_creep" noclick="1"/>
 			<label name="game_player_score_2" width="60%" height="100%" align="right" textalign="center" textvalign="center" font="dyn_10" color="white" noclick="1" />
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1"/>
 		</panel>
 
 		<!-- Team Scores -->
-		<panel y="0" width="11.0h" height="1.6h" align="right" color="0 0 0 0.4" noclick="1">
+		<panel y="0" width="11.0h" height="1.6h" align="right" noclick="true">
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 			<label x="0.5h" content="Kills:" height="100%" textalign="left" textvalign="center" font="dyn_10" color="white" noclick="1" />
 			<label x="7.0h" name="game_team_score_1" height="100%" textalign="left" textvalign="center" font="dyn_10" color="white" noclick="1" />
 			<label x="4.0h" name="game_team_score_2" height="100%" textalign="left" textvalign="center" font="dyn_10" color="1 1 1 1" noclick="1" />
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1"/>
 		</panel>
 
-		<panel y="0" width="11.0h" height="1.6h" align="right" valign="bottom" color="invisible" noclick="true">
-			<panel y="0" width="5.4h" align="left" valign="bottom" color="0 0 0 0.4" noclick="true">
+		<panel width="11.0h" height="1.6h" align="right" valign="bottom" noclick="true">
+			<panel width="48%" align="left" valign="bottom" noclick="true">
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 				<label
 					name="game_match_time_rotation_label"
 					x="0.5h"
@@ -2918,9 +2936,10 @@
 					color="white"
 					noclick="1"
 				/>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true"/>
 			</panel>
-			<panel y="0" width="5.4h" align="right" valign="bottom" color="0 0 0 0.4" noclick="true">
+			<panel width="48%" align="right" valign="bottom" noclick="true">
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 				<label
 					name="game_match_time_rune_label"
 					x="0.5h"
@@ -2930,12 +2949,13 @@
 					color="white"
 					noclick="1"
 				/>
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true"/>
 			</panel>
 		</panel>
 
 		<!-- Game Time -->
-		<panel y="0.8h" width="5.3h" height="1.6h" align="center" valign="bottom" color="0 0 0 0.4" noclick="true">
+		<panel y="0.8h" width="5.3h" height="1.6h" align="center" valign="bottom" noclick="true">
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 			<label
 				name="game_match_time_label"
 				textalign="center" textvalign="top"
@@ -2944,7 +2964,6 @@
 				color="white"
 				noclick="1"
 			/>
-			<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true"/>
 		</panel>
 	</panel>
 
@@ -3348,7 +3367,7 @@
 			</panel>
 		</panel>
 
-		<panel x="-0.2h" y="0.25h" width="9.5h" height="2.0h" align="right" noclick="true">
+		<panel x="-0.0h" y="0.0h" width="9.5h" height="2.0h" align="right" noclick="true">
 
 			<!-- Menu Combobox -->
 			<instance
@@ -3374,7 +3393,7 @@
 			<label x="0.8h" height="100%" textvalign="center" font="dyn_9" color="1 1 1 1" shadow="true" noclick="true" content="game_menu_menu" />
 		</panel>
 
-		<panel x="-10.0h" y="0.25h" width="9.5h" height="2.0h" align="right" noclick="true">
+		<panel x="-9.6h" y="0.0h" width="9.5h" height="2.0h" align="right" noclick="true">
 			<!-- Voting Combobox -->
 			<instance
 				name="gamecontrol_combobox"
@@ -3489,7 +3508,7 @@
 		<include file="game_observatory.package"/>
 	-->
 
-	<frame y="0" width="100%" height="11.5h" align="center" valign="bottom" texture="/ui/info/backdrop.tga" color=".6 .6 .6 1" noclick="true"/>
+	<frame y="0" width="100%" height="11.5h" align="center" valign="bottom" texture="/ui/info/backdrop.tga" color=".5 .5 .5 1" noclick="true"/>
 
 	<!-- BOTTOM CENTER -->
 	<panel name="game_bottom_center" x="0h" y="0h" width="75.0h" height="29.8h" align="center" valign="bottom" color="invisible" noclick="1">
@@ -3597,7 +3616,7 @@
 			<!-- OptiUI: Container panel for left side elements -->
 			<panel x="0.0h" y="0.0h" width="21.2h" height="10.1h" align="left" valign="bottom" color="invisible" >
 				<!-- Portrait -->
-				<panel x="0h" y="0h" width="8.0h" height="8.0h" valign="bottom" align="right" color="invisible">
+				<panel x="0h" y="0h" width="8.0h" height="8.0h" valign="bottom" align="right" color="invisible" noclick="true">
 					<image name="game_center_portrait_icon" width="90%" height="90@" align="center" valign="center"
 						onmouseldownlua="PlaySound('/shared/sounds/ui/center_view.wav') Action('PortraitCenter', 1.0)"
 						onmouseluplua="Action('PortraitCenter', 0.0)"
@@ -3611,33 +3630,8 @@
 						interactive="false"
 					/>
 
-					<!-- UIScript -->
-					<modelpanel
-						noclick="true"
-						model="common/models/lvlup/lvlup.mdf"
-						anim="idle"
-						effect="common/models/lvlup/lvlup.effect"
-						camerapos="0 1 0"
-						cameraangles="0 0 180"
-						cameranear="-20"
-						camerafar="100"
-						camerafov="19.5"
-						depthclear="false"
-						depthcompress="true"
-						visible="false"
-						watch="EventActiveLevelup"
-						ontrigger="SetVisible(true); SetAnim('idle'); SetEffect('/ui/common/models/lvlup/lvlup.effect'); SleepWidget(1000, 'SetVisible(false);');"
-					/>
-
 					<!-- OptiUI: Made levelup portrait glow a texture instead of a model -->
-					<panel name="game_center_portrait_glow" noclick="1" visible="0"
-						x="0"
-						y="0"
-						color="1 1 1 1"
-						texture="/ui/legion/optiui_lvl_up_glow.tga"
-						rendermode="additive"
-					>
-					</panel>
+					<image name="game_center_portrait_glow" texture="/ui/legion/optiui_lvl_up_glow.tga" rendermode="additive" noclick="true" />
 
 					<!-- OptiUI: Player color frame -->
 					<frame height="-2" width="-2" align="center" valign="center" borderthickness="5%" bordercolor="black" color="invisible" noclick="1"/>
@@ -3779,8 +3773,13 @@
 				<panel x="0h" y="0h" width="13.0h" height="8.0h" align="left" valign="bottom" color="invisible" noclick="1">
 					<!-- Damage -->
 					<!-- OptiUI: Added attack cooldown value -->
-					<panel name="game_center_damage" y="-6.5h" height="1.5h" valign="bottom" color=".5 0 0 .20" onmouseoverlua="GetWidget('attack_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attack_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-						<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/damage_icon.tga"/>
+					<panel name="game_center_damage" y="-6.5h" height="1.5h" valign="bottom" passivechildren="true"
+						onmouseoverlua="GetWidget('attack_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('attack_tooltip', 'game'):SetVisible(0)"
+					>
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".5 0 0 .25" />
+						<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".5 0 0 .25" />
+						<image width="1.4h" height="1.4h" valign="center" texture="/ui/common/damage_icon.tga" />
 						<label name="game_center_damage_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
 						<label width="-2.0h" height="100%" align="right" font="dyn_9" color="gray" outline="1" textalign="right" textvalign="top"
 							watch="ActiveAttackCooldown"
@@ -3788,20 +3787,35 @@
 		 				/>
 					</panel>
 					<!-- Movement Speed -->
-					<panel y="-4.7h" height="1.5h" valign="bottom" color="0 .5 0 .20" onmouseoverlua="GetWidget('movement_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('movement_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-						<image width="1.5h" height="1.5h" texture="/ui/common/move_speed_icon.tga"/>
+					<panel y="-4.7h" height="1.5h" valign="bottom" passivechildren="true"
+						onmouseoverlua="GetWidget('movement_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('movement_tooltip', 'game'):SetVisible(0)"
+					>
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 .5 0 .30" />
+						<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 .5 0 .30" />	
+						<image width="1.4h" height="1.4h" valign="center" texture="/ui/common/move_speed_icon.tga" />
 						<label name="game_center_speed_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
 					</panel>
 					<!-- Armor -->
-					<panel y="-1.8h" height="2.5h" valign="bottom" color=".5 0 0 .25" onmouseoverlua="GetWidget('defense_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('defense_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-						<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/armor_icon.tga"/>
+					<panel y="-1.8h" height="2.5h" valign="bottom" passivechildren="true"
+						onmouseoverlua="GetWidget('defense_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('defense_tooltip', 'game'):SetVisible(0)"
+					>
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".5 0 0 .35" />
+						<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".5 0 0 .35" />
+						<image width="1.4h" height="1.4h" valign="center" texture="/ui/common/armor_icon.tga" />
 						<label name="game_center_armor_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top"/>
 						<!-- OptiUI: Added physical and magic armor reduction values. Idea taken from xUI -->
 						<label name="game_center_damage_mitigation_label" width="-2.0h" height="100%" align="right" font="dyn_8" color="gray" outline="1" textalign="left" textvalign="bottom"/>
 					</panel>
 					<!-- Attributes -->
-					<panel name="game_center_att_parent" y="0h" height="1.5h" valign="bottom" color="0 .5 0 .30" onmouseoverlua="GetWidget('attribute_tooltip', 'game'):SetVisible(1)" onmouseoutlua="GetWidget('attribute_tooltip', 'game'):SetVisible(0)" passivechildren="true">
-						<image width="1.5h" height="1.5h" texture="/ui/common/plus_icon.tga"/>
+					<panel name="game_center_att_parent" y="0h" height="1.5h" valign="bottom" passivechildren="true"
+						onmouseoverlua="GetWidget('attribute_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('attribute_tooltip', 'game'):SetVisible(0)"
+					>
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 .5 0 .40" />
+						<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 .5 0 .40" />
+						<image width="1.4h" height="1.4h" valign="center" texture="/ui/common/plus_icon.tga" />
 						<label name="game_center_att_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top" />
 					</panel>
 				</panel>
@@ -3880,8 +3894,9 @@
 			</panel>
 
 			<!-- Shop Indicator -->
-			<frame name="item_shop_sign" y="-10.8h" width="4.5h" height="4.5h" align="right" valign="bottom" visible="true" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" noclick="true" >
-				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
+			<panel name="item_shop_sign" y="-10.8h" width="4.5h" height="4.5h" align="right" valign="bottom" visible="true" >
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" />
+				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
 				<image height="4.5h" width="4.5h" y="0h" valign="top" align="center" texture="common/optiui_sign.tga" />
 				<!-- UIScript -->
 				<button
@@ -3891,10 +3906,10 @@
 					onclick="PlaySound('/shared/sounds/ui/shop.wav'); If(ItemCursorVisible and PlayerCanShop, Sell(), ToggleShop());"
 					interactive="false"
 				/>
-			</frame>
+			</panel>
 
 			<!-- Backpack -->
-			<frame x="0.0h" y="0.0h" width="16.0h" height="10.1h" noclick="1" align="right" valign="bottom" color="invisible" bordercolor="gray" borderthickness="0">
+			<panel x="0.0h" y="0.0h" width="16.0h" height="10.1h" align="right" valign="bottom" color="invisible" noclick="true" >
 				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h">
 						<instance name="inventory_button" slot="36"/>
 					</panel>
@@ -3914,7 +3929,7 @@
 				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom" align="right">
 						<instance name="inventory_button" slot="41"/>
 				</panel>
-			</frame>
+			</panel>
 
 			<!-- Inventory Cover -->
 			<panel x="0.0h" y="0.0h" width="16.0h" height="10.1h" align="right" valign="bottom" color="black" noclick="true" watch="ActiveHasInventory" ontriggerlua="self:SetVisible(not AtoB(param))">
@@ -3925,12 +3940,13 @@
 			<!-- Inventory -->
 			<panel name="inventory" x="0.0h" y="0.0h" width="16.0h" height="13.0h" align="right" valign="bottom" color="invisible" noclick="true">
 				<!-- Gold Amt / Shop Button -->
-				<frame name="shop_button" width="8.4h" height="2.3h" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" noclick="true" >
-					<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
+				<panel name="shop_button" width="8.4h" height="2.3h" >
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" />
+					<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
 
 					<!-- UIScript -->
-					<image x="1" y="-1" height="2.1h" width="2.1h" valign="bottom" align="left" texture="common/optiui_gold.tga" noclick="true" />
-					<label name="game_center_gold_label" y="0.0h" x="2.3h" height="100%" align="left" textalign="left" textvalign="bottom" font="dyn_10" color="white" outline="1" noclick="true" />
+					<image x="1" y="-1" height="2.1h" width="2.1h" valign="bottom" align="left" texture="common/optiui_gold.tga"/>
+					<label name="game_center_gold_label" y="0.0h" x="2.3h" height="100%" align="left" textalign="left" textvalign="bottom" font="dyn_10" color="white" outline="1" />
 					<!-- UIScript -->
 					<button
 						color="invisible"
@@ -3939,7 +3955,7 @@
 						onclick="PlaySound('/shared/sounds/ui/shop.wav'); If(ItemCursorVisible and PlayerCanShop, Sell(), ToggleShop());"
 						interactive="false"
 					/>
-				</frame>
+				</panel>
 
 				<!-- Gold Report -->
 				<floater name="shop_tooltip_gold_report" height="14h" width="38h" x="-4h" y="1.5h" align="left" valign="bottom" color="invisible" noclick="true" visible="false" onload="ForceToFront();">
@@ -3966,7 +3982,8 @@
 
 		<!-- Level Up Buttons -->
 		<!-- OptiUI: Moved ability level up button holder above everything else -->
-		<frame name="game_center_levelup_btn_holder" x="0.6h" y="-11.2h" width="40.2h" height="4.0h" texture="/ui/frames/rounded_bg_white.tga" align="center" valign="bottom" borderthickness=".6h" color="0 0 0 .5" noclick="true" >
+		<panel name="game_center_levelup_btn_holder" x="0.6h" y="-11.2h" width="40.2h" height="4.0h" align="center" valign="bottom" color="invisible" noclick="true" >
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .4" noclick="true" />
 			<frame name="game_center_levelup_btn_holder_frame" texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 
 			<panel float="right" noclick="true"> 
@@ -3996,7 +4013,7 @@
 					</panel>
 				</panel>
 			</panel>
-		</frame>
+		</panel>>
 		
 		<!-- Error Messages -->
 		<textbuffer name="game_center_error_messages"
@@ -4399,15 +4416,15 @@
 
 		<!-- Info - Units/Heroes -->
 		<!-- UIScript -->
-		<panel name="game_selected_info_unit" width="24.0h" height="15.0h" align="right" valign="bottom" group="selected_info" watch="SelectedVisible0 SelectedVisible1 SelectedType0" ontrigger="SetVisible(SelectedVisible0 and !SelectedVisible1 and !StringEquals(SelectedType0, 'building'));" color="invisible" noclick="1">
+		<panel name="game_selected_info_unit" width="22.0h" height="13.5h" align="right" valign="bottom" group="selected_info" watch="SelectedVisible0 SelectedVisible1 SelectedType0" ontrigger="SetVisible(SelectedVisible0 and !SelectedVisible1 and !StringEquals(SelectedType0, 'building'));" color="invisible" noclick="1">
 
-			<frame name="game_selected_info_unit_bg" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .9" noclick="true" >
-				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
-			</frame>
+			<!-- <frame name="game_selected_info_unit_bg" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .9" noclick="true" > -->
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" noclick="true" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
 
 			<!-- Icon -->
-			<panel name="game_selected_info_unit_icon" x="0.0h" y="0.0h" height="6.0h" width="6.0h" align="right" valign="top">
-				<image texture="/ui/legion/portrait_background.tga" color="1 1 1 1"/>
+			<panel name="game_selected_info_unit_icon" height="4.9h" width="4.9h" align="right" >
+				<image texture="/ui/legion/portrait_background.tga" />
 				<image name="game_botright_portrait_icon_0"
 					onmouseldownlua="Action('PortraitCenterInfo', 1.0)" onmouseluplua="Action('PortraitCenterInfo', 0.0)"
 					onmouseoverlua="GetWidget('unit_tooltip_info0', 'game'):SetVisible(1)"   onmouseoutlua="GetWidget('unit_tooltip_info0', 'game'):SetVisible(0)"
@@ -4422,14 +4439,14 @@
 				</panel>
 
 				<!-- Level -->
-				<panel name="game_botright_level_bg_0" x="0" y="0" height="33%" width="33%" valign="bottom" align="right" color="black"
+				<panel name="game_botright_level_bg_0" height="35%" width="35%" valign="bottom" color="black"
 					passivechildren="true"
 					onmouseoverlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(0)"
 				>
 					<!-- <image name="game_botright_level_img_0" x="-0.5h" y="-0.5h" width="5.0h" height="5.0h" texture="/ui/common/ability_toggle.tga" noclick="true" /> -->
 					<label name="game_botright_level_label_0" width="100%" textalign="center" height="100%" textvalign="center" font="dyn_10" color="yellow" shadow="true" />
-					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+					<frame borderthickness="1" bordercolor=".3 .3 .3 1" color="invisible" noclick="true" />
 				</panel>
 
 				<!-- Item catcher -->
@@ -4445,99 +4462,102 @@
 					onrightclick="ItemPlaceSelected(0);"
 				/>
 
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+				<frame borderthickness="1" bordercolor=".3 .3 .3 1" color="invisible" noclick="true" />
 			</panel>
 
+			<!-- OptiUI: Name/Health/Mana/Inventory/Cover -->
+			<panel name="game_botright_info_unit_status_parent" x="0.7h" width="15.9h" align="left" color="invisible" noclick="true" >
+				<panel float="bottom" padding="1" color="invisible" noclick="true" >
 
-			<!-- Inventory -->
-			<panel name="game_selected_info_unit_inventory" x="-1.2h" y="-0.5h" width="13.0h" height="8.5h" align="right" valign="bottom" color="invisible">
-				<panel height="4.1h" width="4.1h" align="left" valign="top" color="invisible">
-					<instance name="inventory_info" slot="36"/>
+					<!-- Name -->
+					<panel name="game_botright_name_label_0_parent" height="1.6h" noclick="true" >
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .7" noclick="true" />
+						<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+						<label name="game_botright_name_label_0" x="-0.5h" textalign="right"  textvalign="top" color="white" font="dyn_9" shadow="true" shadowoffset="2" noclick="true" />
+						<label name="game_botright_name_label_0B" x="0.5h" textalign="left" textvalign="top" color="white" font="dyn_9" shadow="true" shadowoffset="2" noclick="true" />
+					</panel>
+
+					<!-- Health -->
+					<panel name="game_botright_health_bar_bg_0"
+						height="1.5h"
+						color="invisible"
+						onmouseoverlua="GetWidget('health_tooltip_info', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('health_tooltip_info', 'game'):SetVisible(0)"
+						passivechildren="true"
+					>
+						<panel name="game_botright_health_bar_backer_0" color="0 1 0 1" noclick="1">
+							<panel color="0 0 0 .9"/>
+						</panel>
+						<frame borderthickness="1" bordercolor=".3 .3 .3 1" color="invisible" noclick="true" />
+						<panel name="game_botright_health_bar_0" color="0 1 0 1" noclick="1">
+							<instance name="statusbar_overlay" bordercolor=".3 .3 .3 1" />
+						</panel>
+						<label name="game_botright_health_label_0" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="top" />
+					</panel>
+
+					<!-- Mana -->
+					<panel name="game_botright_mana_bar_bg_0"
+						height="1.5h"
+						color="invisible"
+						onmouseoverlua="GetWidget('mana_tooltip_info', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('mana_tooltip_info', 'game'):SetVisible(0)"
+						passivechildren="true"
+					>
+						<panel name="game_botright_mana_bar_backer_0" color="0 0 1 1" noclick="1">
+							<panel color="0 0 0 .9"/>
+						</panel>
+						<frame borderthickness="1" bordercolor=".3 .3 .3 1" color="invisible" noclick="true" />
+						<panel name="game_botright_mana_bar_0" color="0 .4 1 1">
+							<instance name="statusbar_overlay" bordercolor=".3 .3 .3 1" />
+						</panel>
+						<label name="game_botright_mana_label_0" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="top" />
+					</panel>
 				</panel>
-				<panel height="4.1h" width="4.1h" align="center" valign="top" color="invisible">
-					<instance name="inventory_info" slot="37"/>
-				</panel>
-				<panel height="4.1h" width="4.1h" align="right" valign="top" color="invisible">
-					<instance name="inventory_info" slot="38"/>
-				</panel>
-				<panel height="4.1h" width="4.1h" align="left" valign="bottom" color="invisible">
-					<instance name="inventory_info" slot="39"/>
-				</panel>
-				<panel height="4.1h" width="4.1h" align="center" valign="bottom" color="invisible">
-					<instance name="inventory_info" slot="40"/>
-				</panel>
-				<panel height="4.1h" width="4.1h" align="right" valign="bottom" color="invisible">
-					<instance name="inventory_info" slot="41"/>
+
+				<!-- Inventory -->
+				<panel name="game_selected_info_unit_inventory_parent" y="-0.5h" width="12.0h" height="7.7h" valign="bottom" color="invisible" noclick="true" >
+					<!-- <panel name="game_selected_info_unit_inventory" color="invisible" noclick="true"> -->
+						<panel height="48%" width="48@" align="left" valign="top" color="invisible">
+							<instance name="inventory_info" slot="36" bordercolor=".3 .3 .3 1" />
+						</panel>
+						<panel height="48%" width="48@" align="center" valign="top" color="invisible">
+							<instance name="inventory_info" slot="37" bordercolor=".3 .3 .3 1" />
+						</panel>
+						<panel height="48%" width="48@" align="right" valign="top" color="invisible">
+							<instance name="inventory_info" slot="38" bordercolor=".3 .3 .3 1" />
+						</panel>
+						<panel height="48%" width="48@" align="left" valign="bottom" color="invisible">
+							<instance name="inventory_info" slot="39" bordercolor=".3 .3 .3 1" />
+						</panel>
+						<panel height="48%" width="48@" align="center" valign="bottom" color="invisible">
+							<instance name="inventory_info" slot="40" bordercolor=".3 .3 .3 1" />
+						</panel>
+						<panel height="48%" width="48@" align="right" valign="bottom" color="invisible">
+							<instance name="inventory_info" slot="41" bordercolor=".3 .3 .3 1" />
+						</panel>
+					<!-- </panel> -->
+
+					<!-- Inventory Cover -->
+					<panel name="game_selected_info_unit_inventory_cover" color="invisible" passivechildren="true"
+						watch="SelectedHasInventory"
+						ontriggerlua="self:SetVisible(not AtoB(param))"
+					>
+						<frame texture="/ui/frames/rounded_bg_white.tga" color=".1 .1 .1 .9" borderthickness="0" bordercolor="gray" noclick="true" />
+					</panel>
 				</panel>
 			</panel>
-
-			<!-- Health -->
-			<panel name="game_botright_health_bar_bg_0"
-				x="-1.2h"
-				y="2.0h"
-				width="16.0h"
-				height="1.7h"
-				align="right" valign="top"
-				color="0 .2 0 0"
-				onmouseoverlua="GetWidget('health_tooltip_info', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('health_tooltip_info', 'game'):SetVisible(0)"
-				passivechildren="true"
-			>
-				<panel name="game_botright_health_bar_backer_0" color="0 1 0 0" noclick="1">
-					<panel color="0 0 0 .85"/>
-				</panel>
-				<panel name="game_botright_health_bar_0" color="0 1 0 0" noclick="1">
-					<instance name="statusbar_overlay"/>
-				</panel>
-				<label name="game_botright_health_label_0" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
-			</panel>
-
-			<!-- Mana -->
-			<panel name="game_botright_mana_bar_bg_0"
-				x="-1.2h"
-				y="3.7h"
-				width="16.0h"
-				height="1.7h"
-				align="right" valign="top"
-				color="0 0 .1 1"
-				onmouseoverlua="GetWidget('mana_tooltip_info', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('mana_tooltip_info', 'game'):SetVisible(0)"
-				passivechildren="true"
-			>
-				<panel name="game_botright_mana_bar_0" color="0 .4 1 1">
-					<instance name="statusbar_overlay"/>
-				</panel>
-				<label name="game_botright_mana_label_0" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
-			</panel>
-
-			<!-- Inventory Cover -->
-			<panel name="game_selected_info_unit_inventory_cover" x="-1.2h" y="-0.5h" width="13.0h" height="8.5h" align="right" valign="bottom" color="invisible" passivechildren="true"
-				watch="SelectedHasInventory"
-				ontriggerlua="self:SetVisible(not AtoB(param))"
-			>
-				<image width="17.0h" texture="/ui/common/optiui_inventory_cover.tga" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
-			</panel>
-
-			<!-- Name -->
-			<frame name="game_botright_name_label_0_parent" x="-1.2h" y="0.0" width="16.0h" height="1.7h" align="right" valign="top" color="0 0 0 .7" borderthickness="1" bordercolor="gray" noclick="true">
-				<label name="game_botright_name_label_0" x="0.5h" textalign="left"  textvalign="center" color="white" font="dyn_9" shadow="true" shadowoffset="2" noclick="true" />
-			</frame>
-			<frame name="game_botright_name_label_0B_parent" x="-1.2h" y="0.0" width="16.0h" height="1.7h" align="right" valign="top" color="0 0 0 .7" borderthickness="1" bordercolor="gray" noclick="true">
-				<label name="game_botright_name_label_0B" x="-0.5h" textalign="right" textvalign="center" color="white" font="dyn_9" shadow="true" shadowoffset="2" noclick="true" />
-			</frame>
 
 			<!-- Selected Stats -->
-			<panel name="game_selected_info_unit_stats" x="0.0h" y="-0.5h" width="8.8h" height="7.7h" align="left" valign="bottom" color="invisible" float="bottom" padding="0.3h" noclick="true">
+			<panel name="game_selected_info_unit_stats" y="-0.5h" width="8.8h" height="7.7h" align="right" valign="bottom" color="invisible" float="bottom" padding="0.3h" noclick="true">
 				<!-- Damage -->
-				<panel height="1.7h" color=".5 0 0 .15" passivechildren="true"
+				<panel height="1.7h" passivechildren="true"
 					watch="SelectedDamage"
 					ontriggerlua="self:SetVisible(tonumber(param1) ~= 0)"
 					onmouseoverlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(0)"
 				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".5 0 0 .25" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".5 0 0 .25" />
 					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/damage_icon.tga"/>
 					<label x="15@" width="-100@" height="100%" align="right" font="dyn_9" color="white" shadow="1" textalign="left" textvalign="center" outline="1"
 						watch="SelectedDamage"
@@ -4545,12 +4565,14 @@
 					/>
 				</panel>
 				<!-- Movement Speed -->
-				<panel height="1.7h" color="0 .5 0 .15" passivechildren="true"
+				<panel height="1.7h" passivechildren="true"
 					watch="SelectedMoveSpeed"
 					ontriggerlua="self:SetVisible(tonumber(param1) ~= 0)"
 					onmouseoverlua="GetWidget('movement_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('movement_tooltip_info', 'game'):SetVisible(0)"
 				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 .5 0 .25" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 .5 0 .25" />
 					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/move_speed_icon.tga"/>
 					<label x="15@" width="-100@" height="100%" align="right" font="dyn_9" color="white" shadow="1" textalign="left" textvalign="center" outline="1"
 						watch="SelectedMoveSpeed"
@@ -4558,7 +4580,7 @@
 					/>
 				</panel>
 				<!-- Armor -->
-				<panel height="1.7h" color=".5 0 0 .15" passivechildren="true"
+				<panel height="1.7h" passivechildren="true"
 					onmouseoverlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(0)"
 					onload="
@@ -4566,6 +4588,8 @@
 						CreateFloat('game_player_info_magicarmor', 0);
 					"
 				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".5 0 0 .25" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".5 0 0 .25" />
 					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/armor_icon.tga"/>
 					<label x="15@" width="-100@" height="100%" align="right" font="dyn_9" color="white" shadow="1" textalign="left" textvalign="center" outline="1"
 						watch="SelectedArmor"
@@ -4575,11 +4599,13 @@
 					/>
 				</panel>
 				<!-- Attributes -->
-				<panel height="1.7h" color="0 .5 0 .15" passivechildren="true" float="right"
+				<panel height="1.7h" passivechildren="true"
 					watch="SelectedHasAttributes" ontriggerlua="self:SetVisible(AtoB(param))"
 					onmouseoverlua="GetWidget('attribute_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('attribute_tooltip_info', 'game'):SetVisible(0)"
 				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 .5 0 .25" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 .5 0 .25" />
 					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/plus_icon.tga"/>
 					<label x="15@" width="-100@" height="100%" align="right" font="dyn_9" color="white" shadow="1" textalign="left" textvalign="center" outline="1"
 						watch="SelectedAttributes"
@@ -4602,14 +4628,14 @@
 
 		<!-- Info - Buildings -->
 		<!-- UIScript -->
-		<panel name="game_selected_info_building" width="24.0h" height="12.0h" align="right" valign="bottom" visible="1" color="invisible" noclick="1" watch="SelectedVisible0 SelectedVisible1 SelectedType0" ontrigger="SetVisible(SelectedVisible0 and !SelectedVisible1 and StringEquals(SelectedType0, 'building'));">
+		<panel name="game_selected_info_building" width="22.0h" height="11.5h" align="right" valign="bottom" visible="1" color="invisible" noclick="1" watch="SelectedVisible0 SelectedVisible1 SelectedType0" ontrigger="SetVisible(SelectedVisible0 and !SelectedVisible1 and StringEquals(SelectedType0, 'building'));">
 
-			<frame name="game_selected_info_building_bg" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .9" noclick="true" >
-				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
-			</frame>
+			<!-- <frame name="game_selected_info_building_bg" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .9" noclick="true" > -->
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" noclick="true" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
 
 			<!-- Icon -->
-			<panel name="game_selected_info_building_icon" x="0.0h" y="0.0h" height="6.0h" width="6.0h" align="right" valign="top">
+			<panel name="game_selected_info_building_icon" height="4.9h" width="4.9h" align="right" >
 				<image name="game_botright_portrait_icon_1"
 					onmouseldownlua="Action('PortraitCenterInfo', 1.0)"
 					onmouseluplua="Action('PortraitCenterInfo', 0.0)"
@@ -4619,13 +4645,13 @@
 				/>
 				
 				<!-- Level -->
-				<panel name="game_botright_level_bg_1" x="0.0h" y="0.0h" height="33%" width="33%" valign="bottom" align="right" color="black"
+				<panel name="game_botright_level_bg_1" height="35%" width="35%" valign="bottom" color="black"
 					passivechildren="true"
 					onmouseoverlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('experience_tooltip_info', 'game'):SetVisible(0)"
 				>
 					<label name="game_botright_level_label_1" width="100%" textalign="center" height="100%" textvalign="center" font="dyn_10" color="yellow" shadow="true" />
-					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+					<frame borderthickness="1" bordercolor=".3 .3 .3 1" color="invisible" noclick="true" />
 				</panel>
 
 				<!-- Item catcher -->
@@ -4641,59 +4667,61 @@
 					onrightclick="ItemPlaceSelected(0);"
 				/>
 
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+				<frame borderthickness="1" bordercolor=".3 .3 .3 1" color="invisible" noclick="true" />
 			</panel>
 
-			
-			<!-- Health -->
-			<panel name="game_botright_health_bar_bg_1"
-				x="-1.2h"
-				y="2.0h"
-				width="15.0h"
-				height="1.7h"
-				align="right" valign="top"
-				color="0 .2 0 0"
-				onmouseoverlua="GetWidget('health_tooltip_info', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('health_tooltip_info', 'game'):SetVisible(0)"
-				passivechildren="true"
-			>
-				<panel name="game_botright_health_bar_backer_1" color="0 1 0 0" noclick="1">
-					<panel color="0 0 0 .85"/>
-				</panel>
-				<panel name="game_botright_health_bar_1" color="0 1 0 0" noclick="1">
-					<instance name="statusbar_overlay"/>
-				</panel>
-				<label name="game_botright_health_label_1" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
-			</panel>
+			<!-- OptiUI: Name/Health/Mana/Inventory/Cover -->
+			<panel name="game_botright_info_building_status_parent" x="0.7h" width="15.9h" color="invisible" noclick="true" >		
+				<panel float="bottom" padding="1" color="invisible" noclick="true" >
+					<!-- Name -->
+					<panel name="game_botright_name_label_1_parent" height="1.6h" noclick="true">
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .7" noclick="true" />
+						<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+						<label name="game_botright_name_label_1" x="-0.5h" textalign="right" textvalign="top" color="white" font="dyn_9" shadow="true" shadowoffset="2" noclick="true" />
+						<label name="game_botright_name_label_1B" x="0.5h" textalign="left" textvalign="top" color="white" font="dyn_9" shadow="true" shadowoffset="2" noclick="true" />
+					</panel>
 
-			<!-- Shared abilities -->
-			<panel name="game_selected_info_building_shared_abilities" width="13.0h" height="6.0h" align="right" valign="bottom" color="invisible" noclick="1">
-				<panel name="game_selected_info_building_shared_abilities_pos" width="100%" align="center" color="invisible" padding="0" noclick="0">
-					<instance name="ability_frame_shared" align="right"  slot="33"/>
-					<instance name="ability_frame_shared" align="center" slot="34"/>
-					<instance name="ability_frame_shared" align="left"   slot="35"/>
+					<!-- Health -->
+					<panel name="game_botright_health_bar_bg_1"
+						height="1.5h"
+						color="invisible"
+						onmouseoverlua="GetWidget('health_tooltip_info', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('health_tooltip_info', 'game'):SetVisible(0)"
+						passivechildren="true"
+					>
+						<panel name="game_botright_health_bar_backer_1" color="0 1 0 1" noclick="1">
+							<panel color="0 0 0 .9"/>
+						</panel>
+						<frame borderthickness="1" bordercolor=".3 .3 .3 1" color="invisible" noclick="true" />
+						<panel name="game_botright_health_bar_1" color="0 1 0 1" noclick="1">
+							<instance name="statusbar_overlay" bordercolor=".3 .3 .3 1" />
+						</panel>
+						<label name="game_botright_health_label_1" font="dyn_9" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="top" />
+					</panel>
 				</panel>
-			</panel>
 
-			<!-- Name -->
-			<frame name="game_botright_name_label_1_parent" x="-1.2h" y="0.0" width="15.0h" height="1.7h" align="right" valign="top" color="0 0 0 .7" borderthickness="1" bordercolor="gray" noclick="true">
-				<label name="game_botright_name_label_1" x="0.5h" textalign="left"  textvalign="center" color="white" font="dyn_9" shadow="true" shadowoffset="2" noclick="true" />
-			</frame>
-			<frame name="game_botright_name_label_1B_parent" x="-1.2h" y="0.0" width="15.0h" height="1.7h" align="right" valign="top" color="0 0 0 .7" borderthickness="1" bordercolor="gray" noclick="true">
-				<label name="game_botright_name_label_1B" x="-0.5h" textalign="right" textvalign="center" color="white" font="dyn_9" shadow="true" shadowoffset="2" noclick="true" />
-			</frame>
+				<!-- Shared abilities -->
+				<panel name="game_selected_info_building_shared_abilities" width="12.0h" height="6.0h" align="left" valign="bottom" color="invisible" noclick="true" >
+					<panel name="game_selected_info_building_shared_abilities_pos" width="100%" align="center" color="invisible" padding="0" noclick="true" >
+						<instance name="ability_frame_shared" align="left"   slot="33" bordercolor=".3 .3 .3 1" />
+						<instance name="ability_frame_shared" align="center" slot="34" bordercolor=".3 .3 .3 1" />
+						<instance name="ability_frame_shared" align="right"  slot="35" bordercolor=".3 .3 .3 1" />
+					</panel>
+				</panel>
+
+			</panel>
 
 			<!-- Selected Stats -->
-			<panel name="game_selected_info_building_stats" x="0.0h" y="-1.0h" width="8.8h" height="3.7h" align="right" valign="bottom" color="invisible" float="bottom" padding="0.3h">
-
+			<panel name="game_selected_info_building_stats" y="-1.0h" width="8.8h" height="3.7h" align="right" valign="bottom" color="invisible" float="bottom" padding="0.3h" noclick="true" >
 				<!-- Selected Damage -->
-				<panel height="1.7h" align="right" passivechildren="true" color=".5 0 0 0.15"
+				<panel height="1.7h" passivechildren="true"
 					watch="SelectedDamage"
 					ontriggerlua="self:SetVisible(tonumber(param1) ~= 0)"
 					onmouseoverlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('attack_tooltip_info', 'game'):SetVisible(0)"
 				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".5 0 0 .25" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".5 0 0 .25" />
 					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/damage_icon.tga"/>
 					<label width="-1.7h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center"
 						watch="SelectedDamage"
@@ -4710,12 +4738,13 @@
 						"
 					/>
 				</panel>
-
 				<!-- Selected Armor -->
-				<panel height="1.7h" align="right" valign="center" passivechildren="true" color="0 .5 0 0.15"
+				<panel height="1.7h" passivechildren="true"
 					onmouseoverlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(1)"
 					onmouseoutlua="GetWidget('defense_tooltip_info', 'game'):SetVisible(0)"
 				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 .5 0 .25" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 .5 0 .25" />
 					<image width="1.5h" height="1.5h" valign="center" texture="/ui/common/armor_icon.tga"/>
 					<label width="-1.7h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="center"
 						watch="SelectedArmor"
@@ -4731,20 +4760,19 @@
 						"
 					/>
 				</panel>
-
 			</panel>
 		</panel>
 
 		<!-- Multiple Selected -->
 		<!-- UIScript -->
-		<panel name="game_selected_info_mult" watch="SelectedVisible0 SelectedVisible1" width="24.0h" height="13.5h" align="right" valign="bottom" ontrigger="SetVisible(SelectedVisible0 and SelectedVisible1);" noclick="1">
+		<panel name="game_selected_info_mult" watch="SelectedVisible0 SelectedVisible1" width="22.0h" height="13.5h" align="right" valign="bottom" ontrigger="SetVisible(SelectedVisible0 and SelectedVisible1);" noclick="1">
 
 			<!-- Framing -->
-			<frame name="game_selected_info_mult_backer" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .9" noclick="true" >
-				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
-			</frame>
+			<!-- <frame name="game_selected_info_mult_backer" texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .9" noclick="true" > -->
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" noclick="true" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
 
-			<panel name="game_selected_info_mult_units" width="-4" height="-4" align="center" valign="center" color="invisible" visible="1" >
+			<panel name="game_selected_info_mult_units" x="3" y="3" width="-6" height="-6" color="invisible" visible="1" >
 				<panel height="4.2h" valign="top" float="right" padding=".3h">
 					<instance name="multi_select_unit" index="0"/>
 					<instance name="multi_select_unit" index="1"/>
@@ -4771,8 +4799,6 @@
 			</panel>
 		</panel>
 
-		<!-- Stash -->
-		<instance name="stash"/>
 	</panel>
 	<!-- END BOTTOM RIGHT -->
 
@@ -4783,6 +4809,11 @@
 		<!-- OptiUI: Instances are generated inside the lua script -->
 	</panel>
 	<!-- OptiUI: END MOVABLE TEAM ICONS -->
+
+	<!-- OptiUI: MOVABLE STASH -->
+	<!-- Stash -->
+	<instance name="stash"/>
+	<!-- OptiUI: END MOVABLE STASH -->
 
 	<!-- Animated preview for various images (typically grows on hover) -->
 	<!-- UIScript -->
