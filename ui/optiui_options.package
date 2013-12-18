@@ -31,6 +31,13 @@
 	
 	<instance mod_id="optiui_options" name="mod_header" label="Ally Info frames:" />
 	<instance mod_id="optiui_options" name="mod_checkbox"
+		cvar="optiui_AllyFramesWide"
+		label="Use larger Ally Info frames (NEEDS RESTART!)"
+		default="false"
+		tooltip="When ^gchecked^w the allied heroes portraits will be wider to cover more of the empty space on the bottom bar. Useful with the previous option but can be enabled for the top left frames too. NEEDS RESTART TO WORK!"
+		tooltip_width="43h"
+	/>
+	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_AllyFramesWidescreen"
 		label="Move Ally Info frames to bottom center"
 		default="false"
@@ -39,10 +46,11 @@
 		tooltip_width="43h"
 	/>
 	<instance mod_id="optiui_options" name="mod_checkbox"
-		cvar="optiui_AllyFramesWide"
-		label="Use larger Ally Info frames (NEEDS RESTART!)"
+		cvar="optiui_AllyFramesShowGold"
+		label="Show ally current gold inside their portrait"
 		default="false"
-		tooltip="When ^gchecked^w the allied heroes portraits will be wider to cover more of the empty space on the bottom bar. Useful with the previous option but can be enabled for the top left frames too. NEEDS RESTART TO WORK!"
+		onchange="If(_game_phase ge 5, Trigger(\\\'optiui_AllyInfoPosition\\\'));"
+		tooltip="When ^gchecked^w the allied heroes current gold will be shown inside their portrait."
 		tooltip_width="43h"
 	/>
 	<instance mod_id="optiui_options" name="mod_checkbox"
@@ -53,10 +61,19 @@
 		tooltip_width="43h"
 	/>
 
-	<instance mod_id="optiui_options" name="mod_header" label="Mini Map:" />
+	<instance mod_id="optiui_options" name="mod_header" label="Minimap, Stash and Selection Info" />
+	<instance mod_id="optiui_options" name="mod_checkbox"
+		cvar="optiui_MinimalStash"
+		label="Move Stash next to the hero inventory"
+		default="false"
+		onchange="If(_game_phase ge 5, Trigger(\\\'MiniMapPosition\\\'));"
+		tooltip="When ^gchecked^w the Stash will open next to the inventory. It will cover Ally Info Panels if they are positioned at bottom."
+		tooltip_width="43h"
+	/>
+
 	<instance mod_id="optiui_options" name="mod_slider"
 		cvar="optiui_MiniMapSize"
-		label="Size (default size is 50%):"
+		label="Minimap Size (default: 50%):"
 		layout="default"
 		cvartype="int"
 		default="50"
@@ -78,7 +95,7 @@
 		cvar="cg_useNewShop2"
 		label="Use the new shop interface"
 		default="false"
-		tooltip="Disable this if you want to use OptiShop version of the old shop."
+		tooltip="Disable this if you want to use the OptiShop version of the old shop."
 		tooltip_width="43h"
 	/>
 	<!-- <instance mod_id="optiui_options" name="mod_slider"

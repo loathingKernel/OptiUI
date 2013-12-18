@@ -427,8 +427,8 @@
 					<piegraph x="1" y="1" width="-2" height="-2" start="270" end="-90" square="true" color="#000000cc" watch="ShopItem{index}" ontrigger="SetVisible(param21 gt 0); SetValue(param20);" noclick="true"/>
 
 					<!-- Cost -->
-					<panel x="1" y="-1" width="-2" height="25%" color="0 0 0 .7" valign="bottom" noclick="true">
-						<label textalign="center" textvalign="center" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontriggerlua="self:SetText(param4);" />
+					<panel x="1" y="-1" width="-2" height="27%" color="0 0 0 .7" valign="bottom" noclick="true">
+						<label textalign="center" textvalign="top" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontriggerlua="self:SetText(param4);" />
 					</panel>
 
 					<button
@@ -561,9 +561,9 @@
 					</panel>
 
 					<!-- Cost -->
-					<panel x="1" y="-1" width="-2" height="25%" color="0 0 0 .7" valign="bottom" noclick="true">
-						<label textalign="center" textvalign="center" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontrigger="SetVisible(param8 and !param12); SetText(param4);" />
-						<label textalign="center" textvalign="center" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontrigger="SetVisible(param12); SetText(param5);" />
+					<panel x="1" y="-1" width="-2" height="27%" color="0 0 0 .7" valign="bottom" noclick="true">
+						<label textalign="center" textvalign="top" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontrigger="SetVisible(param8 and !param12); SetText(param4);" />
+						<label textalign="center" textvalign="top" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontrigger="SetVisible(param12); SetText(param5);" />
 					</panel>
 
 					<button
