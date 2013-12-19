@@ -27,7 +27,7 @@
 
         <!-- Remove bar -->
         <find>
-            <![CDATA[<frame y="0" width="100%" height="11.5h" align="center" valign="bottom" texture="/ui/info/backdrop.tga" color=".6 .6 .6 1" noclick="true"/>]]>
+            <![CDATA[<frame y="0" width="100%" height="11.5h" align="center" valign="bottom" texture="/ui/info/backdrop.tga" color=".5 .5 .5 1" noclick="true"/>]]>
         </find>
         <delete />
     </editfile>
