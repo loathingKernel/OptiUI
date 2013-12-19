@@ -2102,7 +2102,8 @@
 		<panel width="{width}" height="{height}" align="{align}" valign="{valign}" group="{group}" >
 			<image name="ally_ability_status_image_{index}_{slot}" texture="/ui/legion/empty_pack.tga" />
 			<frame name="ally_ability_status_dot_{index}_{slot}" color="invisible" bordercolor="gray" borderthickness="1"/>
-			<label name="ally_ability_status_level_{index}_{slot}" textalign="right" textvalign="bottom" color="white" outline=".1" font="dyn_8" />
+			<label name="ally_ability_status_level_{index}_{slot}" textalign="right" textvalign="bottom" color="gray" outline="1" font="dyn_8" />
+			<label name="ally_ability_status_cooldown_{index}_{slot}" textalign="center" textvalign="center" color="white" outline="1" font="dyn_10" visible="false" />
 		</panel>
 	</template>
 

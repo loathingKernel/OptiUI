@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <modification
     application="Heroes of Newerth"
-    appversion="3.2"
+    appversion="3.3"
     mmversion="1.3"
     name="OptiUI"
-    version="0.1.8.1"
-    date="2013/11/08"
+    version="0.2.0"
+    date="2013/12/19"
     description="Optimized User Interface"
     author="Trelokotsidu"
     weblink="http://forums.heroesofnewerth.com/showthread.php?508702"
@@ -20,6 +20,7 @@
     <copyfile name="ui/elements/optiui_bar_highlight.tga" overwrite="yes" />
     <copyfile name="ui/elements/optiui_button_bevel_disabled.tga" overwrite="yes" />
     <copyfile name="ui/elements/optiui_button_bevel_down.tga" overwrite="yes" />
+    <copyfile name="ui/elements/optiui_voip_talking.tga" overwrite="yes" />
     <copyfile name="ui/common/optiui_primary_none.tga" overwrite="yes" />
     <copyfile name="ui/common/optiui_sign.tga" overwrite="yes" />
     <copyfile name="ui/common/optiui_pop_up.tga" overwrite="yes" />

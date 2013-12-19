@@ -1054,11 +1054,25 @@ local function InitAllyInfo()
 	end
 																--			0			1			2			3			4		  5			  6				  7		           8			9			10			11		12          13         14        15
 	local function AllyAbilityInfo(allyIndex, slotIndex, sourceWidget, abilityValid, unLeveled, canActivate, isActive, isDisabled, needMana, abilityLevel, remainingCooldown, maxCooldown, null,       displayName, iconPath, isPassive, entityName, charges, maxCharges)
+		local remainingCooldownTime = round(remainingCooldown / 1000)
 		local unLeveled, isDisabled, isPassive, needMana, canActivate, isActive = AtoB(unLeveled), AtoB(isDisabled), AtoB(isPassive), AtoB(needMana), AtoB(canActivate), AtoB(isActive)
 		local remainingCooldown, maxCooldown = AtoB(remainingCooldown), AtoB(maxCooldown)
 		-- OptiUI: Ally abilities level labels
 		GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetText(abilityLevel)
 		GetWidget('ally_ability_status_image_'..allyIndex..'_'..slotIndex):SetTexture(iconPath)
+		GetWidget('ally_ability_status_cooldown_'..allyIndex..'_'..slotIndex):SetText(remainingCooldownTime)
+		if (remainingCooldownTime > 99) then
+			GetWidget('ally_ability_status_cooldown_'..allyIndex..'_'..slotIndex):SetFont('dyn_9')
+			GetWidget('ally_ability_status_cooldown_'..allyIndex..'_'..slotIndex):SetVisible(true)
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetVisible(false)
+		elseif (remainingCooldownTime > 0) then
+			GetWidget('ally_ability_status_cooldown_'..allyIndex..'_'..slotIndex):SetFont('dyn_10')
+			GetWidget('ally_ability_status_cooldown_'..allyIndex..'_'..slotIndex):SetVisible(true)
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetVisible(false)
+		else
+			GetWidget('ally_ability_status_cooldown_'..allyIndex..'_'..slotIndex):SetVisible(false)
+			GetWidget('ally_ability_status_level_'..allyIndex..'_'..slotIndex):SetVisible(true)
+		end
 		-- OptiUI: end
 		if (unLeveled) then
 			GetWidget('ally_ability_status_dot_'..allyIndex..'_'..slotIndex):SetBorderColor('silver')

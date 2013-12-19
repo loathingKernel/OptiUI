@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification
+    application="Heroes of Newerth"
+    appversion="3.3"
+    mmversion="1.3"
+    name="OptiUI_Shop"
+    version="0.1.0"
+    date="2013/12/19"
+    description="OptiUI: Old Shop mod"
+    author="Trelokotsidu"
+    weblink="http://forums.heroesofnewerth.com/showthread.php?508702"
+    updatecheckurl="https://raw.github.com/LoathingKernel/OptiUI/master/addons/Shop/version.txt"
+    updatedownloadurl="https://raw.github.com/LoathingKernel/OptiUI/master/addons/Shop/OptiUI_Shop.honmod"
+>
+    <requirement name="OptiUI" version="*" />
+    <applyafter  name="OptiUI" version="*" />
+
+    <!-- Packages -->
+    <copyfile name="ui/optiui_game_shop_v3_templates.package" overwrite="yes" />
+    <copyfile name="ui/optiui_options_shop.package" overwrite="yes" />
+
+    <!-- Interfaces -->
+    <copyfile name="ui/game_shop_v3.interface" overwrite="yes" />
+
+</modification>
