@@ -89,6 +89,7 @@
 		onchange="If(_game_phase ge 5, Trigger(\\\'MiniMapPosition\\\'));"
 	/>
 
-	<!-- OptiShop -->
+	<!-- Shop -->
+	<include file="/ui/optiui_options_shop.package" />
 
 </package>

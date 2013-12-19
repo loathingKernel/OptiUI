@@ -1,0 +1,3424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface name="game_shop_v3" luatable="1"
+	onload="CreateFloat('_shopFlag_animSpeedMult', 1.0); CreateInt('guide_fadein', 80); CreateBool('_shopFlag_useAnims', true);"
+>
+
+	<lua file="/ui/scripts/game_shop.lua" /> 
+	<childinterface file="ui_items_1.interface" />
+	<childinterface file="/ui/tooltips.interface" />
+	<childinterface file="/ui/confirmations.interface" />
+	<include file="guides_form.package"/>
+	<include file="optiui_game_shop_v3_templates.package"/>
+	<childinterface file="game_shop_shared.interface" />
+	<trigger name="ShopItemDisplayType" />
+	
+	<if condition="cg_useNewShop2">
+	<trigger name="instantiateRecipeTransition1" />
+	<trigger name="instantiateRecipeTransition2" />	
+	<trigger name="InstantiateRecipeIconTrans1" />
+	<trigger name="InstantiateRecipeIconTrans2" />	
+	<trigger name="game_shop_opened" />	
+	<trigger name="game_shop_closed" />	
+	
+	<!-- Central shop controller -->
+	<panel noclick="true" color="invisible" name="game_shop_main_controller" luatable="1"
+		onevent9lua="RegisterScript2('Shop_Interface', '30') Shop:InitializeShop(self)"
+		onload="
+			CreateBool('_shopFlag_visible', false);			## Overall visibility for the shop ##
+			CreateBool('_shopFlag_recipeVisible', false);	## Whether a recipe should be displayed ##
+			CreateBool('_shopFlag_guideOpen', false);		## Whether the guide has been toggled on ##
+			
+			If(
+				!VarExists('_shopFlag_guideOnEmpty'),			## Whether to show the guide if you're not viewing any shop items ##
+				CreateBool('_shopFlag_guideOnEmpty', true)
+			);
+			Cmd('setsave _shopFlag_guideOnEmpty ' # _shopFlag_guideOnEmpty);
+			
+			CreateBool('_shopFlag_showScroll', false);		## Whether to show scrollbar ##
+		
+			If(
+				!VarExists('_shopFlag_itemStyle'),			## 0 is normal detailed view, 1 is simple, 2 is compact (for now) ##
+				CreateInt('_shopFlag_itemStyle', 0)
+			);
+			Cmd('setsave _shopFlag_itemStyle ' # _shopFlag_itemStyle);
+
+			CreateInt('_shopFlag_sortType', 0);				## 0 is category, 1 is filter ##
+			CreateInt('_shopFlag_sortStyle', 0);			## Controls how the left-hand menu is displayed.  0 is the current list, 1 is icons only ##
+			CreateFloat('_shopFlag_animSpeedMult', 1.0);	## Speed multipler for all animations ##
+			CreateBool('_shopFlag_useSavedSortStyle');		## Whether to save your choice of category/filter/etc. view ##
+			CreateInt('_lastCurrentShopItems', 0);			## Total amount of items to be available in the current shop view ##
+			CreateBool('_guideFlag_loadFailure', false);		## Set to true if the guide successfully connects but gets a fail response. ##
+			##CreateBool('_shopFlag_useAnims', true);##
+			
+			If(
+				!VarExists('_shopFlag_savePosition'),			## Whether to preserve the shop's position post-drag ##
+				CreateBool('_shopFlag_savePosition', false)
+			);
+			
+			## Better facilitate scrollbar functionality with multiple views ##
+			CreateInt('_shopFlag_itemsPerRow0', 3);
+			CreateInt('_shopFlag_itemsPerRow1', 5);
+			
+			If(
+				!VarExists('_shopFlag_itemStyle'),			## 0 is normal detailed view, 1 is simple, 2 is compact (for now) ##
+				CreateInt('_shopFlag_itemStyle', 0)
+			);
+
+			## Some optional but could-be-cool stuff ##
+			
+			CreateBool('_shopFlag_guideIntroVisible', true);
+			CreateBool('_shopFlag_guideDescVisible', true);
+			CreateBool('_shopFlag_guideItemsVisible', true);
+			CreateBool('_shopFlag_guideAbilsVisible', true);
+			CreateInt('_shopFlag_guideStyle', 0);				## In case we want to have different display styles for the guide ##
+			
+			##
+				Could have something like this:
+				If only the desc or intro are visible, display the abilities below.
+				If neither are visible, abilities are displayed in that column instead.
+				
+				Possible columns end up being:
+					- Items, Intro/Desc, Abilities
+					- Items, Intro/Abilities(2)
+					- Items, Desc/Abilities(3)
+					- Any of the aforementioned without abilities/items
+					
+				Basically allows for a much more compact guide view.
+				* Might still need to account for fav/vote/etc. button positioning.
+				
+				Will need to account for recipe component display 
+			##
+						
+			## Lua Rewrite ##
+			CreateInt('_recipeTransitionMode', 0);		## Currently 0 is quick, 1 is elaborate (components) ##
+			CreateString('_lastShopSearch', '');
+			CreateString('_overrideRecommendedItems', '');
+			CreateBool('_executeShopSearch', true);
+			
+			DoEvent(9);
+		"
+	/>
+
+	<!-- Store Parent / Drag Bar -->
+	<panel
+		name="newStore"
+		x="8.5h" y="4.8h"
+		width="95.0h" height="5.0h"
+		cangrab="true"
+		onload="
+			CreateString('_shopNewRecipeTarget', '');			
+			If(
+				!VarExists('_shop_v4_tempX') or !_shopFlag_savePosition,
+				CreateInt('_shop_v4_tempX', GetX())
+			);
+			
+			If(
+				!VarExists('_shop_v4_tempY') or !_shopFlag_savePosition,
+				CreateInt('_shop_v4_tempY', GetY())
+			);
+			
+			If(
+				_shopFlag_savePosition and VarExists('_shop_v4_tempX'),
+				SetX(_shop_v4_tempX)
+			);
+			
+			If(
+				_shopFlag_savePosition and VarExists('_shop_v4_tempY'),
+				SetY(_shop_v4_tempY)
+			);
+			
+			If(
+				_shopFlag_savePosition,
+				Split(
+					Cmd('setsave _shop_v4_tempY ' # _shop_v4_tempY),
+					Cmd('setsave _shop_v4_tempX ' # _shop_v4_tempX)
+				)
+			);
+			
+		"
+		onevent0lua="
+			self:FadeIn(90 * Shop.shopFlag_animSpeedMult)
+		"
+		onevent1lua="
+			self:FadeOut(60 * Shop.shopFlag_animSpeedMult)
+		"
+		onevent2lua="
+			self:SetVisible(true)
+		"
+		onevent3lua="
+			self:SetVisible(false)
+		"
+		onevent4lua="
+			self:DoEventN(6)
+			self:SetWidth('95.0h')
+			self:DoEventN(7)
+		"
+		onevent5lua="
+			self:DoEventN(6)
+			self:SetWidth('20.0h')
+			self:DoEventN(7)
+		"
+		onevent6lua="
+			Set('_shop_v4_tempX', self:GetX())
+			Set('_shop_v4_tempY', self:GetY())
+		"
+		onevent7lua="
+			self:SetX(GetCvarInt('_shop_v4_tempX'))
+			self:SetY(GetCvarInt('_shop_v4_tempY'))
+		"	
+		watch4="Disconnected"
+		ontrigger4="FadeOut(1); SleepWidget(2, 'SetVisible(0);'); CloseShop();"	
+		hotkey="ESC"
+		onhotkey="PlaySound('/shared/sounds/ui/button_close_01.wav'); CloseShop();"
+		visible="false"
+		onenddrag="
+			SetFocus(false);
+			If(
+				_shopFlag_savePosition,
+				Split(
+					Set('_shop_v4_tempX', GetX()),
+					Set('_shop_v4_tempY', GetY())
+				)
+			);			
+			If(
+				_shopFlag_savePosition,
+				Split(
+					Cmd('setsave _shop_v4_tempY ' # _shop_v4_tempY),
+					Cmd('setsave _shop_v4_tempX ' # _shop_v4_tempX)
+				)
+			);
+		"
+		watch="PlayerCanShop" ontrigger="PlaySound('/shared/sounds/ui/shop_show.wav'); If(!param, CloseShop()); If(param, SetDefaultActiveShop());"
+		onhide="Call('quickslot_dummy_item', 'DoEvent(5);');"	
+	>
+	
+		<!-- Input blocker (to clarify, needed a panel which best represented the unclickable area on the store background (which none of the current widgets nor images provided) - it prevents you from accidentally giving unit orders on misclicks 
+		<panel name="shop_input_blocker" visible="0" width="-17.0h" height="48.5h" y="5h" x="2.5h" align="right" color="invisible" blockinput="true"/>
+		-->
+	
+		<!-- Left Side -->
+		<panel
+			x="-6.0h" y="-0.9h"
+			width="26.0h"
+			noclick="true"
+		>		
+			<!-- Alpha Slider -->
+			<panel x="-1.4h" y="58.3h" height="3.0h" width="19.0h" align="right" noclick="true" visible="true">
+				<image width="144%" height="36@" align="right" valign="top" texture="/ui/common/new_shop_interface/trans_slider_bg.tga" noclick="true"/>
+				<panel x="-4.3h" y="-0.4h" width="10.0h" height="2.0h" align="right" valign="bottom">			
+					<slider
+						onload="
+							If(
+								!VarExists('shopAlphaValue'), 
+								CreateInt('shopAlphaValue', 65)
+							);
+							DoEvent(0);
+						"
+						onevent0="
+							Cmd('setsave shopAlphaValue ' # shopAlphaValue);
+							SetValue(shopAlphaValue);
+							
+						"
+						onshow="
+							Trigger('storeAlphaUpdate', shopAlphaValue);
+						"
+						slotwidth="-1%" slotheight="0.6h"
+						slotcolor="1 1 1 1"
+						handlewidth="85@" handleheight="85%"
+						handlecolor="1 1 1 1"
+						cvar=""
+						minvalue="10" maxvalue="100"
+						step="1"
+						value="100"
+						texture="/ui/info/slider.tga"
+						onselect=""
+						onchange="
+							Set('shopAlphaValue', this);
+							Trigger('storeAlphaUpdate', this);
+							Cmd('setsave shopAlphaValue ' # this);
+						"
+					/>			
+				</panel>								
+				<instance name="tip_mark" tip_id="shop_trans_tip" x="-1.7h" width="1.8h" height="1.8h" valign="center" align="right" />
+			</panel>
+			
+			<!-- Category / Shop List -->
+			<panel y="11.2h" width="100%" >
+				<image y="-1.8h" width="100%" height="56.5h" align="right" texture="/ui/common/new_shop_interface/shop_category_bg.tga" noclick="true"
+					watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.5 + (param / 200)));"
+				/>
+				
+				<!-- Shop Name View -->
+				<panel
+					name="catlist_name"
+					y="0"
+					grow="true"
+					width="100%"
+					float="bottom"
+					padding="0"
+					noclick="true"
+					visible="true"
+					onload="
+						CreateString('_lastActiveShop', '');
+					"
+					onevent0="
+						If(
+							!IsVisibleSelf(),
+							Split(
+								FadeIn(125),
+								SleepWidget(
+									125,
+									'
+										GroupCall(
+											\'menuItemCategories\',
+											\'DoEvent(0);\'
+										);
+									'
+								)
+							)
+							
+						);
+						
+
+					"
+					onevent1="
+					
+						If(
+							IsVisibleSelf(),
+							Split(
+								GroupCall(
+									'menuItemCategories',
+									'DoEvent(1);'
+								),
+								SleepWidget(
+									125,
+									'
+										FadeOut(125);
+									'
+								)
+							)
+						);
+					"
+					onevent2="
+						If(
+							!IsVisibleSelf(),
+							Split(
+								SetVisible(true),
+								GroupCall(
+									'menuItemCategories',
+									'DoEvent(2);'
+								)
+							)
+						);
+
+					"
+					onevent3="
+						If(
+							IsVisibleSelf(),
+							Split(
+								GroupCall(
+									'menuItemCategories',
+									'DoEvent(3);'
+								),
+								SetVisible(false)
+							)
+						);
+
+					"
+				>
+					<instance name="category_holder" menu_items="menu_items_quickslot" y="0.2h" />
+					<instance name="category_holder" menu_items="menu_items_primary" />
+					<instance name="category_holder" menu_items="menu_items_basic" />
+					<instance name="category_holder" menu_items="menu_items_recipes" />
+					<instance name="category_holder" menu_items="menu_items_extra" />
+				</panel>
+
+				<!-- Filter View -->
+				<panel
+					name="catlist_filter"
+					y="0"
+					grow="true"
+					width="100%"
+					float="bottom"
+					padding="0"
+					noclick="true"
+					visible="false"
+					onload="
+						CreateString('_activeShopFilters', '');
+					"
+					onevent0="
+						If(
+							!IsVisibleSelf(),
+							Split(
+								FadeIn(125),
+								SleepWidget(
+									125,
+									'
+										GroupCall(
+											\'menuItemFilters\',
+											\'DoEvent(0);\'
+										);
+									'
+								)
+							)
+						);
+
+					"
+					onevent1="
+						If(
+							IsVisibleSelf(),
+							Split(
+								GroupCall(
+									'menuItemFilters',
+									'DoEvent(1);'
+								),
+								SleepWidget(
+									125,
+									'FadeOut(125);'
+								)
+							)
+						);
+
+					"
+					onevent2="
+						If(
+							!IsVisibleSelf(),
+							Split(
+								SetVisible(true),
+								GroupCall(
+									'menuItemFilters',
+									'DoEvent(2);'
+								)
+							)
+						);
+
+					"
+					onevent3="
+						If(
+							IsVisibleSelf(),
+							Split(
+								GroupCall(
+									'menuItemFilters',
+									'DoEvent(3);'
+								),
+								SetVisible(false)
+							)
+						);
+
+					"
+				>
+				
+					<instance name="category_holder" menu_items="menu_filters_0" />
+					<instance name="category_holder" menu_items="menu_filters_1" />
+					<instance name="category_holder" menu_items="menu_filters_2" />
+					<instance name="category_holder" menu_items="menu_filters_3" />
+					<instance name="category_holder" menu_items="menu_filters_4" />
+				</panel>
+
+			</panel>
+			
+			<!-- Guide / Cat-Filter Buttons -->
+			<panel
+				y="5.6h"
+				width="100%" height="6.5h"
+				noclick="true"
+			>
+				<image width="100%" height="25@" align="right" texture="/ui/common/new_shop_interface/search_options_bg.tga" noclick="true"
+					watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.5 + (param / 200)));"
+				/>
+				
+				<!-- Cat/Filter Toggle -->
+				<panel x="-7.3h" y="1.0h" width="11.8h" height="3.4h" align="right" color="0 0 0 .6">
+					<frame borderthickness="0.7h" texture="/ui/common/new_shop_interface/simple_border.tga" noclick="true"/>
+					<button
+						y="-0.1h"
+						width="-1.0h"
+						height="-0.6h"
+						align="center" valign="center"
+						color="invisible"
+						numstates="2"
+						interactive="false"
+						onmouseover="PlaySound('/shared/sounds/ui/button_over_03.wav');	ShowWidget('shop_cat_filter');"
+						onmouseout="HideWidget('shop_cat_filter');"
+						onclick="
+							Set(
+								_shopFlag_sortType,
+								GetButtonState()
+							);
+							CallEvent('game_shop_main_controller', 0);
+						"
+					>
+						<widgetstate statename="up">
+							<label x="0.1h" height="100%" textvalign="center" font="dyn_10" color="1 1 1 1" shadow="true" content="game_shop_category"/>
+							<panel x="-2.7h" width="1" height="-0.6h" valign="center" align="right" color="1 1 1 .1"/>
+							<image width="2.4h" height="2.4h" align="right" valign="center" texture="/ui/common/new_shop_interface/cat_swap_up.tga" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="over">
+							<label x="0.1h" height="100%" textvalign="center" font="dyn_10" color="1 1 1 1" shadow="true" content="game_shop_category"/>
+							<panel x="-2.7h" width="1" height="-0.6h" valign="center" align="right" color="1 1 1 .1"/>
+							<image width="2.4h" height="2.4h" align="right" valign="center" texture="/ui/common/new_shop_interface/cat_swap_over.tga" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="down" x="1" y="1">
+							<label x="0.1h" height="100%" textvalign="center" font="dyn_10" color="1 1 1 1" shadow="true" content="game_shop_category"/>
+							<panel x="-2.7h" width="1" height="-0.6h" valign="center" align="right" color="1 1 1 .1"/>
+							<image width="2.4h" height="2.4h" align="right" valign="center" texture="/ui/common/new_shop_interface/cat_swap_down.tga" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="up2">
+							<label x="0.1h" height="100%" textvalign="center" font="dyn_10" color="1 1 1 1" shadow="true" content="game_shop_filter"/>
+							<panel x="-2.7h" width="1" height="-0.6h" valign="center" align="right" color="1 1 1 .1"/>
+							<image width="2.4h" height="2.4h" align="right" valign="center" texture="/ui/common/new_shop_interface/cat_swap_up.tga" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="over2">
+							<label x="0.1h" height="100%" textvalign="center" font="dyn_10" color="1 1 1 1" shadow="true" content="game_shop_filter"/>
+							<panel x="-2.7h" width="1" height="-0.6h" valign="center" align="right" color="1 1 1 .1"/>
+							<image width="2.4h" height="2.4h" align="right" valign="center" texture="/ui/common/new_shop_interface/cat_swap_over.tga" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="down2" x="1" y="1">
+							<label x="0.1h" height="100%" textvalign="center" font="dyn_10" color="1 1 1 1" shadow="true" content="game_shop_filter"/>
+							<panel x="-2.7h" width="1" height="-0.6h" valign="center" align="right" color="1 1 1 .1"/>
+							<image width="2.4h" height="2.4h" align="right" valign="center" texture="/ui/common/new_shop_interface/cat_swap_down.tga" noclick="true" />
+						</widgetstate>
+					</button>
+				</panel>
+				
+				<!-- Hero Guide Button -->
+				<panel x="-1.2h" y="1.0h" width="5.8h" height="3.4h" align="right" color="0 0 0 .6">					
+					
+					<button
+						width="100%" height="100%"
+						align="center" valign="center"
+						color="invisible"
+						numstates="2"
+						name="hero_guide_button"
+						interactive="false"	
+						onmouseover="PlaySound('/shared/sounds/ui/button_over_03.wav');	ShowWidget('shop_guide_btn_tip');"
+						onmouseout="HideWidget('shop_guide_btn_tip');"
+						onclick="
+							PlaySound('/shared/sounds/ui/button_click_06.wav');
+							Set('_lastShopSearch', '');
+							Set('_activeShopFilters', '');
+							If(
+								this,
+								Split(
+									Set('_shopFlag_guideOnEmpty', true),
+									Set('_shopFlag_guideOpen', true),
+									Trigger('SetShopDisplay', '')
+								),
+								Split(
+									Set('_shopFlag_guideOnEmpty', false),
+									Set('_shopFlag_guideOpen', false),
+									Trigger('SetShopDisplay', '')
+								)
+							);
+							
+							Cmd('setsave _shopFlag_guideOnEmpty ' # _shopFlag_guideOnEmpty);
+						"
+				
+					>
+						<widgetstate statename="up">
+							<image texture="/ui/common/new_shop_interface/listing_bg.tga" color="#330505" />
+							<image texture="/ui/common/new_shop_interface/guide_icon_up.tga" width="5.4h" height="5.4h" align="center" valign="center" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="over">
+							<image texture="/ui/common/new_shop_interface/listing_bg.tga" color="#510202" />
+							<image texture="/ui/common/new_shop_interface/guide_icon_over.tga" y="-0.2h" width="4.0h" height="4.0h" align="center" valign="center" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="down">
+							<image texture="/ui/common/new_shop_interface/listing_bg.tga" color="#510202" />
+							<image texture="/ui/common/new_shop_interface/guide_icon_over.tga" width="4.0h" height="4.0h" align="center" valign="center" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="up2">
+							<image texture="/ui/common/new_shop_interface/listing_bg.tga" color="#15301e" />
+							<image texture="/ui/common/new_shop_interface/guide2_icon_up.tga" width="4.0h" height="4.0h" align="center" valign="center" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="over2">
+							<image texture="/ui/common/new_shop_interface/listing_bg.tga" color="#0e4c23" />
+							<image texture="/ui/common/new_shop_interface/guide_icon_over.tga" y="-0.2h" width="4.0h" height="4.0h" align="center" valign="center" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="down2">
+							<image texture="/ui/common/new_shop_interface/listing_bg.tga" color="#0e4c23" />
+							<image texture="/ui/common/new_shop_interface/guide_icon_over.tga" width="4.0h" height="4.0h" align="center" valign="center" noclick="true" />
+						</widgetstate>
+					</button>
+					
+					<frame borderthickness="0.7h" texture="/ui/common/new_shop_interface/simple_border.tga" noclick="true"/>
+					
+				</panel>
+				
+			</panel>
+
+			<!-- Search -->
+			<panel
+				width="100%" height="6.5h"
+				noclick="true"
+			>
+				<image width="100%" height="25@" align="right" texture="/ui/common/new_shop_interface/search_shop_bg.tga" noclick="true"
+					watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.5 + (param / 200)));"
+				/>
+
+				<!-- Search Input Box -->
+				<panel x="-3.5h" y="1.9h" width="15.5h" height="3.0h" align="right" color="0 0 0 .85">
+					<frame borderthickness="0.7h" texture="/ui/common/new_shop_interface/simple_border.tga"/>
+
+					<textbox
+						name="shop_search_entry"
+						hpadding="0.5h"
+						vpadding="0.6h"
+						maxlength="250"
+						width="-3.6h"
+						font="dyn_10"
+						textcolor=".8 .8 .8 1"
+						shadow="false"
+						color="invisible"
+						onshow="SetFocus(false);"
+						onhide="EraseInputLine(); SetFocus(false);"
+						onfocus="If(StringLength(this) le 0, Split(EraseInputLine(), CallEvent('shop_search_label', 1)));"
+						onlosefocus=""
+						onkeydown=""
+						onenter="If(StringLength(this) le 0, Split(EraseInputLine(), CallEvent('shop_search_label', 1))); SetFocus(false);"
+						onesc="
+							EraseInputLine();
+							CallEvent('shop_search_label', 0);
+						"
+						onchange="
+							DoEvent();
+						"
+						onevent="
+							If(
+								_executeShopSearch,
+								If(
+									StringEmpty(this) and !HasFocus(),
+									Split(
+										CallEvent('shop_search_label', 0),
+										DoEvent(1)
+									),
+									Split(
+										Set('_activeShopFilters', ''),
+										CallEvent('shop_search_label', 1),
+										DoEvent(0)
+									)
+								)
+							);
+							Set('_executeShopSearch', true);
+						"
+						onevent0="
+							If(
+								_executeShopSearch,
+								SleepWidget(
+									250,
+									'
+										If(
+											!StringEmpty(this),
+											Split(
+												Set(\'_lastShopSearch\', this),
+												Trigger(\'SetShopDisplay\', \'\', 0)
+											),
+											DoEvent(1)
+										);
+									'
+								)								
+							);
+							
+							
+
+						"
+						onevent1="
+							Set('_lastShopSearch', this);
+							Trigger('SetShopDisplay', '', 0);
+						"
+					/>
+					<label noclick="true" name="shop_search_label" font="dyn_10" textvalign="center" y="-0.1h" x="0.5h" color="0.7 0.7 0.7 1"
+						onevent0="
+							SetText(Translate('Shop_Search_Shop'));
+							HideWidget('shop_clearSearch_divider');
+							HideWidget('shop_clearSearch_button');
+						"
+						onevent1="
+							SetText('');
+							ShowWidget('shop_clearSearch_divider');
+							ShowWidget('shop_clearSearch_button');
+						"
+						onload="DoEvent(0);"
+					/>
+
+					<!-- Clear Search -->
+					<panel x="-2.6h" width="1" height="-1.0h" valign="center" align="right" color="1 1 1 .1" name="shop_clearSearch_divider"/>
+					<button
+						x="-0.4h"
+						width="70@" height="70%"
+						align="right" valign="center"
+						color="invisible"
+						interactive="false"
+						onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); ShowWidget('shop_clear_search');"
+						onmouseout="HideWidget('shop_clear_search');"
+						onclick="
+							Call(
+								'shop_search_entry',
+								'
+									EraseInputLine();
+									DoEvent();
+								'
+							);
+						"
+						name="shop_clearSearch_button"
+					>
+						<widgetstate statename="up">
+							<image texture="/ui/common/new_shop_interface/clear_search.tga" color="#555555" />
+							<image x="0.1h" width="1.3h" height="1.3h" align="center" valign="center" color=".75 .75 .75 1" texture="/ui/elements/closex.tga" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="over">
+							<image texture="/ui/common/new_shop_interface/clear_search.tga" color="#777777" />
+							<image x="0.1h" width="1.3h" height="1.3h" align="center" valign="center" color="1 1 1 1" texture="/ui/elements/closex.tga" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="down" x="1" y="1">
+							<image texture="/ui/common/new_shop_interface/clear_search.tga" color="#777777" />
+							<image x="0.1h" width="1.3h" height="1.3h" align="center" valign="center" color="1 1 1 1" texture="/ui/elements/closex.tga" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="disabled">
+							<image texture="/ui/common/new_shop_interface/clear_search.tga" color=".15 .15 .15 1" />
+							<image x="0.1h" width="1.3h" height="1.3h" align="center" valign="center" color=".4 .4 .4 1" texture="/ui/elements/closex.tga" noclick="true" />
+						</widgetstate>
+					</button>
+
+				</panel>
+				<instance name="shop_btn_closex" width="1.8h" height="1.8h" x="-1h" align="right" valign="center" onclick="CloseShop();" />
+			</panel>
+			<image x="15.4h" y="5.4h" width="1.0h" height="1.0h" texture="/ui/common/new_shop_interface/gem.tga" noclick="true" />
+			
+		</panel>
+
+		<!-- Right Side Container -->
+		<panel
+			name="shop_right"
+			noclick="true"
+			visible="true"
+			onevent0lua="
+				if (not self:IsVisibleSelf()) then
+					self:FadeIn(200 * Shop.shopFlag_animSpeedMult)
+				end		
+			"
+			onevent1lua="
+				if (self:IsVisibleSelf()) then
+					self:FadeOut(200 * Shop.shopFlag_animSpeedMult)
+				end					
+			"
+			onevent2="
+				If(
+					!IsVisibleSelf(),
+					SetVisible(true)
+				);
+			"
+			onevent3="
+				If(
+					IsVisibleSelf(),
+					SetVisible(false)							
+				);
+			"
+		>
+		
+			<!-- Guide Lower Area
+				Hidden: 48.0h
+				Slid Down: 53.6h
+			-->
+			<panel name="guide_lower_area"
+				x="21.0h" y="53.6h"
+				width="71.8h" height="13.0h"
+				align="left"
+				noclick="true"
+				visible="false"
+				onevent0lua="
+					if (not self:IsVisibleSelf()) then
+						self:FadeIn(175 * Shop.shopFlag_animSpeedMult)
+						self:SlideY('53.6h', 200 * Shop.shopFlag_animSpeedMult)		
+					end							
+				"
+				onevent1lua="
+					if (self:IsVisibleSelf()) then
+						self:SlideY('48.0h', 200 * Shop.shopFlag_animSpeedMult)
+						self:FadeOut(175 * Shop.shopFlag_animSpeedMult)
+					end						
+				"
+				onevent2="
+					If(
+						!IsVisibleSelf(),
+						Split(
+							SetY('53.6h'),
+							SetVisible(true)
+						)
+					);
+
+				"
+				onevent3="
+					If(
+						IsVisibleSelf(),
+						Split(
+							SetY('48.0h'),
+							SetVisible(false)
+						)
+					);
+
+				"
+				onshow="Trigger('GuideHeroName', HeroName);"
+			>		
+				
+					
+				
+				<image y="0" width="104.0h" height="13.0h" texture="/ui/common/new_shop_interface/holder_bottom_buttons.tga" noclick="true"
+					watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (param / 100));"
+				/>
+				
+				<panel x="3.4h" y="0.8h" width="65.6h" height="4.2h">
+				
+					<!-- Default -->
+					<instance interactive="false"
+						button_name="guide_button_default"
+						name="button2"
+						x="1.5h"
+						width="13.5h" height="2.4h"
+						valign="center"
+						label="general_set_default"
+						onclick="Trigger('GuideSetAsDefault', 1);"
+						enabled="true"
+						watch="GuideDefaultFormResult"
+						ontrigger="
+						If(param2 and GuideDefaultFormStatus == 2 and (guide_masterQueryTime == param4),
+							If(StringEquals(param1, '1') and param2, Split(SetVisible(0), Call('guide_button_undefault', 'SetVisible(1)')))
+						);
+						"	
+						watch2="GuideInfoFormResult GuideInfoFormResultLocal"
+						ontrigger2="							
+						If((GuideInfoFormStatus == 2  and (guide_masterQueryTime == param17) and param20) or param19, 
+							If(!param14, Split(SetVisible(1), Call('guide_button_undefault', 'SetVisible(0)')))
+						);								
+						"
+						watch1="GuideMasterStatus"
+						ontrigger1="SetEnabled(param != 1);"						
+					/>				
+					<instance  interactive="false"
+						button_name="guide_button_undefault"
+						name="button2"
+						x="1.5h"
+						width="13.5h" height="2.4h"
+						valign="center"
+						label="guide_remove_default"
+						onclick="Trigger('GuideSetAsDefault', 0);"
+						enabled="true"
+						watch="GuideDefaultFormResult"
+						ontrigger="
+						If(param2 and GuideDefaultFormStatus == 2 and (guide_masterQueryTime == param4),
+							If(StringEquals(param1, '0') and param2, Split(SetVisible(0), Call('guide_button_default', 'SetVisible(1)')))
+						);
+						"		
+						watch2="GuideInfoFormResult GuideInfoFormResultLocal"
+						ontrigger2="							
+						If((GuideInfoFormStatus == 2  and (guide_masterQueryTime == param17) and param20) or param19, 
+							If(param14, Split(SetVisible(1), Call('guide_button_default', 'SetVisible(0)')))
+						);"	
+						watch1="GuideMasterStatus"
+						ontrigger1="SetEnabled(param != 1);"						
+					/>	
+					
+					<!-- Favorite -->
+					<instance  interactive="false"
+						button_name="guide_button_favorite"
+						name="button2"
+						x="16.5h"
+						width="14.0h" height="2.4h"
+						valign="center"
+						label="general_addto_fav"
+						onclick="Trigger('GuideAddToFavorites', 1);"
+						enabled="true"
+						watch="GuideFavoriteFormResult"
+						ontrigger="
+						If(param2 and GuideFavoriteFormStatus == 2 and (guide_masterQueryTime == param4), 
+							If(StringEquals(param1, '1') and param2, Split(SetVisible(0), Call('guide_button_unfavorite', 'SetVisible(1)')))
+						);
+						"	
+						watch2="GuideInfoFormResult GuideInfoFormResultLocal"
+						ontrigger2="	
+						If((GuideInfoFormStatus == 2  and (guide_masterQueryTime == param17) and param20) or param19, 
+							If(!param13, Split(SetVisible(1), Call('guide_button_unfavorite', 'SetVisible(0)')))
+						);"		
+						watch1="GuideMasterStatus"
+						ontrigger1="SetEnabled(param != 1);"
+					/>
+					
+					<instance  interactive="false"
+						button_name="guide_button_unfavorite" visible="0"
+						name="button2"
+						x="16.5h"
+						width="14.0h" height="2.4h"
+						valign="center"
+						label="guide_remove_favorite"
+						onclick="Trigger('GuideAddToFavorites', 0);"
+						enabled="true"
+						watch="GuideFavoriteFormResult"
+						ontrigger="
+						If(param2 and GuideFavoriteFormStatus == 2 and (guide_masterQueryTime == param4),
+							If(StringEquals(param1, '0') and param2, Split(SetVisible(0), Call('guide_button_favorite', 'SetVisible(1)')))
+						);
+						"	
+						watch2="GuideInfoFormResult GuideInfoFormResultLocal"
+						ontrigger2="							
+						If((GuideInfoFormStatus == 2  and (guide_masterQueryTime == param17) and param20) or param19, 
+							If(param13, Split(SetVisible(1), Call('guide_button_favorite', 'SetVisible(0)')))
+						);"	
+						watch1="GuideMasterStatus"
+						ontrigger1="SetEnabled(param != 1);"						
+					/>
+					
+					<!-- Report
+					<button
+						x="28.3h"
+						width="2.4h" height="2.4h"
+						valign="center"
+						color="invisible"
+						onmouseover="ShowWidget('guide_report_tip'); PlaySound('/shared/sounds/ui/button_over_01.wav');"
+						onmouseout="HideWidget('guide_report_tip');"
+						onclick="Call('guide_report', 'FadeIn(250);');" 
+					>
+						<widgetstate statename="up">
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.4h" color="#36435c" blockinput="false" noclick="true"/>
+							<frame texture="/ui/frames/roundframe.tga" color="0 0 0 1" borderthickness="0.4h" blockinput="false" noclick="true"/>
+							<image width="70@" height="70%" align="center" valign="center" texture="/ui/fe2/systembar/icons/report.tga" color="1 1 1 1" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="over">
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.4h" color="#0745b7" blockinput="false" noclick="true"/>
+							<frame texture="/ui/frames/roundframe.tga" color="0 0 0 1" borderthickness="0.4h" blockinput="false" noclick="true"/>
+							<image width="70@" height="70%" align="center" color="1 0 0 1" valign="center" texture="/ui/fe2/systembar/icons/report.tga" noclick="true" />
+						</widgetstate>
+						<widgetstate statename="down" x="1" y="1">
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.4h" color="#0745b7" blockinput="false" noclick="true"/>
+							<frame texture="/ui/frames/roundframe.tga" color="0 0 0 1" borderthickness="0.4h" blockinput="false" noclick="true"/>
+							<image width="70@" height="70%" align="center" valign="center" texture="/ui/fe2/systembar/icons/report.tga" color="1 1 1 1" noclick="true" />
+						</widgetstate>
+					</button>
+					 -->
+					 
+					<!-- Voting -->
+					<panel x="31.4h" width="16.0h" height="100%">				
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.4h" color="0 0 0 .75"/>
+						<frame texture="/ui/frames/roundframe.tga" color=".2 .2 .2 1" borderthickness="0.4h"/>				
+						<!-- Current -->
+						<label y="8%" width="100%" height="100%" textvalign="top" textalign="center" font="dyn_9" color=".8 .8 .8 1" noclick="true" content="game_guide_popularity" />
+						<label name="guide_pop_display_label" y="34%" width="100%" height="100%" textvalign="top" textalign="center" font="dyn_16" color="0.7 0.7 0.7 1" noclick="true" content="N/A" />					
+						<!-- Up -->
+						<instance name="guide_vote_btn" thumbs="up" x="0.3h" align="left" texture="vote_up.tga" label="game_guide_vote_up" 
+							onclick="
+								if(GuideMasterStatus != 1,
+									Split(							
+										Trigger('GuideMasterQuery', 'GuideVoteForm', HostTime),
+										SubmitForm('GuideVoteForm', 'f', 'guide_vote', 'account', GetAccountID(), 'cookie', GetCookie(), 'v', 1, 'guide', guide_selectedGuide, 'gid', guide_selectedGuide, 'hosttime', HostTime)
+									)
+								);"
+							watch="GuideVoteFormResult"
+							ontrigger="
+							If(GuideVoteFormStatus == 2  and param3, 
+								If(StringEquals(param1, '1'), 
+									Split(
+										Call('guide_vote_thumbs_up_button', 'SetEnabled(0);'),
+										Call('guide_vote_thumbs_down_button', 'SetEnabled(1);'),
+										GroupCall('guide_vote_thumbs_up', 'SetRenderMode(\'grayscale\');'),
+										GroupCall('guide_vote_thumbs_down', 'SetRenderMode(\'normal\');')
+									),
+									If(StringEquals(param1, '0'), 
+										Split(
+											Call('guide_vote_thumbs_up_button', 'SetEnabled(1);'),
+											Call('guide_vote_thumbs_down_button', 'SetEnabled(0);'),
+											GroupCall('guide_vote_thumbs_up', 'SetRenderMode(\'normal\');'),
+											GroupCall('guide_vote_thumbs_down', 'SetRenderMode(\'grayscale\');')
+										)
+									)
+								)
+							);
+							"
+							watch1="GuideInfoFormResult GuideInfoFormResultLocal" 
+							ontrigger1="
+							If(!StringEmpty(param18) and ((GuideInfoFormStatus == 2  and (guide_masterQueryTime == param17) and param20) or param19),
+								Split(
+									If(StringEquals(param16, '1'), 
+										Split(
+											GroupCall('guide_vote_thumbs_up', 'SetRenderMode(\'grayscale\');'),
+											GroupCall('guide_vote_thumbs_down', 'SetRenderMode(\'normal\');'),
+											Call('guide_vote_thumbs_down_button', 'SetEnabled(1); '),
+											Call('guide_vote_thumbs_up_button', 'SetEnabled(0); ') 
+											)
+										),
+									If(StringEquals(param16, '0'), 
+										Split(
+											GroupCall('guide_vote_thumbs_up', 'SetRenderMode(\'normal\');'),
+											GroupCall('guide_vote_thumbs_down', 'SetRenderMode(\'grayscale\');'),						
+											Call('guide_vote_thumbs_down_button', 'SetEnabled(0); '), 
+											Call('guide_vote_thumbs_up_button', 'SetEnabled(1); ')
+										)
+									)
+								)
+							);
+							"
+							watch2="GuideLoadGuide"
+							ontrigger2="GroupCall('guide_vote_thumbs_up', 'SetRenderMode(\'normal\');'); Call('guide_vote_thumbs_up_button', 'SetEnabled(1);');"
+						/>		
+						<!-- Down -->
+						<instance name="guide_vote_btn" thumbs="down" x="-0.3h" align="right" texture="vote_down.tga" label="game_guide_vote_down" 
+							onclick="
+								if(GuideMasterStatus != 1,
+									Split(
+										Trigger('GuideMasterQuery', 'GuideVoteForm', HostTime),
+										SubmitForm('GuideVoteForm', 'f', 'guide_vote', 'account', GetAccountID(), 'cookie', GetCookie(), 'v', 0, 'guide', guide_selectedGuide, 'gid', guide_selectedGuide, 'hosttime', HostTime)
+									)
+								);
+								"
+							watch2="GuideLoadGuide"
+							ontrigger2="GroupCall('guide_vote_thumbs_down', 'SetRenderMode(\'normal\');'); Call('guide_vote_thumbs_down_button', 'SetEnabled(1);');"							
+						/>					
+						<!-- Voting in progress -->
+						<panel noclick="0" width="100%" height="100%" align="left" x="0" color=".2 .2 .2 1" visible="0" watch="GuideVoteFormStatus" ontrigger="If(param == 1, SetVisible(1), SleepWidget(3000, 'FadeOut(500)'));" >
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.4h" color="0 0 .07 .8" />
+							<frame texture="/ui/frames/roundframe.tga" color="#667788" borderthickness="0.4h"/>						
+							<label y="0" x="7%" width="100%" height="100%" textvalign="center" textalign="left" font="dyn_14" color="1.0 0.8 0.0 1" noclick="true" content="Voting..." outline="1" shadow="1" />
+							<animatedimage x="55%" name="GuideVoteThrob" texture="/ui/elements/throb/throb.tga" noclick="true" valign="center" loop="1" fps="30" onshow="StartAnim(1);" visible="0" height="66%" width="66@" 
+								watch="GuideVoteFormStatus" ontrigger="SetVisible(0); If(param0 == 1, SetVisible(1), FadeOut(10));" 
+							/>
+							<image x="75%" name="GuideVoteValid" texture="/ui/elements/check_mark.tga" color="0 0.6 0 1" align="left" valign="center" visible="0" height="66%" width="66@" 
+								watch="GuideVoteFormResult" ontrigger="
+									If(GuideVoteFormStatus == 2  and param3, 
+										Split(
+											SetVisible(0),
+											If((StringEquals(param1, '0') or StringEquals(param1, '1')) and param3, Split(SetVisible(0), FadeIn(50), SleepWidget(3000, 'FadeOut(500)')))
+										)
+									);"
+							/>
+							<image x="75%" name="GuideVoteInvalid" texture="/ui/fe2/store/closex2.tga" color="0.6 0 0 1" align="left" valign="center" visible="0" height="66%" width="66@" 
+								watch="GuideVoteFormResult" ontrigger="
+								If(GuideVoteFormStatus == 2  and param3, 
+									Split(
+										SetVisible(0),
+										If(!(StringEquals(param1, '0') or StringEquals(param1, '1')) or !param3, Split(SetVisible(0), FadeIn(50), SleepWidget(3000, 'FadeOut(500)')))
+									)
+								);"
+							/>
+						</panel>
+						<!--
+						<panel noclick="0" width="100%" height="100%" align="left" x="0" color=".2 .2 .2 1" visible="1" >
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.4h" color="0 0 .07 .8" />
+							<frame texture="/ui/frames/roundframe.tga" color="#667788" borderthickness="0.4h"/>				
+							<label y="-25%" x="0%" width="100%" height="100%" textvalign="center" textalign="center" font="dyn_12" color="1.0 0.8 0.0 1" noclick="true" content="Guide Voting" outline="1" shadow="1" />
+							<label y="20%" x="0%" width="100%" height="100%" textvalign="center" textalign="center" font="dyn_12" color="1.0 0.8 0.0 1" noclick="true" content="Coming Soon(TM)" outline="1" shadow="1" />
+						</panel>
+						-->
+						<panel name="guide_usingLocalPanel" noclick="0" width="100%" height="100%" align="left" x="0" color=".2 .2 .2 1" visible="0" >
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.4h" color="0 0 .07 .8" />
+							<frame texture="/ui/frames/roundframe.tga" color="#667788" borderthickness="0.4h"/>				
+							<instance valign ="center" align="center" height="65%"
+								name="button2"
+								label="Retry Web Guides"
+								onclick="
+									Set(_guideFlag_loadFailure, 0);
+									Set(guide_newRound, 1);
+									Trigger('GuideHeroName', HeroName);															
+								"
+								enabled="true"
+								width="95%"
+							/>
+						</panel>						
+					</panel>
+					
+					<!-- Auto Level Checkbox -->
+					<panel width="17.0h" align="right" noclick="true">
+						<instance
+							name="Noptions_checkbox"				
+							width="15.0h"
+							align="left" valign="center"					
+							font="dyn_10" label="game_guide_auto_level"
+							tip_id="shop_guide_auto_level"
+							cvar=""
+							onclick="If(GetButtonState() == 1, SetAutoLevelup(StringReplace(guide_autolevel_abilities, '|', ',')), SetAutoLevelup(' '));"
+							watch="GuideChangedGuide AutoLevelClear"
+							ontrigger="SetButtonState(0);"
+							watch1="GameMode"
+							ontrigger1lua="
+								if (param == 'krosmode') then
+									self:SetButtonState(0)
+									self:UICmd('SetAutoLevelup(\' \')')
+									self:SetVisible(0)
+								else
+									self:SetVisible(1)
+								end"
+							interactive="false"
+						/>
+						<instance name="tip_mark" tip_id="shop_guide_auto_level" width="1.8h" height="1.8h" valign="center" align="right" />
+					</panel>			
+				</panel>	
+				
+			</panel>
+
+			<!-- Recipe Tree -->
+			<panel x="20.7h" y="53.5h" width="74.0h" height="21.5h" align="left" noclick="true"
+				name="shopRecipeTree"
+				visible="false"
+				onevent0lua="
+					if (not self:IsVisibleSelf()) then
+						self:FadeIn(200 * Shop.shopFlag_animSpeedMult)
+						self:SlideY('53.5h', 200 * Shop.shopFlag_animSpeedMult)
+					end						
+				"
+				onevent1lua="
+					if (self:IsVisibleSelf()) then
+						self:SlideY('30h', 200 * Shop.shopFlag_animSpeedMult)
+						self:FadeOut(200 * Shop.shopFlag_animSpeedMult)		
+					end		
+				"
+				onevent2="
+					If(
+						!IsVisibleSelf(),
+						Split(
+							SetVisible(true),
+							SetY('53.5h')
+						)
+					);
+
+				"
+				onevent3="
+					If(
+						IsVisibleSelf(),
+						Split(
+							SetY('30h'),
+							SetVisible(false)
+						)
+					);
+
+				"
+				
+				onhotkey="PlaySound('/shared/sounds/ui/button_close_01.wav'); SetActiveRecipe('');"
+			>
+			
+				<!-- Buy All Button -->
+				<panel x="30.6h" y="0.6h" width="12.4h" height="2.4h" color="0 0 0 1" noclick="true" watch="storeAlphaUpdate" ontrigger="SetColor('0 0 0 ' # (param / 100));">
+					<panel noclick="true"
+						group="activeRecipeGroup"
+						onevent4lua="
+							if (Shop.recipe.cur.IsRecipe) then
+								self:FadeOut(200 * Shop.shopFlag_animSpeedMult)
+							end
+						"
+						onevent5lua="
+							if (Shop.recipe.cur.IsRecipe) then
+								if (not self:IsVisible()) then
+									self:FadeIn(200 * Shop.shopFlag_animSpeedMult)
+								end
+							end
+						"
+					>
+						<instance
+							name="button2"
+							borderthickness="0.6h"
+							label="game_shop_label_buyremaining"
+							onclick="								
+								PurchaseRemainingComponents(GetActiveRecipe());
+							"
+							labelwatch="RecipeItem"
+							labelontrigger="
+								If(
+									param31,
+									SetText(Translate('game_shop_label_upgrade')),
+									SetText(Translate('game_shop_label_buyremaining'))
+								);
+							"
+							onevent0=""
+							enabled="true"
+
+						/>
+					</panel>
+				</panel>
+
+				<image name="tree_body_background" y="0" width="104.0h" height="26.0h" texture="/ui/common/new_shop_interface/shop_tree_body.tga" noclick="true" watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (param / 100));"/>
+
+				<!-- Tree Layout -->
+				<panel y="0.7h" x="2.0h" width="69.57h" height="21.1h" noclick="true" visible="1" name="guide_lower_tree"
+					watch="setRecipeViewStyle"
+					ontrigger="
+						If(
+							param == 0,
+							DoEvent(0),
+							DoEvent(1)
+						);
+					"
+					
+					onevent0lua="
+						self:FadeIn(150 * Shop.shopFlag_animSpeedMult)
+					"
+					onevent1lua="
+						self:FadeOut(150 * Shop.shopFlag_animSpeedMult)
+					"
+				>
+				
+					<label width="25.28h" align="left" textalign="center" textvalign="top" font="dyn_12" color="1 1 1 1" outline="true" content="game_shop_label_components" noclick="true" luatable="1"
+						onloadlua="Shop:RegisterRecipeTreeLabelComponents(self)" 
+						group="recipe_tree_labels"
+					/>
+					<label width="25.28h" align="right" textalign="center" textvalign="top" font="dyn_12" color="1 1 1 1" outline="true" content="game_shop_label_buildsinto" noclick="true" luatable="1"
+						onloadlua="Shop:RegisterRecipeTreeLabelBuildup(self)" 						
+						group="recipe_tree_labels"
+					/>
+
+					<panel
+						name="tree_4"
+						height="-2.54h"
+						valign="bottom"
+						noclick="true"
+					>
+					
+						<!-- Left Tree Image --> 
+						<panel x="26.2h" y="0.5h" width="4.31h" align="left" noclick="true">
+							<image width="5.4h" height="20.8h" valign="center" align="right" texture="/ui/common/new_shop_interface/tree_left_4.tga" noclick="true" group="recipeBranchImages" luatable="1"
+								onloadlua="Shop:RegisterLeftTreeImage(self)" 
+							/>
+						</panel>
+
+						<!-- Right Tree Image -->
+						<panel x="-26.2h" y="0.5h" width="4.31h" align="right" noclick="true">
+							<image width="5.4h" height="20.8h" valign="center" align="left" texture="/ui/common/new_shop_interface/tree_right_4.tga" noclick="true" group="recipeBranchImages" luatable="1"
+								onloadlua="Shop:RegisterRightTreeImage(self)" 
+							/>
+						</panel>
+
+						<!-- Center Item Background Isolated -->
+						<image y="2.5%" x="31.4%" width="26.0h" height="26.0h" valign="center" texture="/ui/common/new_shop_interface/shop_tree_body_center.tga" noclick="true" watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (param / 100));"/>
+						
+						<!-- Sub-components / Initial Components -->
+						<panel x="0" y="0.5h" width="25.2h" align="left" noclick="true" onload="CreateInt('component_tree_baseY', GetAbsoluteY());" name="component_tree_parent" onevent="Set('component_tree_baseY', GetAbsoluteY());">
+							<instance name="tree_component_base" y="0" 		rowIndex="0" slotInit="0"  slotSubA="8" 	slotSubB="9" 	slotSubC="10" 	slotSubD="11" 	itemY4="0" 		itemY3="1.4h" 	itemY2="2.4h" 		itemY1="6.9h" />
+							<instance name="tree_component_base" y="4.7h" 	rowIndex="1" slotInit="1"  slotSubA="16" 	slotSubB="17" 	slotSubC="18" 	slotSubD="19" 	itemY4="4.7h" 	itemY3="6.9h" 	itemY2="11.3h" 		itemY1="0" />
+							<instance name="tree_component_base" y="9.2h" 	rowIndex="2" slotInit="2"  slotSubA="24" 	slotSubB="25" 	slotSubC="26" 	slotSubD="27" 	itemY4="9.2h" 	itemY3="12.4h" 	itemY2="0" 			itemY1="0" />
+							<instance name="tree_component_base" y="13.8h" 	rowIndex="3" slotInit="3"  slotSubA="32" 	slotSubB="33" 	slotSubC="34" 	slotSubD="35" 	itemY4="13.8h" 	itemY3="0" 		itemY2="0" 			itemY1="0" />
+						</panel>
+
+						<!-- Second Tier Buildups / Initial Buildups  -->
+						<panel name="buildup_tree_parent" x="0" y="0.5h" width="25.2h" align="right" noclick="true" onload="CreateInt('buildup_tree_baseY', GetY());">
+							<instance name="tree_buildup_base" y="0" 		rowIndex="0" slotInit="72" slotSubA="80" 	slotSubB="81" 	slotSubC="82" 	slotSubD="83" 	itemY4="0" 		itemY3="1.4h" 	itemY2="2.4h" 		itemY1="6.9h" />
+							<instance name="tree_buildup_base" y="4.7h" 	rowIndex="1" slotInit="73" slotSubA="88" 	slotSubB="89" 	slotSubC="90" 	slotSubD="91" 	itemY4="4.7h" 	itemY3="6.9h" 	itemY2="11.3h" 		itemY1="0" />
+							<instance name="tree_buildup_base" y="9.2h" 	rowIndex="2" slotInit="74" slotSubA="96" 	slotSubB="97" 	slotSubC="98" 	slotSubD="99" 	itemY4="9.2h" 	itemY3="12.4h" 	itemY2="0" 			itemY1="0" />
+							<instance name="tree_buildup_base" y="13.8h" 	rowIndex="3" slotInit="75" slotSubA="104" 	slotSubB="105" 	slotSubC="106" 	slotSubD="107" 	itemY4="13.8h" 	itemY3="0" 		itemY2="0" 			itemY1="0" />
+						</panel>
+
+						<!-- Current Active Recipe -->
+						<panel width="9.7h" align="center" noclick="true">							
+								
+							<!-- Name -->
+							<panel y="1.2h" width="120%" height="3.6h" align="center">
+								<label height="100%" wrap="true" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_11" watch="updateRecipeDisplay" ontriggerlua="self:SetText(Shop.recipe.cur.Title)" group="activeRecipeGroup" onevent4lua=" if (Shop.recipe.cur.Entity) ~= (Shop.recipe.old.Entity) then self:FadeOut(200 * Shop.shopFlag_animSpeedMult) end "
+									onevent5lua="
+										if (not self:IsVisible()) then
+											self:FadeIn(200 * Shop.shopFlag_animSpeedMult)										
+										end
+									"							
+								/>
+							</panel>
+							
+							<!-- Cost -->
+							<panel grow="true" height="1.75h" x="-0.4h" y="0" align="center" valign="bottom" float="right" padding="0.2h" noclick="true" watch="updateRecipeDisplay" group="activeRecipeGroup" onevent4lua=" if (Shop.recipe.cur.Entity) ~= (Shop.recipe.old.Entity) then self:FadeOut(200 * Shop.shopFlag_animSpeedMult) end "
+								onevent5lua="
+									if (not self:IsVisible()) then
+										self:FadeIn(200 * Shop.shopFlag_animSpeedMult)										
+									end
+								"								
+							>
+								<label fitx="true" height="1.75h" color="#FFCC00" shadow="true" font="dyn_10" align="center" content="Cost:" watch="updateRecipeDisplay" ontriggerlua="self:SetText('Cost:^w ' .. Shop.recipe.cur.Cost)" group="activeRecipeGroup" 
+									onevent4lua="
+										if (Shop.recipe.cur.Entity) ~= (Shop.recipe.old.Entity) then
+											self:FadeOut(200 * Shop.shopFlag_animSpeedMult)
+										end
+									" 
+									onevent5lua="
+										if (not self:IsVisible()) then
+											self:FadeIn(200 * Shop.shopFlag_animSpeedMult)										
+										end
+									"									
+								/>
+								<panel height="1.75h" width="1.4h" noclick="true">
+									<image texture="/ui/fe2/store/gold_coins.tga" width="100%" height="100@" valign="center" noclick="true" />
+								</panel>
+							</panel>
+							
+							<!-- Big Icon -->
+							<panel y="5.95h" width="100%" height="100@">
+								<instance name="shop_recipe_item_button" id="1" watch1="recipeCheckComponentMatch" />
+							</panel>							
+							
+						</panel>
+						
+						<panel noclick="true" color="invisible"  name="shop_base_tree_transition_parent" >
+							<instance name="componentIconPlaceholder" id="1" />	
+							<instance name="componentIconPlaceholder" id="2" />							
+							<instance name="recipeIconPlaceholder" id="1" />
+							<instance name="recipeIconPlaceholder" id="2" />
+						</panel>
+						
+					</panel>
+				</panel>
+
+
+				<image name="boot_body_background" y="0" width="104.0h" height="26.0h" texture="/ui/common/new_shop_interface/boots_tree_background.tga" noclick="true" visible="0" watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (param / 100));"
+					watch1="setRecipeViewStyle"
+					ontrigger1="
+						If(
+							param == 0,
+							DoEvent(1),
+							DoEvent(0)
+						);
+					"
+					
+					onevent0lua="
+						self:FadeIn(150 * Shop.shopFlag_animSpeedMult)
+					"
+					onevent1lua="
+						self:FadeOut(150 * Shop.shopFlag_animSpeedMult)
+					"
+				/>
+				<!-- Boots display -->
+				<panel y="1.2h" x="2.0h" width="69.57h" height="20.0h" noclick="true" visible="true"
+					name="extendedRecipe"
+					watch="setRecipeViewStyle"
+					ontrigger="
+						If(
+							param == 0,
+							DoEvent(1),
+							DoEvent(0)
+						);
+					"
+					
+					onevent0lua="
+						self:FadeIn(150 * Shop.shopFlag_animSpeedMult)
+					"
+					onevent1lua="
+						self:FadeOut(150 * Shop.shopFlag_animSpeedMult)
+					"
+				>				
+				
+					
+					<!-- Selected Item(Top) -->
+					<panel height="6.5h" width="100%" noclick="true">
+					
+						<!-- Name / Cost / Buy -->
+						<panel align="left" width="39%" noclick="true">
+							<label y="0.2h" fity="true" width="100%" textalign="center" font="dyn_14" color="1 1 1 1" shadow="true" noclick="true" watch="updateRecipeDisplay" ontriggerlua="self:SetText(Shop.recipe.cur.Title)" group="activeRecipeGroup" 
+									onevent4lua=" if (Shop.recipe.cur.Entity) ~= (Shop.recipe.old.Entity) then self:FadeOut(200 * Shop.shopFlag_animSpeedMult) end " 
+									onevent5lua="if (not self:IsVisible()) then self:FadeIn(200 * Shop.shopFlag_animSpeedMult) end"										
+							/>							
+							<panel grow="true" x="-0.7h" y="2.2h" height="1.75h" align="center" float="right" padding="0.2h" noclick="true" watch="updateRecipeDisplay" group="activeRecipeGroup" onevent4lua=" if (Shop.recipe.cur.Entity) ~= (Shop.recipe.old.Entity) then self:FadeOut(200 * Shop.shopFlag_animSpeedMult) end "  onevent5lua="if (not self:IsVisible()) then self:FadeIn(200 * Shop.shopFlag_animSpeedMult) end" >
+								<label fitx="true" height="1.75h" color="#FFCC00" shadow="true" font="dyn_10" align="center" content="Total Cost:" watch="updateRecipeDisplay" ontriggerlua="self:SetText('Total Cost:^w ' .. Shop.recipe.cur.Cost)" group="activeRecipeGroup" onevent4lua=" if (Shop.recipe.cur.Entity) ~= (Shop.recipe.old.Entity) then self:FadeOut(200 * Shop.shopFlag_animSpeedMult) end "  onevent5lua="if (not self:IsVisible()) then self:FadeIn(200 * Shop.shopFlag_animSpeedMult) end" />
+								<panel height="1.75h" width="1.4h" noclick="true">
+									<image texture="/ui/fe2/store/gold_coins.tga" width="100%" height="100@" valign="center" noclick="true" />
+								</panel>
+							</panel>
+							<instance
+								name="button2"
+								y="-0.1h"
+								width="15.0h" height="2.2h"
+								align="center" valign="bottom"
+								label="game_shop_label_buyremaining"
+								onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav');"
+								onclick="PurchaseRemainingComponents(GetActiveRecipe()));"
+								watch="updateRecipeDisplay"
+								ontriggerlua="
+									if (Shop.recipe.cur.IsRecipe) then
+										if (not self:IsVisible()) then
+											self:FadeIn(200 * Shop.shopFlag_animSpeedMult)
+										end
+									else
+										if (self:IsVisible()) then
+											self:FadeOut(200 * Shop.shopFlag_animSpeedMult)
+										end									
+									end
+								"
+							/>
+						</panel>
+						
+						<!-- Icon -->
+						<panel y="0.2h" width="100@" height="100%" align="center" noclick="true">
+							<instance name="shop_recipe_item_button" id="2" />
+						</panel>
+						
+						<!-- Description -->
+						<panel align="right" width="39%" noclick="true">							
+							<panel width="16.0h" height="4.6h" align="center" float="bottom" noclick="true">
+								<label fity="true" valign="center" font="dyn_10" wrap="true" color="1 1 1 1" shadow="true" content="" watch="updateRecipeDisplay" ontriggerlua="self:SetText(Shop.recipe.cur.Desc)" group="activeRecipeGroup" onevent4lua=" if (Shop.recipe.cur.Entity) ~= (Shop.recipe.old.Entity) then self:FadeOut(200 * Shop.shopFlag_animSpeedMult) end " onevent5lua="if (not self:IsVisible()) then self:FadeIn(200 * Shop.shopFlag_animSpeedMult) end" />
+							</panel>							
+						</panel>
+					
+					</panel>
+				
+					<!-- Tree Texture -->
+					<panel y="7.6h" width="100%" height="2.8h" noclick="true">
+						<image width="100.0h" height="6.25h" align="center" texture="/ui/common/new_shop_interface/boots_bar.tga" noclick="true"/>
+					</panel>
+					
+					<!-- Build-up Display -->
+					<panel y="9.0h" width="100%" noclick="true">
+						<instance name="boot_tree_item" itemIndex="72" slotIndex="0" slideX8="-28.2h" slideX7="-28.2h" slideX6="-28.2h" slideX5="-28.2h" />
+						<instance name="boot_tree_item" itemIndex="73" slotIndex="1" slideX8="-20.2h" slideX7="-18.8h" slideX6="-16.9h" slideX5="-14.1h" />
+						<instance name="boot_tree_item" itemIndex="74" slotIndex="2" slideX8="-12.1h" slideX7="-9.4h" slideX6="-5.6h" slideX5="0" />
+						<instance name="boot_tree_item" itemIndex="75" slotIndex="3" slideX8="-4.0h" slideX7="0" slideX6="5.6h" slideX5="14.1h" />							
+						<instance name="boot_tree_item" itemIndex="76" slotIndex="4" slideX8="4.0h" slideX7="9.4h" slideX6="16.9h" slideX5="28.2h" />
+						<instance name="boot_tree_item" itemIndex="77" slotIndex="5" slideX8="12.1h" slideX7="18.8h" slideX6="28.2h" />
+						<instance name="boot_tree_item" itemIndex="78" slotIndex="6" slideX8="20.2h" slideX7="28.2h" />
+						<instance name="boot_tree_item" itemIndex="79" slotIndex="7" slideX8="28.2h" />					
+					</panel>
+					
+				</panel>
+				
+				<instance name="shop_btn_closex" width="1.8h" height="1.8h" x="-1.7h" y="0.8h" align="right" valign="top" tip_id="shop_collapse_tree"
+					onclick="
+						Set('_shopFlag_recipeVisible', false);
+						Set('_shopNewRecipeTarget', '');
+						Set('_recipeTransitionMode', 0);
+						SetActiveRecipe('');
+						CallEvent('game_shop_main_controller', 0);
+					"
+				/>
+				
+				<!-- Tree Area Item catcher-->
+				<panel
+					x="1.2h" y="0.8h"
+					width="71.2h" height="20.8h"
+					color="invisible"
+					texture="/ui/common/new_shop_interface/sellback_drop.tga"
+					watch="ItemCursorVisible PlayerCanShop"
+					ontrigger="SetVisible(ItemCursorVisible and PlayerCanShop); RefreshCursor();"
+					rendermode="overlay"					
+					onmouseover="
+						SetColor('1 1 1 1');						
+						Call(
+							'tree_body_background',
+							'
+								##SetColor(\'#a7e9ff\');##
+								SetColor(\'0.65 0.91 1 \' # (0.2 + (shopAlphaValue * 0.008)));
+							'
+						);
+						Call(
+							'boot_body_background',
+							'
+								SetColor(\'0.65 0.91 1 \' # (0.2 + (shopAlphaValue * 0.008)));
+							'
+						);
+					"
+					onmouseout="
+						SetColor('invisible');						
+						Call(
+							'tree_body_background',
+							'
+								SetColor(\'1 1 1 \' # (shopAlphaValue / 100));
+							'
+						);
+						Call(
+							'boot_body_background',
+							'
+								SetColor(\'1 1 1 \' # (shopAlphaValue / 100));
+							'
+						);
+						"
+					onclick="Sell();"
+					onrightclick="Sell();"
+				/> 
+			</panel>
+			
+			<!-- Item / Recipe Listings -->
+			<panel
+				x="19.1h" y="-1.0h"
+				width="75.8h" height="50h"
+				align="left"
+				noclick="true"
+				visible="true"
+			>
+				<!--<image width="104.0h" height="13.0h" align="left" valign="top" texture="/ui/common/new_shop_interface/shop_header.tga" noclick="true" />-->
+				<image width="107.8h" height="13.0h" align="left" valign="top" texture="/ui/common/new_shop_interface/shop_header.tga" noclick="true"
+					watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.3 + (param * 0.007)));"
+				/>
+				<!--<image y="5.2h" width="104.0h" height="52.0h" align="left" valign="top" texture="/ui/common/new_shop_interface/shop_body.tga" noclick="true" />-->
+				<image name="shop_body_background" y="5.2h" width="107.8h" height="52.0h" align="left" valign="top" texture="/ui/common/new_shop_interface/shop_body.tga" noclick="true" watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (param / 100));"/>
+				<image x="75.5h" y="-40h" width="7h" height="95.0h" align="left" valign="top" texture="/ui/common/new_shop_interface/Scrollbar_Panel.tga" noclick="true" visible="false"
+					name="shop_scroll_backer"
+					onevent0="
+						If(
+							!IsVisibleSelf(),
+							FadeIn(200 * _shopFlag_animSpeedMult)
+						);
+						
+					"
+					onevent1="
+						If(
+							IsVisibleSelf(),
+							FadeOut(200 * _shopFlag_animSpeedMult)							
+						);
+						
+					"
+					onevent2="
+						If(
+							!IsVisibleSelf(),
+							SetVisible(true)
+						);
+					"
+					onevent3="
+						If(
+							IsVisibleSelf(),
+							SetVisible(false)							
+						);
+					"
+				/>
+				<image x="37.4h" y="5.4h" width="1.25h" height="1.25h" texture="/ui/common/new_shop_interface/gem.tga" noclick="true" />
+				<scrollbar
+					onload="
+						CreateInt('_shopScrollMax', 1);
+						CreateInt('_shopScrollMinID', 0);
+						CreateInt('_shopScrollMaxID', 0);
+						CreateBool('_storeInstantTransition', true);
+						CreateBool('_useShopScroll', true);
+					"
+					visible="true"
+					align="right" width="2h" height="-2h" x="1.9h" y="6h"
+					texture="/ui/info/newstoreslider.tga"
+					minvalue="6"
+					maxvalue="10"
+					onslide="
+						If(
+							_useShopScroll,
+							DoEvent(7),
+							Set('_useShopScroll', true)
+						);
+					"
+
+					handlewidth="2h"
+					handleheight="2h"
+					step="1"
+					value="6"
+					vertical="true"
+					slotwidth="0.6h" slotheight="1"
+					name="shopItemScrollbar"
+					onevent0="
+						If(
+							!IsVisibleSelf(),
+							FadeIn(200 * _shopFlag_animSpeedMult)
+						);
+						
+					"
+					onevent1="
+						If(
+							IsVisibleSelf(),
+							FadeOut(200 * _shopFlag_animSpeedMult)							
+						);
+						
+					"
+					onevent2="
+						If(
+							!IsVisibleSelf(),
+							SetVisible(true)
+						);
+					"
+					onevent3="
+						If(
+							IsVisibleSelf(),
+							SetVisible(false)							
+						);
+					"
+					onevent4="
+						If(
+							GetValue() lt _shopScrollMax,
+							SetValue(GetValue() + 1)
+						);
+					"
+					onevent5="
+						If(
+							GetValue() gt 6,
+							SetValue(GetValue() - 1)
+						);
+					"
+					onevent6="
+						Set('_shopScrollMax', Floor((_lastCurrentShopItems + *('_shopFlag_itemsPerRow' # _shopFlag_itemStyle) - 1) / *('_shopFlag_itemsPerRow' # _shopFlag_itemStyle)));
+					
+						If(
+							_shopFlag_showScroll,
+							SetMaxValue(_shopScrollMax),
+							SetMaxValue(6)
+						);
+					"
+					onevent7="
+									
+						Set(
+							'_shopScrollMinID',
+							Ceil(
+								(this - 6) *
+								(*('_shopFlag_itemsPerRow' # _shopFlag_itemStyle))
+							)
+						);
+						Set(
+							'_shopScrollMaxID',
+							Ceil(
+								(
+									this *
+									(*('_shopFlag_itemsPerRow' # _shopFlag_itemStyle))
+								) - 1
+								
+							)
+						);
+						
+						Set('_storeInstantTransition', true);
+						
+						SetShopItemRange(
+							_shopScrollMinID,
+							_shopScrollMaxID
+						);
+					"
+				/>
+
+				<panel name="shop_v4_listbox" color="invisible" noclick="true" luatable="1" />
+				<panel color="invisible" x="1.5h" y="6.75h" width="-2.5h" height="-3h" name="shop_v4_itemList" noclick="true" visible="false" luatable="1" >				
+					<!-- Full Item Display -->
+					<panel noclick="true">				
+						<panel width="20h" height="32h" align="center" valign="center" color="0 0 0 0.75" name="shop_popup_noitemsfound" visible="false" luatable="1" >
+							<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />					
+							<panel height="2.8h" >
+								<panel width="100%" height="100%" >
+									<image align="center" width="-64"
+										texture="/ui/info/header_bar_c.tga"
+										watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.25 + (param * 0.0075)));"
+									/>
+									<image height="50%" width="32" align="left" valign="top" texture="/ui/info/header_bar_tl.tga" noclick="1"
+										watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.25 + (param * 0.0075)));"									
+									/>
+									<image height="50%" width="32" align="left" valign="bottom" texture="/ui/info/header_bar_bl.tga" noclick="1"
+										watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.25 + (param * 0.0075)));"
+									/>
+									<image height="50%" width="32" align="right" valign="top" texture="/ui/info/header_bar_tr.tga" noclick="1"
+										watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.25 + (param * 0.0075)));"
+									/>
+									<image height="50%" width="32" align="right" valign="bottom" texture="/ui/info/header_bar_br.tga" noclick="1"
+										watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.25 + (param * 0.0075)));"
+									/>		
+								</panel>
+								<label textvalign="center" width="-1h" x="0.5h" font="dyn_11" color="white" shadow="true" content="game_shop_noitemsfound_title"/>
+								<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />
+							</panel>
+							
+							<panel height="-13.25h" y="3.25h">
+							
+								<panel width="100@" height="100%" align="center">
+									<image texture="/heroes/dwarf_magi/icon.tga"
+										watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # (0.50 + (param * 0.005)));"
+									/>
+									<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />
+								</panel>
+							</panel>
+							
+							<panel valign="bottom" height="10h">
+								<panel width="-1h" height="-1h" valign="center" align="center" color="black"
+									watch="storeAlphaUpdate"
+									ontrigger="
+										SetColor('0 0 0 ' # (0.25 + (param * 0.0075)));
+									"
+								>
+									<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />
+									<panel width="-1h" height="-1h" valign="center" align="center" float="bottom" padding="0.75h">
+										<label font="dyn_10" color="white" wrap="true" width="100%" fity="true" content="game_shop_noitemsfound1"/>
+										<label font="dyn_10" color="#FFCC00" wrap="true" width="100%" fity="true" content="game_shop_noitemsfound2"/>
+										
+									</panel>
+								</panel>
+							</panel>
+						</panel>
+					
+						<!-- Detailed Item Display -->
+						<panel noclick="true" visible="true" 
+							watch="ShopItemDisplayType"
+							ontriggerlua="
+								if (tonumber(param0) == 0) then
+									self:DoEventN(1)
+								end
+							"
+							onload="If(!VarExists('_shopFlag_itemStyle'), DoEvent(1), DoEvent());"
+							onevent="If(_shopFlag_itemStyle == 0, DoEvent(1));"
+							onevent1lua="
+								if (not AtoB(self:UICmd([[WidgetExists('shop_v4_item_panel')]]))) then 
+									self:Instantiate('shop_v4_item_panel_template')
+									self:Sleep(1, 
+										function() 
+											Trigger('ShopItemDisplayType', GetCvarInt('_shopFlag_itemStyle')) 
+											if (AtoB(self:UICmd([[WidgetExists('shop_v4_item_simple_panel')]]))) then										
+												self:Sleep(1, 
+													function()
+													local tempLast = GetCvarString('_lastActiveShop')	
+														Trigger('SetShopDisplay')
+
+														self:Sleep(1,
+															function()
+																Trigger('SetShopDisplay', tempLast)
+															end
+														)
+													end
+												)
+											end
+										end
+									)
+								end
+								"														
+						>	
+						</panel>						
+
+					</panel>
+
+					<!-- Simple Item Display -->
+					<panel noclick="true" visible="true" 
+						watch="ShopItemDisplayType" 
+						ontriggerlua="
+							if (tonumber(param0) == 1) then
+								self:DoEventN(1)
+							end
+						"
+						onload="If(!VarExists('_shopFlag_itemStyle'), DoEvent(1), DoEvent());"
+						onevent="If(_shopFlag_itemStyle == 1, DoEvent(1));"
+						onevent1lua="
+							if (not AtoB(self:UICmd([[WidgetExists('shop_v4_item_simple_panel')]]))) then 
+								self:Instantiate('shop_v4_item_simple_panel_template')
+								self:Sleep(1, 
+									function() 
+										Trigger('ShopItemDisplayType', GetCvarInt('_shopFlag_itemStyle'))
+											if (AtoB(self:UICmd([[WidgetExists('shop_v4_item_panel')]]))) then											
+												self:Sleep(1, 
+													function()
+													local tempLast = GetCvarString('_lastActiveShop')	
+														Trigger('SetShopDisplay')
+
+														self:Sleep(1,
+															function()
+																Trigger('SetShopDisplay', tempLast)
+															end
+														)
+													end
+												)
+											end
+									end
+								)
+							end
+						"							
+					>	
+					</panel>					
+					
+					<panel processonlyscroll="true" color="invisible" name="shopScrollCatcher"
+						hover="false"
+						onmousewheeldown="
+							CallEvent('shopItemScrollbar', 4);
+						"
+						onmousewheelup="
+							CallEvent('shopItemScrollbar', 5);
+						"
+						onevent0="
+							If(
+								!IsVisibleSelf(),
+								SetVisible(true)
+							);
+							
+						"
+						onevent1="
+							If(
+								IsVisibleSelf(),
+								SetVisible(false)
+							);
+							
+						"
+					/>
+				</panel>
+				<panel noclick="1"
+					name="hero_guide"
+					x="2.0h" y="6.8h"
+					width="-4.2h" height="-3h"
+					float="right" padding="1.0h"
+					visible="false"
+					onevent0="
+						FadeIn(200 * _shopFlag_animSpeedMult);
+						
+					"
+					onevent1="
+						If(
+							IsVisibleSelf(),
+							FadeOut(200 * _shopFlag_animSpeedMult)							
+						);
+						
+					"
+					onevent2="
+						SetVisible(true);
+					"
+					onevent3="
+						SetVisible(false);
+					"
+				>
+				
+					<!-- Recommended Items -->
+					<panel noclick="1"
+						name="guide_main_recommended_panel"
+						width="18.2h"
+						float="bottom"
+						padding="0.5h"
+						onshow="DoEvent();"
+						onevent="Trigger('GuideRecommendedEvent');"
+					>
+						<instance name="guide_recommended" panel="1" phaseName="game_guide_reco_1" tip_id="shop_guide_reco_1_tip" watch="GuideInfoFormResultExplodeItemsStart" />
+						<instance name="guide_recommended" panel="2" phaseName="game_guide_reco_2" tip_id="shop_guide_reco_2_tip" watch="GuideInfoFormResultExplodeItemsLaning" />
+						<instance name="guide_recommended" panel="3" phaseName="game_guide_reco_3" tip_id="shop_guide_reco_3_tip" watch="GuideInfoFormResultExplodeItemsCore"  />
+						<instance name="guide_recommended" panel="4" phaseName="game_guide_reco_4" tip_id="shop_guide_reco_4_tip" watch="GuideInfoFormResultExplodeItemsLux"  />
+					</panel>
+					
+					<!-- Guide Text -->
+					<panel noclick="1"
+						width="-31.7h"
+					>
+						<!-- Intro -->
+						<panel height="14.2h" align="center"  noclick="1">
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.4h" color="0 .08 0 .8"  noclick="1" />
+							<frame texture="/ui/frames/roundframe.tga" color="#58805e" borderthickness="0.4h"  noclick="1" />
+							<label y="0.6h" width="-1.8h" height="2.4h" align="center" font="dyn_14" color="#8aff81" content="game_guide_label_intro" outline="true"  noclick="1" />
+							<label y="0.8h" x="-0.6h" width="10h" height="2.4h" textalign="right" align="right" font="dyn_12" color="#8aff81" content="game_guide_label_premium" outline="true"  noclick="1" visible="0"
+								watch0="GuideInfoFormResult GuideInfoFormResultLocal"
+								ontrigger0="	
+								If((GuideInfoFormStatus == 2  and (guide_masterQueryTime == param17) and param20) or param19, 
+									SetVisible(param21)
+								);								
+								"							
+							/>
+							<textbuffer y="3.0h" width="-1.8h" height="-4.4h" align="center" valign="top" font="dyn_9" color="invisible" wrap="true" shadow="1" shadowcolor="black" noclick="0"
+								group="guide_label_group"
+								watch4="GuideTextClear" ontrigger4="SetBufferText('');"
+								watch3="GuideLabelEvent"
+								ontrigger3="##If(IsVisible(), DoEvent());## SetBufferText(NormalizeLineBreaks(guide_currentIntroString));"
+								content=""							
+								watch0="GuideInfoFormResult GuideInfoFormResultLocal"
+								ontrigger0="
+								SetBufferText(NormalizeLineBreaks(param10));
+								Set(guide_currentIntroString, param10);
+								If(GetStringWrapHeight('dyn_9', NormalizeLineBreaks(param10), GetWidth()) gt GetHeight(), SetNoClick(0), SetNoClick(1));
+								## If((GuideInfoFormStatus == 2  and (guide_masterQueryTime == param17) and param20) or param19, 							
+									Split(										
+										ClearBufferText(),
+										Set(guide_currentIntroString, param10),
+										If(GetStringWrapHeight('dyn_9', param10, GetWidth()) gt GetHeight(), SetNoClick(0), SetNoClick(1))
+									)
+								); ##							
+								"						
+								onshow="##DoEvent();##"
+								onevent="
+								If(GuideInfoFormStatus == 2,
+									If(StringLength(guide_currentIntroString) lt 100, 
+										SetBufferText(NormalizeLineBreaks(guide_currentIntroString)),
+										Split(
+											CreateLerp('GuideIntroTextLerp', StringLength(guide_currentIntroString), guide_lerptime * _shopFlag_animSpeedMult, 0, 1),
+											SleepWidget(guide_lerptime * _shopFlag_animSpeedMult, 'CreateLerp(\'GuideIntroTextLerp\', 0, 1, 0, -1)')
+										)
+									)
+								);
+								"
+								watch1="GuideIntroTextLerpTrigger"
+								ontrigger1="
+									If(param gt 0,
+										SetBufferText(
+											NormalizeLineBreaks(SubString(guide_currentIntroString, 0, param-15)#'^751'#SubString(guide_currentIntroString, param-15, 15))
+										),
+										SetBufferText(NormalizeLineBreaks(guide_currentIntroString))
+									);
+								"	
+								scrolltexture="/ui/info/combobox.tga"
+								handleheight="1.8h"
+								scrollbarsize="1.8h"
+								scrollbarplaceholder="false"
+								exteriorscrollbars="false"
+								textalign="left"
+								onchange="If(WidgetExists('guide_no_content_error'), If(StringEmpty(this), Call('guide_no_content_error', 'DoEvent(0);'), Call('guide_no_content_error', 'DoEvent(1);')  ));"
+								textcolor="white"
+							/>	
+							
+							<panel noclick="1" name="guide_no_content_error" onload="CreateBool('guide_no_content_error_bool', 0);"						
+								onevent0="
+									SleepWidget(0, '');
+									Set(guide_no_content_error_bool, 1);
+									SleepWidget(15000, 'If(guide_no_content_error_bool, Trigger(\'GuideListFormStatus\', 3));');								
+								"
+								onevent1="
+									Set(guide_no_content_error_bool, 0);
+									SleepWidget(0, '');
+									"
+							/> 
+							
+						</panel>
+						
+						<!-- Description -->
+						<panel y="-0.4h" height="-15.0h" align="center" valign="bottom"  noclick="1" >
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.4h" color="0 0 .07 .8"  noclick="1" />
+							<frame texture="/ui/frames/roundframe.tga" color="#667788" borderthickness="0.4h"  noclick="1" />
+							<label noclick="1"  y="0.6h" width="-1.8h" height="2.4h" align="center" font="dyn_14" color="#83cfff" content="game_guide_label_detailed" outline="true" />
+							
+							<textbuffer noclick="0" color="invisible"  y="3.0h" width="-1.8h" height="-4.4h" valign="top" align="center" font="dyn_9" wrap="true" content="" shadow="1" shadowcolor="black"
+								group="guide_label_group"
+								watch4="GuideTextClear" ontrigger4="SetBufferText('');"
+								watch3="GuideLabelEvent"
+								ontrigger3="##DoEvent();## SetBufferText(NormalizeLineBreaks(guide_currentGuideString));"								
+								watch0="GuideInfoFormResult GuideInfoFormResultLocal"
+								ontrigger0="														
+								SetBufferText(NormalizeLineBreaks(param11));
+								Set(guide_currentGuideString, param11);
+								If(GetStringWrapHeight('dyn_9', NormalizeLineBreaks(param11), GetWidth()) gt GetHeight(), SetNoClick(0), SetNoClick(1));
+								## 
+								If((GuideInfoFormStatus == 2  and (guide_masterQueryTime == param17) and param20) or param19, 
+									Split(
+										Set(guide_currentGuideString, param11),
+										If(GetStringWrapHeight('dyn_9', param11, GetWidth()) gt GetHeight(), SetNoClick(0), SetNoClick(1))
+									)
+								);	
+								##
+								"							
+								onshow="##DoEvent();##"
+								onevent="
+								If(GuideInfoFormStatus == 2, 
+									If(StringLength(guide_currentGuideString) lt 100, 
+										SetBufferText(NormalizeLineBreaks(guide_currentGuideString)),									
+										Split(
+											CreateLerp('GuideMainTextLerp', StringLength(guide_currentGuideString), guide_lerptime * _shopFlag_animSpeedMult, 0, 1),
+											SleepWidget(guide_lerptime * _shopFlag_animSpeedMult, 'CreateLerp(\'GuideMainTextLerp\', 0, 1, 0, -1)')
+										)
+									)
+								);
+								"
+								watch1="GuideMainTextLerpTrigger"
+								ontrigger1="
+									If(param gt 0,
+										SetBufferText(
+											NormalizeLineBreaks(SubString(guide_currentGuideString, 0, param-15)#'^751'#SubString(guide_currentGuideString, param-15, 15))
+										),
+										SetBufferText(NormalizeLineBreaks(guide_currentGuideString))
+									);
+								"	
+								scrollbarplaceholder="false"
+								scrolltexture="/ui/info/combobox.tga"
+								handleheight="1.8h"
+								scrollbarsize="1.8h"
+								exteriorscrollbars="false"
+								textalign="left"
+								textcolor="white"					
+							/>					
+						</panel>
+					</panel>	
+					
+					<!-- Ability Order -->
+					<panel noclick="1"
+						width="12.0h"
+						visible="true"
+						onshow="Trigger('GuideAbilityEvent');"
+						watch="GameMode"
+						ontriggerlua="self:SetVisible(param ~= 'krosmode')"
+					>					
+						<panel name="guide_ability_panel_1" width="49.0%" align="left" float="bottom" padding="0.2h"  noclick="1" >
+							<instance name="guide_ability_lvl" id="1" />
+							<instance name="guide_ability_lvl" id="2" />
+							<instance name="guide_ability_lvl" id="3" />
+							<instance name="guide_ability_lvl" id="4" />
+							<instance name="guide_ability_lvl" id="5" />
+							<instance name="guide_ability_lvl" id="6" />
+							<instance name="guide_ability_lvl" id="7" />
+							<instance name="guide_ability_lvl" id="8" />
+							<instance name="guide_ability_lvl" id="9" />
+							<instance name="guide_ability_lvl" id="10" />
+							<instance name="guide_ability_lvl" id="11" />
+							<instance name="guide_ability_lvl" id="12" />
+							<instance name="guide_ability_lvl" id="13" />
+						</panel>						
+						<panel name="guide_ability_panel_2"  width="49.0%" align="right" float="bottom" padding="0.2h"  noclick="1">
+							<instance name="guide_ability_lvl" id="14" />
+							<instance name="guide_ability_lvl" id="15" />
+							<instance name="guide_ability_lvl" id="16" />
+							<instance name="guide_ability_lvl" id="17" />
+							<instance name="guide_ability_lvl" id="18" />
+							<instance name="guide_ability_lvl" id="19" />
+							<instance name="guide_ability_lvl" id="20" />
+							<instance name="guide_ability_lvl" id="21" />
+							<instance name="guide_ability_lvl" id="22" />
+							<instance name="guide_ability_lvl" id="23" />
+							<instance name="guide_ability_lvl" id="24" />
+							<instance name="guide_ability_lvl" id="25" />							
+						</panel>
+					</panel>
+
+					<panel noclick="1" y="0" name="guide_thinking_panel" onevent1="SetVisible(0);" onevent2="SetVisible(1);" visible="0" color="0 0 0 0" height="40%" width="40%" valign="center" align="center"
+						watch="GuideInfoFormStatus GuideListFormStatus"
+						ontrigger="SetVisible(param0 == 1);"
+					>
+						<frame width="-1.6h" align="center" noclick="true" texture="/ui/frames/rounded_bg_white.tga" borderthickness="6" color="black"/>
+						<frame width="-1.6h" align="center" noclick="true" texture="/ui/frames/roundframe.tga" color=".3 .3 .3 1" borderthickness="6"/>					
+						<label width="-10.0h" height="100%" y="1h" align="center" textalign="center" textvalign="center" wrap="1" font="dyn_10" color="white" shadow="1" content="Retrieving..." noclick="1"
+							onshow="Call('guide_thinking_panel_retry', 'SetVisible(0); SleepWidget(0, \'\'); SleepWidget(1500, \'SetVisible(1);\');'); Call('guide_thinking_panel_cancel', 'SetVisible(0); SleepWidget(0, \'\'); SleepWidget(1500, \'SetVisible(1);\');');"
+						/>
+						<instance valign="center" y="4.9h"
+							name="button2" x="-6.5h" button_name="guide_thinking_panel_retry"
+							width="12.0h" height="2.5h"
+							align="center"
+							label="main_stats_retry"
+							font="dyn_10"
+							onclick=" CallEvent('guide_thinking_panel', 1); Set(guide_useCache, 0); Set(_guideFlag_loadFailure, 0); Set(guide_newRound, 1); Trigger('GuideHeroName', HeroName);"
+						/>			
+						<instance
+							valign="center" name="button2" y="4.9h" x="15.5h" button_name="guide_thinking_panel_cancel"
+							label="general_cancel"
+							onclick="CallEvent('guide_thinking_panel', 1);	CallEvent('shopGuideError', 1); "
+							enabled="true"
+							width="12.0h" height="2.5h"
+							font="dyn_10"
+						/>					
+						<animatedimage y="-5h" x="0h" width="5.5h" height="5.5h" valign="center" align="center" texture="/ui/elements/throb/throb.tga" noclick="true" loop="1" fps="30" onshow="StartAnim(1);" visible="1"  />				
+					</panel>
+					
+				</panel>
+				
+				<!-- Space to get the guide errors filled out -->
+				<panel noclick="1"
+					y="6.8h"
+					align="right"
+					x="-0.25h"
+					width="-1h"
+					height="-2h"
+					float="right" padding="1.0h"
+					visible="true"
+					onload="
+						CreateString('_guideErrorString', '');
+					"
+					name="heroGuideErrorDisplay"
+					onevent0="
+						If(
+							!IsVisibleSelf(),
+							SetVisible(1)
+						);
+						
+					"
+					onevent1="
+						If(
+							IsVisibleSelf(),
+							SetVisible(0)
+						);
+					"
+					
+					watch="GuideListFormStatus GuideInfoFormStatus"
+					ontrigger="if(param0 == 3, Split(Call('guide_error_popup_label', 'SetText(Translate(\'mstore_error_connect\'));'), CallEvent('shopGuideError', 0)));"					
+					
+				>
+				
+					<!-- Error popup and background-darking panel -->
+					<panel color="0 0 0 0.75"
+						name="shopGuideError"
+						visible="false"
+						onevent0lua="self:FadeIn(150 * Shop.shopFlag_animSpeedMult)"
+						onevent1lua="self:FadeOut(150 * Shop.shopFlag_animSpeedMult)"
+						onshow="CallEvent('guide_thinking_panel', 1);"
+					>
+						<panel color="0 0 0 0.5" grow="true" regrow="true" width="35h" align="center" valign="center">
+							<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />
+							<panel grow="true" regrow="true" width="100%" float="bottom">
+								<instance name="header_bar" width="100%" height="2.8h" lbl="mstore_error_generic" lbl_font="dyn_11" show_close="1" onclick="CallEvent('shopGuideError', 1);" />
+								<panel height="0.5h"/>
+
+								<panel width="100%" grow="true" regrow="true">
+									<panel align="center" width="-1h" grow="true" regrow="true" color="black">
+										<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />
+										<panel float="bottom" width="100%" grow="true" regrow="true">
+											<panel height="0.5h"/>
+											<panel grow="true" regrow="true" width="100%">
+												<label name="guide_error_popup_label" fity="true" font="dyn_10" color="white" wrap="true" width="-1h" align="center"
+													watch="GuideMasterQuery"
+													ontrigger="
+														SetWatch(1, param0 # 'Status');
+														SetWatch(2, param0 # 'Result');
+													"
+													ontrigger1="
+														If(
+															param == 3,
+															DoEvent(9)
+														);
+													"
+													ontrigger2="
+														If(
+															!StringEmpty(param0),
+															Set('_guideErrorString', '')
+														);
+														
+														If(
+															!StringEmpty(param0),
+															ExplodeTrigger('buildGuideErrorString', param0, '|')
+														);
+														
+														If(
+															!StringEmpty(param0),
+															Split(
+																SetText(FormatStringNewLine(_guideErrorString)),
+																CallEvent('shopGuideError', 0)
+															)
+														);
+													"
+													watch3="buildGuideErrorString"
+													ontrigger3="
+														Set(
+															'_guideErrorString', _guideErrorString #
+															If(
+																!StringEmpty(_guideErrorString),
+																'\\n',
+																''
+															) #
+															Translate(param1)
+														)
+													"
+													onevent9="
+														SetText(Translate('mstore_error_connect'));
+														CallEvent('shopGuideError', 0);
+													"
+												/>
+											</panel>
+											<panel height="0.5h"/>
+											<panel height="2.5h">
+												<panel align="center" grow="true" height="100%" float="right" padding="1h">
+
+													<instance
+														name="button2"
+														label="general_retry"
+														onclick="
+															Set(guide_newRound, 1);
+															Trigger('GuideHeroName', HeroName);															
+															CallEvent('shopGuideError', 1);
+														"
+														enabled="true"
+														width="7h"
+													/>
+													<instance
+														name="button2"
+														label="game_guide_label_getFeatured"
+														onclick="
+															Trigger('GuideLoadFeatured');
+															CallEvent('shopGuideError', 1);
+														"
+														enabled="true"
+														width="14h"
+													/>
+
+												</panel>
+											</panel>	
+											<panel height="0.75h"/>
+											<!--
+											<panel height="2.5h">
+												<panel align="center" grow="true" height="100%" float="right" padding="1h">
+													<instance
+														name="button2"
+														label="general_cancel"
+														onclick="
+															CallEvent('shopGuideError', 1);
+														"
+														enabled="true"
+														width="8h"
+													/>
+												</panel>												
+												
+											</panel>
+											<panel height="0.75h"/>
+											-->
+										</panel>
+									</panel>
+								</panel>
+								
+								<panel height="0.5h"/>
+							</panel>
+						</panel>
+					</panel>
+				</panel>
+
+				<!-- Report Guide Form
+				<panel
+					name="guide_report"						
+					x="33.8h" y="36.5h"
+					grow="true"
+					width="30.0h"
+					color="0 0 0 1"
+					cangrab="true"
+					visible="false"
+					onload="BringToFront();"
+				>
+					<frame width="110%" height="108%" align="center" valign="center" texture="/ui/frames/squareglow.tga" borderthickness="2.0h" color="0 0 0 .8" noclick="true"/>
+					<frame color="0 0 0 .8" bordercolor="#455166" borderthickness="1" noclick="1" />		
+					<panel float="bottom" padding="0.8h" grow="true" width="100%" noclick="true" regrow="true">
+						<instance name="header_bar" show_close="true" height="2.5h" lbl="game_guide_report_title" onclick="Call('guide_report', 'FadeOut(250 * _shopFlag_animSpeedMult);');"/>			
+
+						<panel grow="true" width="100%" noclick="true">
+							<label fity="true" width="-1.6h" align="center" wrap="true" font="dyn_10" color="1 1 1 1" content="game_guide_report_descrip" noclick="true" />
+						</panel>
+						
+						<panel height="7.6h" noclick="true">
+						
+							<frame width="-1.6h" align="center" noclick="true" texture="/ui/frames/rounded_bg_white.tga" borderthickness="6" color="black"/>
+							<frame width="-1.6h" align="center" noclick="true" texture="/ui/frames/roundframe.tga" color=".3 .3 .3 1" borderthickness="6"/>
+							<textbox
+								name="report_guide_txt"
+								width="-3.0h" height="-1.0h"
+								align="center" valign="center"
+								wrap="true"
+								font="dyn_10"
+								color="invisible"
+								textcolor="white"
+								maxlength="210"
+								onchange="Set(guide_reportReason, this);"
+							/>
+						
+						</panel>
+						
+						<panel height="2.4h" noclick="true">							
+							<panel grow="true" height="100%" float="right" padding="2.0h" align="center" noclick="true" >
+								<instance
+									name="button2"
+									width="10.0h"
+									label="general_cancel"
+									onclick="Call('guide_report', 'FadeOut(250 * _shopFlag_animSpeedMult);');"
+								/>
+								<instance
+									name="button2"
+									width="14.0h"
+									label="game_guide_submit_report"
+									onclick="
+									If(StringLength(guide_reportReason) ge 10,
+										SubmitForm('GuideReportForm', 'f', 'guide_report', 'account', GetAccountID(), 'cookie', GetCookie(), 'hosttime', HostTime, 'gid', guide_selectedGuide, 'reason', guide_reportReason),
+										Split(Trigger('GuideReportFormStatus', 1), SleepWidget(Rand(250,750), 'Trigger(\'GuideReportFormStatus\', 2); Trigger(\'GuideReportFormResult\', 1, 0);')    )
+									);
+									"
+								/>
+							</panel>							
+						</panel>
+						
+						<panel height="0"/>
+						
+					</panel>
+					 -->
+					<!-- Errors
+					<panel color="0 0 0 0.5" visible="false" name="guide_report_errors" watch="GuideReportFormResult" ontrigger="SetVisible(param0 != 1);" noclick="1">
+						<panel align="center" valign="center" color="0 0 0 1" grow="true" width="35h">
+							<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />
+							<instance name="header_bar" height="2.5h" lbl="general_error" lbl_font="dyn_12" />
+							<panel grow="true" width="-1h" align="center" float="bottom" padding="0.5h" y="2.5h">
+								<label color="white" font="dyn_10" textalign="center" width="-1h" align="center" textvalign="center"  height="6h" wrap="true" 
+									watch="GuideReportFormResult" ontrigger="SetText(Translate('web_form_guide_error' # param1));"
+								/>
+								<panel width="100%" grow="true">
+									<instance
+										name="button2"
+										width="14.0h" height="2.5h"
+										align="center"
+										label="general_ok"
+										font="dyn_10"
+										onclick="Call('guide_report_errors', 'FadeOut(250 * _shopFlag_animSpeedMult);'); Call('guide_report', 'FadeOut(100 * _shopFlag_animSpeedMult);');"
+									/>
+								</panel>
+								<panel height="0.5h"/>
+							</panel>
+						</panel>
+					</panel>
+					 -->
+					<!-- Success
+					<panel color="0 0 0 0.5" noclick="1" visible="false" name="guide_report_success" watch="GuideReportFormResult" ontrigger="					
+						If(param0 == 1,
+							Split(
+								SetVisible(true),
+								Call('report_guide_txt', 'EraseInputLine();')
+							),
+							SetVisible(false)
+						);"
+					>
+						<panel align="center" valign="center" color="0 0 0 1" grow="true" width="35h">
+							<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />
+							<instance name="header_bar" height="2.5h" lbl="web_form_reportabuse_success_title" lbl_font="dyn_12" />
+							<panel grow="true" width="-1h" regrow="true" align="center" float="bottom" padding="0.5h" y="2.5h">
+								<label color="white" font="dyn_10" width="-1h" align="center" textalign="center" textvalign="center" height="6h" wrap="true">web_form_reportabuse_success</label>
+								<panel width="100%" grow="true">
+									<instance
+										name="button2"
+										width="14.0h" height="2.5h"
+										align="center"
+										label="general_ok"
+										font="dyn_10"
+										onclick="Call('guide_report_success', 'FadeOut(250 * _shopFlag_animSpeedMult);'); Call('guide_report', 'FadeOut(100 * _shopFlag_animSpeedMult);');"
+									/>
+								</panel>
+								<panel height="0.5h"/>
+							</panel>
+						</panel>
+					</panel>				
+					 -->
+					<!-- Thinking
+					<panel color="0 0 0 0.5" noclick="1" visible="false" name="guide_report_thinking" align="center" valign="center" watch="GuideReportFormStatus" ontrigger="					
+						If(param0 == 1,
+							SetVisible(true),
+							FadeOut(250 * _shopFlag_animSpeedMult)
+						);"
+					>
+						<panel align="center" valign="center" color="0 0 0 1" grow="true" width="20h" >
+							<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />
+							<instance name="header_bar" height="2.5h" lbl="Submitting" lbl_font="dyn_12" />
+							<panel grow="true" width="-1h" regrow="true" align="center" float="bottom" padding="0.5h" y="2.5h">
+								<label color="white" font="dyn_10" width="-1h" align="center" textalign="center" textvalign="center" height="6h" wrap="true">Submitting</label>
+								<panel height="4.5h"/>										
+								<panel width="100%" grow="true">
+									<instance
+										name="button2"
+										width="14.0h" height="2.5h"
+										align="center"
+										label="general_cancel"
+										font="dyn_10"
+										onclick="Call('guide_report_thinking', 'FadeOut(250 * _shopFlag_animSpeedMult);'); Call('guide_report', 'FadeOut(250 * _shopFlag_animSpeedMult);');"
+									/>
+								</panel>
+								<panel height="0.5h"/>
+							</panel>
+							<animatedimage y="1.2h" align="center" valign="center" texture="/ui/elements/throb/throb.tga" noclick="true" loop="1" fps="30" onshow="StartAnim(1); FadeIn(50 * _shopFlag_animSpeedMult);" onhide="FadeOut(50 * _shopFlag_animSpeedMult);" visible="1" height="4h" width="4h" />
+						</panel>
+					</panel>				
+					 
+				</panel>
+				 -->
+				
+				<!-- Upper Item catcher -->
+				<panel
+					x="1.6h" y="6.8h"
+					width="73.4h" height="47.0h"
+					color="invisible"
+					texture="/ui/common/new_shop_interface/sellback_drop.tga"
+					watch="ItemCursorVisible PlayerCanShop"
+					ontrigger="SetVisible(ItemCursorVisible and PlayerCanShop); RefreshCursor();"
+					rendermode="overlay"					
+					onmouseover="
+						SetColor('1 1 1 1');
+						Call(
+							'shop_body_background',
+							'
+								SetColor(\'0.65 0.91 1 \' # (0.2 + (shopAlphaValue * 0.008)));
+							'
+						);
+						"
+					onmouseout="
+						SetColor('invisible');						
+						Call(
+							'shop_body_background',
+							'
+								SetColor(\'1 1 1 \' # (shopAlphaValue / 100));
+							'
+						);
+					"
+					onclick="Sell();"
+					onrightclick="Sell();"
+				/>
+				
+				<!--
+					Simple View Checkbox
+					This could stand to be a combobox or something later for changing views
+				 -->
+				<panel x="1.5h" y="1.8h" width="16.0h" height="3.4h" color="0 0 0 .55" noclick="true" visible="false"
+					name="shopSimpleViewCheckbox"
+					onevent0lua="
+						self:FadeIn(200 * Shop.shopFlag_animSpeedMult)
+					"
+					onevent1lua="
+						self:FadeOut(200 * Shop.shopFlag_animSpeedMult)
+					"
+					onevent2="
+						SetVisible(true);
+					"
+					onevent3="
+						SetVisible(false);
+					"
+				>
+					<frame borderthickness="0.7h" texture="/ui/common/new_shop_interface/simple_border.tga" noclick="true"/>				
+					
+					<instance
+						name="Noptions_checkbox"
+						checkbox_name="simpleViewCheckbox"
+						onevent0="
+							SetButtonState(_shopFlag_itemStyle);		## Obviously this won't work with the default states if additional views are added ##
+						"
+						x="1.0h"
+						width="15.0h"
+						align="center" valign="center"					
+						font="dyn_10" label="game_shop_label_shopview"
+						tip_id="shop_simple_view"
+						cvar=""
+						onclick="
+							Set('_shopFlag_itemStyle', this);
+							Cmd('setsave _shopFlag_itemStyle ' # _shopFlag_itemStyle);
+							Trigger('SetShopDisplay', _lastActiveShop);
+						"
+						interactive="false"
+					/>
+
+				</panel>
+				
+				<!-- Store Header Info  -->
+				<panel name="header_store" x="18.0h" y="1.8h" width="56.8h" height="3.4h" color="0 0 0 .55" noclick="true" visible="false"
+					onevent0lua="
+						self:FadeIn(200 * Shop.shopFlag_animSpeedMult)
+					"
+					onevent1="
+						FadeOut(200 * _shopFlag_animSpeedMult);
+					"
+					onevent2="
+						SetVisible(true);
+					"
+					onevent3="
+						SetVisible(false);
+					"
+				>
+					<frame borderthickness="0.7h" texture="/ui/common/new_shop_interface/simple_border.tga"  noclick="true"/>			
+					<!-- LMB/RMB -->
+					<panel x="-2.5h" grow="true" height="100%" align="center" float="right" padding="3.0h" noclick="true">
+						<panel grow="true" float="right" padding="0.5h" height="100%" noclick="true">
+							<panel width="1.8h" height="100%" noclick="true">
+								<image texture="/ui/common/new_shop_interface/lmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+							</panel>
+							<label fitx="true" height="100%" font="dyn_10" color=".8 .8 .8 1" shadow="true" textvalign="center" content="game_shop_label_header_LMB" noclick="true" />
+						</panel>
+						<panel grow="true" float="right" padding="0.5h" height="100%" noclick="true">
+							<panel width="1.8h" height="100%" noclick="true">
+								<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+							</panel>
+							<label fitx="true" height="100%" font="dyn_10" color=".8 .8 .8 1" shadow="true" textvalign="center" content="game_shop_label_header_RMB" noclick="true" />
+						</panel>
+					</panel>
+					
+					<!-- Store Shortcuts -->
+					<instance name="tip_mark" tip_id="shop_controls_full" x="-4.0h" width="1.9h" height="1.9h" valign="center" align="right" />
+					
+					<panel name="shop_controls_full" x="-6.2h" y="1.2h" width="83.0h" height="32.4h" align="right" valign="top" visible="false" >
+						<frame texture="/ui/frames/tooltip_bg.tga" color="0 0 0 .85" borderthickness=".6h" />
+						<frame texture="/ui/frames/roundframe.tga" color="#A0A0A0" borderthickness=".6h" />
+						
+							<!-- Shop Shortcuts -->
+							<panel x="1.0h" y="0.8h" align="left" width="24%" float="bottom" padding="1.0h">
+							
+								<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_14" shadow="true" color="#FFCC00" content="game_shop_key_shop_cuts"/>
+								
+								<!-- Open/Close -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_openclose"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													onshow="SetText(GetKeybindButton('game', 'ToggleShop', ''));"
+												/>
+											</panel>
+										</panel>							
+									</panel>							
+								</panel>
+							
+								<!-- Item Details -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_showhide"/>
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/lmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>
+									</panel>
+								</panel>
+								
+								<!-- Buy -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_buyitem"/>
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>
+									</panel>
+								</panel>
+								
+								<!-- Purchase Recipe Only -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_purchaserecipe"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													content="CTRL"
+												/>
+											</panel>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>							
+									</panel>							
+								</panel>
+						
+							</panel>
+
+							<!-- Inventory Shortcuts -->
+							<panel x="-13%" y="0.8h" align="center" width="24%" float="bottom" padding="1.0h">
+							
+								<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_14" shadow="true" color="#FFCC00" content="game_shop_key_inv_cuts"/>
+							
+								<!-- Use Item -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_useitem"/>
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/lmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>
+									</panel>
+								</panel>
+								
+								<!-- Grab -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_grab"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>
+									</panel>
+								</panel>
+								
+								<!-- View In Shop -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_viewrecipe"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													content="CTRL"
+												/>
+											</panel>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/lmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>							
+									</panel>							
+								</panel>
+								
+								<!-- Swap Stash/Inv -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_swapitem"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													content="CTRL"
+												/>
+											</panel>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>							
+									</panel>							
+								</panel>
+								
+								<!-- Sell Anywhere -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_sellitem"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													content="CTRL"
+												/>
+											</panel>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													content="SHIFT"
+												/>
+											</panel>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>							
+									</panel>							
+								</panel>
+						
+							</panel>
+				
+							<!-- Stash Shortcuts -->
+							<panel x="13%" y="0.8h" align="center" width="24%" float="bottom" padding="1.0h">
+							
+								<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_14" shadow="true" color="#FFCC00" content="game_shop_key_stash_cuts"/>
+								
+								<!-- Disassemble -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_dissassemble"/>
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/lmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>
+									</panel>
+								</panel>
+								
+								<!-- Swap Stash/Inv -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_swapitem"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													content="CTRL"
+												/>
+											</panel>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>							
+									</panel>							
+								</panel>
+								
+								<!-- Sell Anywhere -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_sellitem"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													content="CTRL"
+												/>
+											</panel>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													content="SHIFT"
+												/>
+											</panel>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+										</panel>							
+									</panel>							
+								</panel>
+						
+							</panel>
+
+							<!-- Quickslot Shortcuts -->
+							<panel x="-1.0h" y="0.8h" align="right" width="24%" float="bottom" padding="1.0h">
+							
+								<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_14" shadow="true" color="#FFCC00" content="game_shop_key_qs"/>
+								
+								<!-- Shop item to quickslot -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_qs1"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel grow="true" regrow="true" height="100%">
+												<frame texture="/ui/frames/key.tga" width="100%" height="100%" borderthickness="33@" />
+												<label y="-1" fitx="true" fitxpadding="0.8h" font="dyn_9" textalign="center" textvalign="center" color=".1 .1 .1 1" shadow="true" shadowcolor=".8 .8 .8 1"
+													content="SHIFT"
+												/>
+											</panel>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/lmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+											
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="drag"/>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/lmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>											
+										</panel>							
+									</panel>							
+								</panel>
+
+								<!-- inventory item to quickslot -->
+								<panel height="4.5h">
+									<label fity="true" width="100%" textalign="left" textvalign="center" font="dyn_10" shadow="true" color="#58bef0" content="game_shop_key_qs2"/>							
+									<panel y="2.1h" grow="true" regrow="true" height="1.8h" float="right">								
+										<panel grow="true" regrow="true" height="100%" float="right" padding="0">								
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>
+											
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="drag"/>
+											<label fitx="true" height="100%" textalign="center" textvalign="center" font="dyn_10" shadow="true" color="white" content="game_shop_key_seperator"/>
+											
+											<panel width="2.0h" height="100%" noclick="true">
+												<image texture="/ui/common/new_shop_interface/rmb.tga" width="100%" height="100@" valign="center" noclick="true" />
+											</panel>											
+										</panel>							
+									</panel>							
+								</panel>
+								
+							</panel>							
+							
+					</panel>
+					
+					<!-- Close Store -->
+					<instance name="shop_btn_closex" width="1.8h" height="1.8h" x="-1.0h" align="right" valign="center" onclick="CloseShop();" />
+				</panel>
+				
+				<!-- Guide Header Info -->
+				<panel name="header_guide" x="1.5h" y="1.8h" width="73.3h" height="3.4h" color="0 0 0 .55" noclick="true" visible="true"
+					onevent0lua="
+						self:FadeIn(200 * Shop.shopFlag_animSpeedMult)
+					"
+					onevent1="
+						FadeOut(200 * _shopFlag_animSpeedMult);
+					"
+					onevent2="
+						SetVisible(true);
+					"
+					onevent3="
+						SetVisible(false);
+					"
+				>
+					<frame borderthickness="0.7h" texture="/ui/common/new_shop_interface/simple_border.tga"  noclick="true"/>			
+					
+					<!-- Guide Selection -->
+					<instance name="guidelist_combobox" populate=""
+						onload=""
+						onselect="If(this gt 0, Set(guide_selectedGuide, this)); ##Echo('^g guide_auto_selection? 2: ' # guide_auto_selection #' | '# guide_usingLocal #' ^y| '#this);## If((this gt 0) and !guide_auto_selection and !guide_usingLocal, Trigger('GuideLoadGuide'));"
+					/>
+					
+					<!-- Last Modified -->
+					<label x="-3.4h" height="100%" textvalign="center" textalign="right" font="dyn_9" color=".7 .7 .7 1" noclick="true" content="" shadow="1" shadowcolor="black"
+						watch0="GuideInfoFormResult GuideInfoFormResultLocal"
+						ontrigger0="	
+						If((GuideInfoFormStatus == 2  and (guide_masterQueryTime == param17) and param20) or param19, 
+							If(StringLength(param12) ge 6, SetText('^951'#Translate('guide_last_updated')#':  ^777'#SubString(param12, 0, 8)#''))
+						);								
+						"											
+					/>
+					
+					<!-- Close Guide/Store -->
+					<instance name="shop_btn_closex" width="1.8h" height="1.8h" x="-1.0h" align="right" valign="center" onclick="CloseShop();" />
+				</panel>
+
+			</panel>
+		
+
+		</panel>
+		
+	</panel>
+	
+	<!-- Buy All -->	
+	<panel width="30h" grow="true" color="0 0 0 0.5" align="center" valign="center" name="purchase_components_popup" visible="false" cangrab="true"
+		onload="
+			CreateString('_lastSelectedItemEntity', '');
+			CreateInt('_recipeRemainingCost', 0);
+		"
+		onevent0="
+			If(
+				shop_confirm_buyall,
+				DoEvent(2),
+				PurchaseRemainingComponents(_lastSelectedItemEntity)
+			);
+		"
+		onevent2="
+			GroupCall('buyall_list_items', 'SetVisible(false);');
+			Set('_recipeRemainingCost', 0);
+			TriggerRemainingComponents(_lastSelectedItemEntity);
+			FadeIn(150);
+		"
+		onevent1="FadeOut(250);"
+		regrow="true"
+	>		
+		<frame width="107%" height="105%" align="center" valign="center" texture="/ui/frames/squareglow.tga" borderthickness="2.0h" color="0 0 0 .75" noclick="true"/>
+		<frame color="0 0 0 .8" bordercolor="#455166" borderthickness="1" noclick="1" />		
+		<panel float="bottom" grow="true" width="100%" noclick="true" regrow="true">
+			<instance name="header_bar" show_close="true" height="2.5h" lbl="game_shop_label_buyremaining" onclick="CallEvent('purchase_components_popup', 1);"
+				watch="RemainingComponentsUpgrade"
+				ontrigger="
+					If(
+						param,
+						SetText(Translate('game_shop_label_upgrade')),
+						SetText(Translate('game_shop_label_buyremaining'))
+					);
+				"
+			/>			
+			<panel height="0.5h"/>			
+			<panel grow="true" width="100%" regrow="true">
+				<panel width="-1h" align="center" grow="true" regrow="true">				
+					<frame texture="/ui/frames/tooltip_bg.tga" color="#2c4b6c" noclick="1"/>
+					<frame color="invisible" bordercolor="#455166" borderthickness="1" noclick="1" />					
+					<panel width="-1h" align="center" grow="true" float="bottom" padding="0.6h" regrow="true">					
+						
+						<panel y="0.5h" grow="true" width="100%" noclick="true" regrow="true">
+							<label fity="true" wrap="true" width="-0.6h" align="center" font="dyn_10" content="game_shop_label_buycomponents_desc" shadow="true" color="white"
+								watch="RemainingComponentsUpgrade"
+								ontrigger="
+									If(
+										param0,
+										SetText(Translate('game_shop_label_buyupgrade_desc')),
+										SetText(Translate('game_shop_label_buycomponents_desc'))
+									);
+								"
+							/>
+						</panel>
+						
+						<!-- Completed Item Details -->
+						<panel grow="true" width="100%" noclick="true">						
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.5h" color="#002e45" blockinput="false" noclick="true"/>
+							<frame texture="/ui/frames/roundframe.tga" color="#00acff" borderthickness="0.5h" blockinput="false" noclick="true"/>							
+							<panel y="0.4h" grow="true" width="-1.0h" align="center" float="bottom" padding="0.4h" noclick="true">
+								<!-- Title -->
+								<panel height="2.0h" noclick="true">
+									<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness="0.3h" style="recipe_header" noclick="true"/>
+									<frame texture="/ui/frames/roundframe.tga" color="0 0 0 1" borderthickness="0.3h" noclick="true"/>
+									<label y="-0.1h" height="100%" width="-0.8h" align="center" textvalign="center" textalign="left" font="dyn_10" color="1 1 1 1" shadow="true" watch="shopBuyRemainingInfo" ontriggerlua="self:SetText(param0)" noclick="true"/>
+								</panel>
+								<panel grow="true" width="100%" noclick="true">								
+									<!-- Icon -->
+									<panel width="4.6h" height="4.6h" valign="center"
+										onmouseover="
+											TriggerItemTooltip(
+												'shopGlobalItemTooltipUpdate',
+												_lastSelectedItemEntity,
+												false
+											);
+											Trigger('shopGlobalItemTooltipIcon', GetEntityIconPath(_lastSelectedItemEntity));
+											ShowWidget('shopGlobalItemTooltip');
+										"
+										onmouseout="
+											HideWidget('shopGlobalItemTooltip');
+										"
+										onhide="
+											HideWidget('shopGlobalItemTooltip');
+										"
+									>
+										<image texture="/ui/common/empty_pack.tga" noclick="true" watch="shopBuyRemainingInfo" ontriggerlua="self:SetTexture(param2)" />
+										<frame borderthickness="1" bordercolor=".2 .2 .2 1" color="invisible" noclick="true" />
+									</panel>									
+									<!-- Description -->
+									<label fity="true" align="right" width="-5.2h" wrap="true" font="dyn_9" color="1 1 1 1" shadow="true" watch="shopBuyRemainingInfo" ontriggerlua="self:SetText(param1)" noclick="true"/>								
+								</panel>								
+								<panel width="100%" height="0.1h" noclick="true" />							
+							</panel>						
+						</panel>
+						<!-- Items -->
+						<panel width="100%" float="bottom" padding="0.5h" noclick="true" grow="true" regrow="true" growinvis="false">
+							<instance name="buyall_list_item" index="0"/>
+							<instance name="buyall_list_item" index="1"/>
+							<instance name="buyall_list_item" index="2"/>
+							<instance name="buyall_list_item" index="3"/>
+							<instance name="buyall_list_item" index="4"/>
+							<instance name="buyall_list_item" index="5"/>
+							<instance name="buyall_list_item" index="6"/>
+							<instance name="buyall_list_item" index="7"/>
+							<instance name="buyall_list_item" index="8"/>
+							<instance name="buyall_list_item" index="9"/>
+							<instance name="buyall_list_item" index="10"/>
+							<instance name="buyall_list_item" index="11"/>
+							<instance name="buyall_list_item" index="12"/>
+							<instance name="buyall_list_item" index="13"/>
+							<instance name="buyall_list_item" index="14"/>
+							<instance name="buyall_list_item" index="15"/>
+							<instance name="buyall_list_item" index="16"/>
+							<instance name="buyall_list_item" index="17"/>
+							<instance name="buyall_list_item" index="18"/>
+							<instance name="buyall_list_item" index="19"/>
+						</panel>						
+						<!-- Total Cost -->
+						<panel height="4.4h" width="100%" >
+							<panel y="0.5h" height="1" color=".2 .2 .2 1" noclick="true" />							
+							<panel y="0.5h" noclick="true">
+								<!-- Name -->
+								<label x="5.0h" height="100%" textvalign="center" font="dyn_10" color="1 1 1 1" shadow="true" content="game_shop_label_buycomponents_total" noclick="true"/>
+								<!-- Cost -->
+								<image texture="/ui/fe2/store/gold_coins.tga" x="-0.5h" width="1.6h" height="1.6h" valign="center" align="right" />
+								<label x="-3.0h" height="100%" textalign="right" textvalign="center" font="dyn_10" color="1 1 0 1" shadow="true" noclick="true" name="recipeRemainingCostTotal" onevent="SetText(_recipeRemainingCost);"/>
+							</panel>							
+						</panel>						
+						<panel width="100%" height="2.5h">
+							<panel align="center" height="100%" grow="true" float="right" padding="1h">
+								<instance name="button2" width="10h" onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav');" label="general_ok"
+									onclick="
+										PurchaseRemainingComponents(_lastSelectedItemEntity);
+										CallEvent('purchase_components_popup', 1);
+									"
+								/>
+								<instance name="button2" width="10h" onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav');" onclick="CallEvent('purchase_components_popup', 1);" label="general_cancel" />
+							</panel>
+						</panel>
+						
+						<!-- Don't Axe Me -->
+						<panel height="2.4h" noclick="true">
+							<instance
+								name="Noptions_checkbox"				
+								width="22.0h"
+								align="center" valign="center"					
+								font="dyn_10" label="game_shop_label_buyremaining_dontaxe"
+								tip_id="shop_buyremaining_dontaxe"
+								cvar="shop_confirm_buyall"
+								interactive="false"
+							/>
+						</panel>
+						
+						<panel height="0.1h" noclick="true" />
+					</panel>					
+				</panel>
+			</panel>			
+			<panel height="0.5h"/>			
+		</panel>
+		
+		
+	</panel>
+	</if>
+
+	<template name="shop">
+		<if condition="!cg_useNewShop2">
+			<panel
+				name="item_shop"
+				x="9.5h"
+				y="6h"
+				width="14.05h"
+				height="40.0h"
+				color="invisible"
+				visible="0"
+				watch="PlayerCanShop"
+				ontrigger="PlaySound('/shared/sounds/ui/shop_show.wav'); If(!param, CloseShop()); If(param, SetDefaultActiveShop());"
+				onshow=""
+				watch0="ShopActive"
+				ontrigger0="SetVisible(param and !cg_useNewShop2);"
+				hotkey="ESC"
+				onhotkey="PlaySound('/shared/sounds/ui/button_close_01.wav'); CloseShop();"
+				cangrab="true"
+			>
+
+				<!-- Main Store Background -->
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" noclick="true" />
+				<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+
+				<panel
+					x="6.5h"
+					width="6.5h"
+					height="26.0h"
+					valign="bottom"
+					align="right"
+					color="invisible"
+					noclick="1"
+				>
+					<!-- <image texture="/ui/common/new_shop_interface/shops_panel_close.tga" noclick="1"/> -->
+
+					<button
+						name="main_shop_close_btn"
+						y="0" x="0"
+						width="3.3h" height="3.3h"
+						valign="center" align="left"
+						color="invisible"
+						onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav');"
+						onclick="PlaySound('/shared/sounds/ui/button_close_01.wav'); CloseShop();"
+						interactive="false"
+					>
+						<widgetstate statename="up">
+							<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/close_shops_up.tga" />
+						</widgetstate>
+						<widgetstate statename="over">
+							<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/close_shops_over.tga" />
+						</widgetstate>
+					</button>
+
+				</panel>
+
+				<!-- Shop Default -->
+				<panel
+					color="invisible"
+					noclick="1"
+					float="right"
+					padding="1"
+				>
+					<!-- Shop Keeper Images -->
+					<panel x="0" y="0" name="shop" color="invisible" noclick="1">
+
+						<panel width="-1.1h" height="-1.1h" color="invisible" align="center" valign="Center" float="right" noclick="1">
+							<!-- Items Col -->
+							<panel width="50%" color="invisible" float="bottom" noclick="1">
+								<instance name="shop_cats_button" iconfile="shop_supplies" label="game_shop_label_supplies" shopname="Shop_Supplies" slot="3" />
+								<instance name="shop_cats_button" iconfile="shop_accessories" label="game_shop_label_accessories" shopname="Shop_Accessories" slot="0" />
+								<instance name="shop_cats_button" iconfile="shop_weapons" label="game_shop_label_weapons" shopname="Shop_Weapons" slot="1" />
+								<instance name="shop_cats_button" iconfile="shop_relics" label="game_shop_label_relics" shopname="Shop_Relics" slot="2" />
+								<instance name="shop_cats_button" iconfile="shop_secret" label="game_shop_label_secret" shopname="Shop_Secret" slot="4" />
+								<instance name="shop_cats_button" iconfile="shop_outpost" label="game_shop_label_recipe_outpost" shopname="Shop_Outpost" slot="10" />
+							</panel>
+							<!-- Recipes Col -->
+							<panel width="50%" color="invisible" float="bottom" noclick="1">
+								<instance name="shop_cats_button" iconfile="shop_recommended" label="game_shop_label_recommended" shopname="Shop_Recommended" slot="11" />
+								<instance name="shop_cats_button" iconfile="shop_recipes1" label="game_shop_label_recipe_one" shopname="Shop_Recipes1" slot="5" />
+								<instance name="shop_cats_button" iconfile="shop_recipes2" label="game_shop_label_recipe_two" shopname="Shop_Recipes2" slot="6" />
+								<instance name="shop_cats_button" iconfile="shop_recipes3" label="game_shop_label_recipe_three" shopname="Shop_Recipes3" slot="7" />
+								<instance name="shop_cats_button" iconfile="shop_recipes4" label="game_shop_label_recipe_four" shopname="Shop_Recipes4" slot="8" />
+								<instance name="shop_cats_button" iconfile="shop_recipes5" label="game_shop_label_recipe_five" shopname="Shop_Recipes5" slot="9" />
+							</panel>
+						</panel>
+
+						<!-- Item catcher -->
+						<panel
+							x="0" y="0"
+							width="100%"
+							height="100%"
+							color="invisible"
+							texture="/ui/info/drop.tga"
+							watch="ItemCursorVisible PlayerCanShop"
+							ontrigger="SetVisible(ItemCursorVisible and PlayerCanShop); RefreshCursor();"
+							onmouseover="
+								SetColor('1 1 1 ' # (0.3 + (shopAlphaValue * 0.003)));
+							"
+							onmouseout="
+								SetColor('invisible');
+							"
+							onclick="Sell();"
+							onrightclick="Sell();"
+						/>
+					</panel>
+
+					<!-- Shop Items -->
+					<panel
+						width="33.5h"
+						watch="ShopType"
+						ontrigger="SetVisible(!StringEquals(param, ''));"
+						noclick="true"
+						color="invisible"
+					>
+						<!-- Item BG -->
+						<!-- <image
+							x="-14.2h"
+							width="52.0h"
+							height="52.0h"
+							texture="/ui/common/new_shop_interface/shop_items_panel.tga"
+							noclick="1"
+						/> -->
+
+						<panel group="shop" width="100%" color="invisible" noclick="1">
+
+							<panel width="100%" height="31.0h" valign="bottom" color="invisible" noclick="1">
+
+								<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" noclick="true" />
+								<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+
+								<!-- Shop name -->
+								<panel width="50%" height="2.5h" align="center" color="invisible" noclick="true" >
+									<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+									<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+									<label font="dyn_12" align="center" textalign="center" textvalign="center" shadow="true" shadowoffset="2" color="white" noclick="1" watch="ShopName" ontriggerlua="self:SetText(param)" />
+								</panel>
+
+								<panel x="0" y="-1.5h" width="-1.1h" height="25.9h" align="center" valign="bottom" float="bottom" color="invisible" noclick="1">
+									<!-- Row 1 -->
+									<panel height="25%" width="100%" float="right" color="invisible" noclick="1">
+										<instance name="shop_item_button" watch="ShopItem" index="0" />
+										<instance name="shop_item_button" watch="ShopItem" index="1" />
+										<instance name="shop_item_button" watch="ShopItem" index="2" />
+										<instance name="shop_item_button" watch="ShopItem" index="3" />
+										<instance name="shop_item_button" watch="ShopItem" index="4" />
+									</panel>
+									<!-- Row 2 -->
+									<panel height="25%" width="100%" float="right" color="invisible" noclick="1">
+										<instance name="shop_item_button" watch="ShopItem" index="5" />
+										<instance name="shop_item_button" watch="ShopItem" index="6" />
+										<instance name="shop_item_button" watch="ShopItem" index="7" />
+										<instance name="shop_item_button" watch="ShopItem" index="8" />
+										<instance name="shop_item_button" watch="ShopItem" index="9" />
+									</panel>
+									<!-- Row 3 -->
+									<panel height="25%" width="100%" float="right" color="invisible" noclick="1">
+										<instance name="shop_item_button" watch="ShopItem" index="10" />
+										<instance name="shop_item_button" watch="ShopItem" index="11" />
+										<instance name="shop_item_button" watch="ShopItem" index="12" />
+										<instance name="shop_item_button" watch="ShopItem" index="13" />
+										<instance name="shop_item_button" watch="ShopItem" index="14" />
+									</panel>
+									<!-- Row 4 -->
+									<panel height="25%" width="100%" float="right" color="invisible" noclick="1">
+										<instance name="shop_item_button" watch="ShopItem" index="15" />
+										<instance name="shop_item_button" watch="ShopItem" index="16" />
+										<instance name="shop_item_button" watch="ShopItem" index="17" />
+										<instance name="shop_item_button" watch="ShopItem" index="18" />
+										<instance name="shop_item_button" watch="ShopItem" index="19" />
+									</panel>
+								</panel>
+
+								<!-- Item catcher -->
+								<panel
+									x="0"
+									width="100%"
+									height="100%"
+									align="center"
+									color="invisible"
+									texture="/ui/info/drop.tga"
+									watch="ItemCursorVisible PlayerCanShop"
+									ontrigger="SetVisible(ItemCursorVisible and PlayerCanShop); RefreshCursor();"
+									onmouseover="SetColor('1 1 1 .6');"
+									onmouseout="SetColor('invisible');"
+									onclick="Sell();"
+									onrightclick="Sell();"
+								/>
+
+								<!-- Shopkeeper Image
+								<image x="0" y="-21.5h" width="32.0h" height="25.6h" valign="bottom" align="left" texture="" noclick="1" watch="ShopHeader" ontrigger="SetTexture(param);"/>
+								 -->
+							</panel>
+						</panel>
+					</panel>
+
+					<!-- Recipe Display -->
+					<panel
+						name="recipe_display"
+						width="30.0h" height="26.0h"
+						valign="bottom"
+						color="invisible"
+						visible="false"
+						noclick="true"
+						onloadlua="
+							local watch_RecipeItemType = ''
+							local watch_ShopType = ''
+						"
+						watch="RecipeItemType"
+						ontriggerlua="
+							watch_RecipeItemType = param
+							self:SetVisible((not (param == '')) and (not (OptiUI_ShopType == '')))
+						"
+						watch1="ShopType"
+						ontrigger1lua="
+							watch_ShopType = param
+							self:SetVisible((not (watch_RecipeItemType == '')) and (not (param == '')))
+						"
+					>
+
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" noclick="true" />
+						<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+
+						<!-- Recipe Icon -->
+						<panel x="0" y="0" width="5.8h" height="5.8h" noclick="1">
+							<image
+								watch="RecipeItem"
+								ontrigger="If(param6, SetRenderMode('normal'), SetRenderMode('grayscale'));"
+								onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); ShowWidget('recipe_item_tooltip'); ShowWidget('recipe_item_tooltip_short');"
+								onmouseout="HideWidget('recipe_item_tooltip'); HideWidget('recipe_item_tooltip_short');"
+								ontriggerlua="self:SetTexture(param3)"
+							/>
+							<image
+								texture="$white"
+								rendermode="overlay"
+								watch="RecipeItem"
+								ontrigger="SetVisible(true);
+									If(!param6,
+										SetColor('#404040'),
+										SetVisible(false)
+									);"
+								noclick="1"
+							/>
+							<frame borderthickness="1" bordercolor=".3 .3 .3 1" color="invisible" noclick="1" />
+						</panel>
+
+						<!-- Buy All Button -->
+						<instance
+							name="button2"
+							x="7.0h" y="4.0h"
+							width="14.8h" height="2.5h"
+							valign="top" align="left"
+							label="game_shop_label_buyremaining"
+							onclick="PurchaseRemainingComponents(GetActiveRecipe()));"
+							enabled="true"
+						/>
+
+						<!-- Buy All Tooltip -->
+						<panel x="22.6h" y="4.0h" width="2.5h" height="2.5h" valign="top" align="left" color="invisible" noclick="1">
+							<button
+								color="invisible"
+								onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showwidget('shop_recipe_buyall_tip');"
+								onmouseout="hidewidget('shop_recipe_buyall_tip');"
+								interactive="false"
+							>
+								<widgetstate statename="up">
+									<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_up.tga" />
+								</widgetstate>
+								<widgetstate statename="over">
+									<image width="100%" height="100%" valign="center" align="center" texture="/ui/elements/tip_mark_over.tga" />
+								</widgetstate>
+							</button>
+						</panel>
+
+						<!-- Recipe Minimize
+						<button
+							name="shop_min_btn"
+							x="30.2h" y="13.8h"
+							width="1.9h" height="1.9h"
+							valign="top" align="left"
+							color="invisible"
+							onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showWidget('shop_min');"
+							onmouseout="hideWidget('shop_min');"
+							onclick="PlaySound('/shared/sounds/ui/shop_hide.wav'); SetActiveRecipe('');"
+						>
+							<widgetstate statename="up">
+								<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/recipe_in_up.tga" />
+							</widgetstate>
+							<widgetstate statename="over">
+								<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/recipe_in_over.tga" />
+							</widgetstate>
+						</button>
+						-->
+
+						<button
+							name="shop_min_btn"
+							x="-1" y="1"
+							width="1.9h" height="1.9h"
+							valign="top" align="right"
+							color="invisible"
+							onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav'); showWidget('shop_min');"
+							onmouseout="hideWidget('shop_min');"
+							onclick="PlaySound('/shared/sounds/ui/shop_hide.wav'); SetActiveRecipe('');"
+							interactive="false"
+						>
+							<widgetstate statename="up">
+								<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/recipe_in_up.tga" />
+							</widgetstate>
+							<widgetstate statename="over">
+								<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/recipe_in_over.tga" />
+							</widgetstate>
+						</button>
+
+						<!-- Shop Close -->
+						<button
+							name="shop_close_btn"
+							x="3.3h" y="0"
+							width="3.3h" height="3.3h"
+							valign="center" align="right"
+							color="invisible"
+							onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav');"
+							onclick="PlaySound('/shared/sounds/ui/button_close_01.wav'); CloseShop();"
+							interactive="false"
+						>
+							<widgetstate statename="up">
+								<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/close_shops_up.tga" />
+							</widgetstate>
+							<widgetstate statename="over">
+								<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/close_shops_over.tga" />
+							</widgetstate>
+						</button>
+
+						<!-- Background Image -->
+						<!-- <image y="13.3h" texture="/ui/common/new_shop_interface/recipe_panel.tga" noclick="1" watch="storeAlphaUpdate" ontrigger="SetColor('1 1 1 ' # param / 100);"/> -->
+						
+						<!-- Recipe Text -->
+						<panel x="7.0h" y="0" width="18.0h" height="3.8h" align="left" valign="top" color="invisible" noclick="1">
+							<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+							<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+							<label x="0.5h" height="50%" valign="top" textalign="left" textvalign="center" font="dyn_10" color="white" shadow="1" noclick="1" watch="RecipeItem" ontriggerlua="self:SetText(param1)" />
+							<panel x="0.5h" height="50%" valign="bottom" color="invisible" float="right" noclick="1" grow="true">
+								<label fity="true" fitx="true" fitxpadding="0.5h" textalign="left" textvalign="center" color="white" shadow="1" noclick="1" font="dyn_10">game_shop_label_total_cost</label>
+								<label fity="true" fitx="true" textalign="left" textvalign="center" color="yellow" shadow="1" font="dyn_10" noclick="1" watch="RecipeItem" ontriggerlua="self:SetText(param5)" />
+							</panel>
+						</panel>
+
+						<!-- Recipe Items -->
+						<panel x="0" y="0" width="28.7h" height="18.8h" valign="bottom" color="invisible" noclick="1">
+							<panel align="left" valign="top" float="bottom" color="invisible" noclick="1">
+								<!-- Requires -->
+								<panel height="2.2h" width="50%" color="invisible" noclick="1" watch="RecipeComponent0" ontriggerlua="self:SetVisible(AtoB(param0))" >
+									<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+									<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+									<label x="0.5h" align="left" font="dyn_12" textalign="left" textvalign="center" color="yellow" shadow="1" sticky="true" stickytoinvis="false" noclick="true" >game_shop_label_requires</label>
+								</panel>
+								<panel height="7.0h" noclick="true">
+									<panel width="-1.1h" align="center" float="right" color="invisible" noclick="1">
+										<instance name="shop_item_component" watch="RecipeComponent" index="0" cmd="PurchaseComponent" description="recipe_component_description" tooltip="recipe_component_tooltip" width="25%" />
+										<instance name="shop_item_component" watch="RecipeComponent" index="1" cmd="PurchaseComponent" description="recipe_component_description" tooltip="recipe_component_tooltip" width="25%" />
+										<instance name="shop_item_component" watch="RecipeComponent" index="2" cmd="PurchaseComponent" description="recipe_component_description" tooltip="recipe_component_tooltip" width="25%" />
+										<instance name="shop_item_component" watch="RecipeComponent" index="3" cmd="PurchaseComponent" description="recipe_component_description" tooltip="recipe_component_tooltip" width="25%" />
+										<!-- Optional Fifth Recipe Component  Item
+										<instance name="shop_item_component" watch="RecipeComponent" index="4" cmd="PurchaseComponent" description="recipe_component_description" tooltip="recipe_component_tooltip" width="25%" />
+										-->
+									</panel>
+								</panel>
+								<!-- Used In -->
+								<panel height="2.2h" width="50%" color="invisible" noclick="1" watch="RecipeUsedIn0" ontriggerlua="self:SetVisible(AtoB(param0))" >
+									<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
+									<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+									<label x="0.5h" align="left" font="dyn_12" textalign="left" textvalign="center" color="yellow" shadow="1" sticky="true" stickytoinvis="false" noclick="true" >game_shop_label_used_in</label>
+								</panel>
+								<panel height="7.0h" noclick="true">
+									<panel width="-1.1h" align="center" float="right" color="invisible" noclick="1">
+										<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="0" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip" width="25%" />
+										<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="1" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip" width="25%" />
+										<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="2" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip" width="25%" />
+										<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="3" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip" width="25%" />
+										<!-- Optional Fifth Used In Item
+										<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="4" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip"  width="25%"/>
+										-->
+									</panel>
+								</panel>
+							</panel>
+						</panel>
+
+						<!-- Item catcher -->
+						<panel
+							x="0" y="0"
+							width="100%" height="100%"
+							color="invisible"
+							texture="/ui/info/drop.tga"
+							watch="ItemCursorVisible PlayerCanShop"
+							ontrigger="SetVisible(ItemCursorVisible and PlayerCanShop); RefreshCursor();"
+							onmouseover="SetColor('1 1 1 .6');"
+							onmouseout="SetColor('invisible');"
+							onclick="Sell();"
+							onrightclick="Sell();"
+						/>
+
+					</panel>
+
+				</panel>
+
+				<!-- Recipe Gear -->
+				<!-- <image
+					name="recipe_gear"
+					x="48.2h" y="42.5h"
+					width="3.3h" height="3.3h"
+					texture="/ui/common/new_shop_interface/gear.tga"
+					watch="ShopType"
+					ontrigger="SetVisible(!StringEquals(param, ''));"
+				/> -->
+
+			</panel>
+		</if>
+
+		<!-- Floating Tooltips -->
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip0" title="game_shop_label_accessories" label="Shop_Accessories_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip1" title="game_shop_label_weapons" label="Shop_Weapons_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip2" title="game_shop_label_relics" label="Shop_Relics_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip3" title="game_shop_label_supplies" label="Shop_Supplies_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip4" title="game_shop_label_legendary" label="Shop_Legendary_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip5" title="game_shop_label_recipe_one" label="Shop_Recipes1_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip6" title="game_shop_label_recipe_two" label="Shop_Recipes2_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip7" title="game_shop_label_recipe_three" label="Shop_Recipes3_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip8" title="game_shop_label_recipe_four" label="Shop_Recipes4_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip9" title="game_shop_label_recipe_five" label="Shop_Recipes5_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip10" title="game_shop_label_recipe_outpost" label="Shop_Outpost_description" />				
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip11" title="game_shop_label_recommended" label="Shop_Recommended_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip12" title="game_shop_label_consumables" label="Shop_Filter_Consumables_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip13" title="game_shop_label_mobility" label="Shop_Filter_Mobility_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip14" title="game_shop_label_attack_speed" label="Shop_Filter_AttackSpeed_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip15" title="game_shop_label_damage" label="Shop_Filter_Damage_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip16" title="game_shop_label_armor" label="Shop_Filter_Armor_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip17" title="game_shop_label_regeneration" label="Shop_Filter_Regeneration_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip18" title="game_shop_label_agi" label="Shop_Filter_AGI_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip19" title="game_shop_label_str" label="Shop_Filter_STR_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip20" title="game_shop_label_int" label="Shop_Filter_INT_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip21" title="game_shop_label_booster" label="Shop_Filter_Booster_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip22" title="game_shop_label_activatable" label="Shop_Filter_Activatable_description" />
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip23" title="game_shop_label_modifier" label="Shop_Filter_Modifier_description" />		
+		<instance name="shopdescription_tooltip" tip_id="shop_cat_tip24" title="game_shop_label_modifier" label="Shop_Observatory_description" />
+		<instance name="simple_tooltip_floater" tip_id="shop_recipe_buyall_tip" label="game_shop_label_total_cost_tip" align="right" x="0" />
+		
+		<instance name="simple_tooltip_floater" tip_id="shop_guide_btn_tip" label="game_shop_guide_btn_tip" align="left" x="25" width="19.0h" />
+		<instance name="simple_tooltip_floater" tip_id="shop_cat_filter" label="game_shop_cat_filter_tip" align="left" x="25" width="19.0h" />
+		<instance name="simple_tooltip_nowrap" tip_id="shop_clear_search" label="game_shop_clear_search_tip"  />
+		<instance name="simple_tooltip_nowrap" tip_id="shop_close_shop" label="game_shop_close_shop_tip"  />
+		<instance name="simple_tooltip_nowrap" tip_id="shop_collapse_tree" label="game_shop_close_tree_tip"  />
+		
+		<instance name="generic_tooltip_floater" tip_id="shop_guide_reco_1_tip" title="game_guide_reco_1" label="game_guide_reco_1_tip" align="right" x="0" />
+		<instance name="generic_tooltip_floater" tip_id="shop_guide_reco_2_tip" title="game_guide_reco_2" label="game_guide_reco_2_tip" align="right" x="0" />
+		<instance name="generic_tooltip_floater" tip_id="shop_guide_reco_3_tip" title="game_guide_reco_3" label="game_guide_reco_3_tip" align="right" x="0" />
+		<instance name="generic_tooltip_floater" tip_id="shop_guide_reco_4_tip" title="game_guide_reco_4" label="game_guide_reco_4_tip" align="right" x="0" />
+		<instance name="simple_tooltip_nowrap" tip_id="guide_report_tip" align="center" valign="bottom" y="10" label="game_guide_report_title"  />
+		
+		<instance name="generic_tooltip_floater" tip_id="shop_guide_auto_level" title="game_guide_auto_level" label="game_guide_auto_level_tip" align="right" valign="bottom" x="0" y="10" />
+		<instance name="simple_tooltip_floater" tip_id="shop_buyremaining_dontaxe" label="game_shop_label_buyremaining_dontaxe_tip" align="center" valign="bottom" y="10" />
+		<instance name="generic_tooltip_floater" tip_id="shop_simple_view" title="game_shop_label_shopview" label="game_shop_label_shopview_tip" align="left" valign="top" x="20" y="10" />
+
+		<instance name="generic_tooltip_floater" tip_id="shop_trans_tip" title="game_shop_trans" label="game_shop_trans_tip" align="left" valign="bottom" x="10" y="10" />
+
+		<panel x="-1.0h" y="-26h" align="right"	valign="bottom" width="0" height="0" noclick="true" passivechildren="true">
+			<instance name="item_tooltip" id="shop_item_tooltip0" watch="ShopItemTooltip0" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip1" watch="ShopItemTooltip1" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip2" watch="ShopItemTooltip2" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip3" watch="ShopItemTooltip3" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip4" watch="ShopItemTooltip4" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip5" watch="ShopItemTooltip5" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip6" watch="ShopItemTooltip6" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip7" watch="ShopItemTooltip7" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip8" watch="ShopItemTooltip8" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip9" watch="ShopItemTooltip9" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip10" watch="ShopItemTooltip10" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip11" watch="ShopItemTooltip11" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip12" watch="ShopItemTooltip12" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip13" watch="ShopItemTooltip13" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip14" watch="ShopItemTooltip14" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip15" watch="ShopItemTooltip15" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip16" watch="ShopItemTooltip16" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip17" watch="ShopItemTooltip17" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip18" watch="ShopItemTooltip18" help="true" />
+			<instance name="item_tooltip" id="shop_item_tooltip19" watch="ShopItemTooltip19" help="true" />
+
+			<instance name="item_tooltip" id="recipe_item_tooltip" watch="RecipeItemTooltip" help="true" />
+
+			<instance name="item_tooltip" id="recipe_component_tooltip0" watch="RecipeComponentTooltip0" help="true" />
+			<instance name="item_tooltip" id="recipe_component_tooltip1" watch="RecipeComponentTooltip1" help="true" />
+			<instance name="item_tooltip" id="recipe_component_tooltip2" watch="RecipeComponentTooltip2" help="true" />
+			<instance name="item_tooltip" id="recipe_component_tooltip3" watch="RecipeComponentTooltip3" help="true" />
+
+			<instance name="item_tooltip" id="recipe_usedin_tooltip0" watch="RecipeUsedInTooltip0" help="true" />
+			<instance name="item_tooltip" id="recipe_usedin_tooltip1" watch="RecipeUsedInTooltip1" help="true" />
+			<instance name="item_tooltip" id="recipe_usedin_tooltip2" watch="RecipeUsedInTooltip2" help="true" />
+			<instance name="item_tooltip" id="recipe_usedin_tooltip3" watch="RecipeUsedInTooltip3" help="true" />
+			
+			<!-- New store global tooltip -->
+			<instance name="item_tooltip" id="shopGlobalItemTooltip" watch="shopGlobalItemTooltipUpdate" help="true" />
+		</panel>
+
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short0" watch="ShopItemTooltip0" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short1" watch="ShopItemTooltip1" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short2" watch="ShopItemTooltip2" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short3" watch="ShopItemTooltip3" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short4" watch="ShopItemTooltip4" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short5" watch="ShopItemTooltip5" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short6" watch="ShopItemTooltip6" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short7" watch="ShopItemTooltip7" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short8" watch="ShopItemTooltip8" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short9" watch="ShopItemTooltip9" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short10" watch="ShopItemTooltip10" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short11" watch="ShopItemTooltip11" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short12" watch="ShopItemTooltip12" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short13" watch="ShopItemTooltip13" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short14" watch="ShopItemTooltip14" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short15" watch="ShopItemTooltip15" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short16" watch="ShopItemTooltip16" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short17" watch="ShopItemTooltip17" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short18" watch="ShopItemTooltip18" help="true" />
+		<instance name="item_tooltip_short" id="shop_item_tooltip_short19" watch="ShopItemTooltip19" help="true" />
+
+		<instance name="item_tooltip_short" id="recipe_item_tooltip_short" watch="RecipeItemTooltip" help="true" />
+
+		<instance name="item_tooltip_short" id="recipe_component_tooltip_short0" watch="RecipeComponentTooltip0" help="true" />
+		<instance name="item_tooltip_short" id="recipe_component_tooltip_short1" watch="RecipeComponentTooltip1" help="true" />
+		<instance name="item_tooltip_short" id="recipe_component_tooltip_short2" watch="RecipeComponentTooltip2" help="true" />
+		<instance name="item_tooltip_short" id="recipe_component_tooltip_short3" watch="RecipeComponentTooltip3" help="true" />
+
+		<instance name="item_tooltip_short" id="recipe_usedin_tooltip_short0" watch="RecipeUsedInTooltip0" help="true" />
+		<instance name="item_tooltip_short" id="recipe_usedin_tooltip_short1" watch="RecipeUsedInTooltip1" help="true" />
+		<instance name="item_tooltip_short" id="recipe_usedin_tooltip_short2" watch="RecipeUsedInTooltip2" help="true" />
+		<instance name="item_tooltip_short" id="recipe_usedin_tooltip_short3" watch="RecipeUsedInTooltip3" help="true" />
+
+	</template>	
+	<instance name="shop" />
+
+</interface>
