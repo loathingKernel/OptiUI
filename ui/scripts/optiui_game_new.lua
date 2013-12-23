@@ -27,6 +27,7 @@ Game.KROSMODE_BASE_HEALTH	= 5000
 Game.lastHealthEntity = nil
 Game.lastManaEntity = nil
 
+
 local function GetWidgetGame(widget, fromInterface, hideErrors)
 	--println('GetWidget ' .. tostring(widget) .. ' in interface ' .. tostring(fromInterface)) 
 	if (widget) then
@@ -1379,11 +1380,9 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_mana'):SetY('0.0h')
 			GetWidget('game_center_abilities'):SetY('-4.6h')
 		end
-		if GetCvarBool('optiui_ItemShopSignDisabled') then
-			GetWidget('item_shop_sign'):SetVisible(false)
-		else
-			GetWidget('item_shop_sign'):SetVisible(true)
-		end
+		GetWidget('item_shop_sign'):SetVisible(not GetCvarBool('optiui_BottomCenterHideItemShopSign'))
+		GetWidget('game_center_portrait_model'):SetVisible(GetCvarBool('optiui_BottomCenter3DPortrait'))
+		GetWidget('game_center_portrait_model_parent'):SetVisible(GetCvarBool('optiui_BottomCenter3DPortrait'))
 	end
 	interface:RegisterWatch('optiui_BottomCenterPosition', PositionBottomCenter)
 	PositionBottomCenter()
@@ -1503,8 +1502,7 @@ local function InitBottomCenterPanel()
 		local status = AtoB(status)
 		Game.ActiveStatus = status
 		UpdateGameCenterPortrait()
-		-- OptiUI: Portrait icon always visible
-		--GetWidget('game_center_portrait_icon'):SetVisible(status)
+		GetWidget('game_center_portrait_model'):SetVisible(status)
 	end
 	interface:RegisterWatch('ActiveStatus', ActiveStatus)
 
@@ -1517,15 +1515,16 @@ local function InitBottomCenterPanel()
 
 	-- OptiUI: Removed to fix console spam --
 	local function ActiveModel(sourceWidget, model)
-		--if (model) then
-			--GetWidget('game_center_portrait_icon'):UICmd("SetModel('"..model.."')")
-		--end
+		if (model) then
+			GetWidget('game_center_portrait_model'):UICmd("SetModel('"..model.."')")
+		end
 	end
 	interface:RegisterWatch('ActiveModel', ActiveModel)
 
 	local function ActivePlayerInfo(sourceWidget, playerName, playerColor)
 		-- OptiUI: Removed model and added frame color
-		--GetWidget('game_center_portrait_icon'):UICmd("SetTeamColor('"..playerColor.."')")
+		GetWidget('game_center_portrait_model'):UICmd("SetTeamColor('"..playerColor.."')")
+		GetWidget('game_center_portrait_model_parent'):SetColor(playerColor)
 		GetWidget('game_center_portrait_frame'):SetBorderColor(playerColor)
 		GetWidget('game_center_level_backer'):SetColor(playerColor)
 	end
@@ -1533,9 +1532,9 @@ local function InitBottomCenterPanel()
 
 	local function ActiveEffect(sourceWidget, ...)
 		-- OptiUI: Removed to fix console spam --
-		-- for index, effectPath in ipairs(arg) do
-		-- 	GetWidget('game_center_portrait_icon'):UICmd("SetEffectIndexed('"..effectPath.."',"..index..");")
-		-- end
+		for index, effectPath in ipairs(arg) do
+			GetWidget('game_center_portrait_model'):UICmd("SetEffectIndexed('"..effectPath.."',"..index..");")
+		end
 	end
 	interface:RegisterWatch('ActiveEffect', ActiveEffect)
 
@@ -1651,7 +1650,7 @@ local function InitBottomCenterPanel()
 	-- Shop indicator (hanging sign thingy)
 	local function PlayerCanShop(sourceWidget, canShop)
 		local canShop = AtoB(canShop)
-		if ((canShop) and not GetCvarBool('optiui_ItemShopSignDisabled')) then
+		if ((canShop) and not GetCvarBool('optiui_BottomCenterHideItemShopSign')) then
 			GetWidget('item_shop_sign'):SetVisible(true)
 			GetWidget('item_shop_sign'):Sleep(1, function() GetWidget('item_shop_sign'):FadeIn(100) end)
 			-- do the above sleep to interrupt any existing sleeps to set the sign invisible

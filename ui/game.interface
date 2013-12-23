@@ -2407,7 +2407,7 @@
 				</panel>
 
 				<!-- Ally Ability Status Lights -->
-				<panel name="game_top_left_ally_status_light_{index}" width="1.6h" float="bottom" padding="1" color="invisible" noclick="1" passivechildren="true">
+				<panel name="game_top_left_ally_status_light_{index}" width="1.6h" float="bottom" padding="0" color="invisible" noclick="1" passivechildren="true">
 					<instance name="ally_ability_status" width="100%" height="100@" group="{group}" slot="0" index="{index}" />
 					<instance name="ally_ability_status" width="100%" height="100@" group="{group}" slot="1" index="{index}" />
 					<instance name="ally_ability_status" width="100%" height="100@" group="{group}" slot="2" index="{index}" />
@@ -2455,7 +2455,7 @@
 					</panel>
 
 					<!-- Ally Ability Status Lights -->
-					<panel name="game_top_left_ally_status_light_{index}" height="1.5h" float="right" padding="1" color="invisible" noclick="1" passivechildren="true">
+					<panel name="game_top_left_ally_status_light_{index}" height="1.5h" float="right" padding="0" color="invisible" noclick="1" passivechildren="true">
 						<instance name="ally_ability_status" group="{group}" width="25%" height="25@" slot="0" index="{index}" />
 						<instance name="ally_ability_status" group="{group}" width="25%" height="25@" slot="1" index="{index}" />
 						<instance name="ally_ability_status" group="{group}" width="25%" height="25@" slot="2" index="{index}" />
@@ -2928,7 +2928,7 @@
 				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
 				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 				<label
-					name="game_match_time_rotation_label"
+					name="game_match_time_rune_label"
 					x="0.5h"
 					textalign="left" textvalign="top"
 					height="100%"
@@ -2941,7 +2941,7 @@
 				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
 				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 				<label
-					name="game_match_time_rune_label"
+					name="game_match_time_rotation_label"
 					x="0.5h"
 					textalign="left" textvalign="top"
 					height="100%"
@@ -3616,39 +3616,62 @@
 			<!-- OptiUI: Container panel for left side elements -->
 			<panel x="0.0h" y="0.0h" width="21.2h" height="10.1h" align="left" valign="bottom" color="invisible" >
 				<!-- Portrait -->
-				<panel x="0h" y="0h" width="8.0h" height="8.0h" valign="bottom" align="right" color="invisible" noclick="true">
-					<image name="game_center_portrait_icon" width="90%" height="90@" align="center" valign="center"
-						onmouseldownlua="PlaySound('/shared/sounds/ui/center_view.wav') Action('PortraitCenter', 1.0)"
-						onmouseluplua="Action('PortraitCenter', 0.0)"
-						onmouseoverlua="GetWidget('unit_tooltip', 'game'):SetVisible(1)"
-						onmouseoutlua="GetWidget('unit_tooltip', 'game'):SetVisible(0)"
-					/>
-					<!-- UIScript -->
-					<button name="game_center_portrait_button"
-						color="invisible"
-						onclick="SelectUnit(ActiveIndex);"
-						interactive="false"
-					/>
-
-					<!-- OptiUI: Made levelup portrait glow a texture instead of a model -->
-					<image name="game_center_portrait_glow" texture="/ui/legion/optiui_lvl_up_glow.tga" rendermode="additive" noclick="true" />
+				<panel x="0h" y="0h" width="8.0h" height="8.0h" valign="bottom" align="right" color="black" noclick="true">
+					<panel width="-10%" height="-10%" align="center" valign="center" >
+						<image name="game_center_portrait_icon" 
+							onmouseldownlua="PlaySound('/shared/sounds/ui/center_view.wav') Action('PortraitCenter', 1.0)"
+							onmouseluplua="Action('PortraitCenter', 0.0)"
+							onmouseoverlua="GetWidget('unit_tooltip', 'game'):SetVisible(1)"
+							onmouseoutlua="GetWidget('unit_tooltip', 'game'):SetVisible(0)"
+						/>
+						<!-- UIScript -->
+						<button name="game_center_portrait_button"
+							color="invisible"
+							onclick="SelectUnit(ActiveIndex);"
+							interactive="false"
+						/>
+						<panel name="game_center_portrait_model_parent" color="black" noclick="true" >
+							<panel color="0 0 0 .9" noclick="true" />
+							<modelpanel name="game_center_portrait_model"
+								visible="1"
+								noclick="true"
+								model=""
+								anim="portrait"
+								camerapos="0 1 26"
+								cameraangles="0 0 200"
+								camerafov="25"
+								cameranear="1"
+								carmerafar="100"
+								depthclear="false"
+								depthcompress="true"
+								sunazimuth="120"
+								sunaltitude="50"
+								suncolor="0.9 0.9 0.9"
+								ambientcolor="0.6 0.7 0.7"
+								onshow="SetAnim('portrait');"
+								lookupresource="true"
+							/>
+						</panel>
+						<!-- OptiUI: Made levelup portrait glow a texture instead of a model -->
+						<image name="game_center_portrait_glow" texture="/ui/legion/optiui_lvl_up_glow.tga" rendermode="additive" noclick="true" />
+					</panel>
 
 					<!-- OptiUI: Player color frame -->
-					<frame height="-2" width="-2" align="center" valign="center" borderthickness="5%" bordercolor="black" color="invisible" noclick="1"/>
-					<frame name="game_center_portrait_frame" borderthickness="5%" bordercolor="black" color="invisible" noclick="1"/>
+					<frame x="1" y="1" height="-2" width="-2" borderthickness="5%" bordercolor="black" color="invisible" noclick="1"/>
+					<frame name="game_center_portrait_frame" borderthickness="5%" bordercolor="gray" color="invisible" noclick="1"/>
 					<!-- OptiUI: and Level Indicator -->
-					<panel height="25%" width="25%" align="right" valign="bottom" color="black">
+					<panel height="25%" width="25%" align="right" valign="bottom" color="black" noclick="true">
 						<panel name="game_center_level_backer" height="-1" width="-1" align="right" valign="bottom" color="invisible" passivechildren="true"
 							onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)"
 							onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)"
 						>
-							<label name="game_center_level_label" width="100%" height="100%" align="center" valign="center" textalign="center" textvalign="center" font="dyn_10" color="yellow" shadow="true" />
+							<label name="game_center_level_label" textalign="center" textvalign="center" font="dyn_10" color="yellow" outline="true" />
 						</panel>
 					</panel>
+
 					<!-- Primary Icon -->
 					<panel
-						x="0h"
-						y="0h"
+						y="1"
 						height="30%"
 						width="30%"
 						align="left"
@@ -3663,8 +3686,7 @@
 
 					<!-- primary icon cover, we use this so the below mouseover/out works nicely when swapping between things -->
 					<image
-						x="0h"
-						y="0h"
+						y="1"
 						height="30%"
 						width="30%"
 						align="left"
@@ -3680,8 +3702,7 @@
 
 					<!-- Alt Courier Button -->
 					<panel
-						x="0h"
-						y="0h"
+						y="1"
 						height="30%"
 						width="30%"
 						align="left"
@@ -3702,8 +3723,7 @@
 
 					<!-- Alt Courier Lock -->
 					<panel
-						x="0h"
-						y="0h"
+						y="1"
 						height="30%"
 						width="30%"
 						align="right"
@@ -3770,7 +3790,7 @@
 
 				<!-- Detail Stats -->
 				<!-- OptiUI: Made panels smaller to add a little more information to the UI -->
-				<panel x="0h" y="0h" width="13.0h" height="8.0h" align="left" valign="bottom" color="invisible" noclick="1">
+				<panel width="13.0h" height="8.0h" align="left" valign="bottom" color="invisible" noclick="1">
 					<!-- Damage -->
 					<!-- OptiUI: Added attack cooldown value -->
 					<panel name="game_center_damage" y="-6.5h" height="1.5h" valign="bottom" passivechildren="true"
