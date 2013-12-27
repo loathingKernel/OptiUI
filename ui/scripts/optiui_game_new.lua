@@ -1381,8 +1381,8 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_abilities'):SetY('-4.6h')
 		end
 		GetWidget('item_shop_sign'):SetVisible(not GetCvarBool('optiui_BottomCenterHideItemShopSign'))
+		GetWidget('game_center_portrait_model_bg'):SetVisible(GetCvarBool('optiui_BottomCenter3DPortrait'))
 		GetWidget('game_center_portrait_model'):SetVisible(GetCvarBool('optiui_BottomCenter3DPortrait'))
-		GetWidget('game_center_portrait_model_parent'):SetVisible(GetCvarBool('optiui_BottomCenter3DPortrait'))
 	end
 	interface:RegisterWatch('optiui_BottomCenterPosition', PositionBottomCenter)
 	PositionBottomCenter()
@@ -1502,7 +1502,7 @@ local function InitBottomCenterPanel()
 		local status = AtoB(status)
 		Game.ActiveStatus = status
 		UpdateGameCenterPortrait()
-		GetWidget('game_center_portrait_model'):SetVisible(status)
+		GetWidget('game_center_portrait_model'):SetVisible(status and GetCvarBool('optiui_BottomCenter3DPortrait'))
 	end
 	interface:RegisterWatch('ActiveStatus', ActiveStatus)
 
@@ -1524,7 +1524,7 @@ local function InitBottomCenterPanel()
 	local function ActivePlayerInfo(sourceWidget, playerName, playerColor)
 		-- OptiUI: Removed model and added frame color
 		GetWidget('game_center_portrait_model'):UICmd("SetTeamColor('"..playerColor.."')")
-		GetWidget('game_center_portrait_model_parent'):SetColor(playerColor)
+		GetWidget('game_center_portrait_model_bg'):SetColor(playerColor)
 		GetWidget('game_center_portrait_frame'):SetBorderColor(playerColor)
 		GetWidget('game_center_level_backer'):SetColor(playerColor)
 	end
