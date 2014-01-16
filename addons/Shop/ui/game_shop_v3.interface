@@ -2887,6 +2887,9 @@
 
 	<template name="shop">
 		<if condition="!cg_useNewShop2">
+
+			<trigger name="optiui_ShopAlphaUpdate" /> 
+
 			<panel
 				name="item_shop"
 				x="9.5h"
@@ -2897,7 +2900,7 @@
 				visible="0"
 				watch="PlayerCanShop"
 				ontrigger="PlaySound('/shared/sounds/ui/shop_show.wav'); If(!param, CloseShop()); If(param, SetDefaultActiveShop());"
-				onshow=""
+				onshow="Trigger('optiui_ShopAlphaUpdate', optiui_ShopAlphaValue);"
 				watch0="ShopActive"
 				ontrigger0="SetVisible(param and !cg_useNewShop2);"
 				hotkey="ESC"
@@ -2906,8 +2909,8 @@
 			>
 
 				<!-- Main Store Background -->
-				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" noclick="true" />
-				<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .65" noclick="true" watch="optiui_ShopAlphaUpdate" ontrigger="SetColor('.1 .1 .1 ' # param / 100); SetBorderColor('.1 .1 .1 ' # param / 100);" />
+				<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".3 .3 .3 .65" noclick="true" watch="optiui_ShopAlphaUpdate" ontrigger="SetBorderColor('.3 .3 .3 ' # param / 100);" />
 
 				<panel
 					x="6.5h"
@@ -2950,9 +2953,9 @@
 					<!-- Shop Keeper Images -->
 					<panel x="0" y="0" name="shop" color="invisible" noclick="1">
 
-						<panel width="-1.1h" height="-1.1h" color="invisible" align="center" valign="Center" float="right" noclick="1">
+						<panel width="-1.0h" height="-1.0h" color="invisible" align="center" valign="center" noclick="1">
 							<!-- Items Col -->
-							<panel width="50%" color="invisible" float="bottom" noclick="1">
+							<panel width="50%" align="left" color="invisible" float="bottom" padding="0" noclick="1">
 								<instance name="shop_cats_button" iconfile="shop_supplies" label="game_shop_label_supplies" shopname="Shop_Supplies" slot="3" />
 								<instance name="shop_cats_button" iconfile="shop_accessories" label="game_shop_label_accessories" shopname="Shop_Accessories" slot="0" />
 								<instance name="shop_cats_button" iconfile="shop_weapons" label="game_shop_label_weapons" shopname="Shop_Weapons" slot="1" />
@@ -2961,7 +2964,7 @@
 								<instance name="shop_cats_button" iconfile="shop_outpost" label="game_shop_label_recipe_outpost" shopname="Shop_Outpost" slot="10" />
 							</panel>
 							<!-- Recipes Col -->
-							<panel width="50%" color="invisible" float="bottom" noclick="1">
+							<panel width="50%" align="right" color="invisible" float="bottom" noclick="1">
 								<instance name="shop_cats_button" iconfile="shop_recommended" label="game_shop_label_recommended" shopname="Shop_Recommended" slot="11" />
 								<instance name="shop_cats_button" iconfile="shop_recipes1" label="game_shop_label_recipe_one" shopname="Shop_Recipes1" slot="5" />
 								<instance name="shop_cats_button" iconfile="shop_recipes2" label="game_shop_label_recipe_two" shopname="Shop_Recipes2" slot="6" />
@@ -3012,8 +3015,8 @@
 
 							<panel width="100%" height="31.0h" valign="bottom" color="invisible" noclick="1">
 
-								<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" noclick="true" />
-								<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+								<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .65" noclick="true" watch="optiui_ShopAlphaUpdate" ontrigger="SetColor('.1 .1 .1 ' # param / 100); SetBorderColor('.1 .1 .1 ' # param / 100);" />
+								<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".3 .3 .3 .65" noclick="true" watch="optiui_ShopAlphaUpdate" ontrigger="SetBorderColor('.3 .3 .3 ' # param / 100);" />
 
 								<!-- Shop name -->
 								<panel width="50%" height="2.5h" align="center" color="invisible" noclick="true" >
@@ -3022,7 +3025,7 @@
 									<label font="dyn_12" align="center" textalign="center" textvalign="center" shadow="true" shadowoffset="2" color="white" noclick="1" watch="ShopName" ontriggerlua="self:SetText(param)" />
 								</panel>
 
-								<panel x="0" y="-1.5h" width="-1.1h" height="25.9h" align="center" valign="bottom" float="bottom" color="invisible" noclick="1">
+								<panel x="0" y="-1.5h" width="-1.0h" height="25.9h" align="center" valign="bottom" float="bottom" color="invisible" noclick="1">
 									<!-- Row 1 -->
 									<panel height="25%" width="100%" float="right" color="invisible" noclick="1">
 										<instance name="shop_item_button" watch="ShopItem" index="0" />
@@ -3104,8 +3107,8 @@
 						"
 					>
 
-						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .8" noclick="true" />
-						<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+						<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .65" noclick="true" watch="optiui_ShopAlphaUpdate" ontrigger="SetColor('.1 .1 .1 ' # param / 100); SetBorderColor('.1 .1 .1 ' # param / 100);" />
+						<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".3 .3 .3 .65" noclick="true" watch="optiui_ShopAlphaUpdate" ontrigger="SetBorderColor('.3 .3 .3 ' # param / 100);" />
 
 						<!-- Recipe Icon -->
 						<panel x="0" y="0" width="5.8h" height="5.8h" noclick="1">
@@ -3240,7 +3243,7 @@
 									<label x="0.5h" align="left" font="dyn_12" textalign="left" textvalign="center" color="yellow" shadow="1" sticky="true" stickytoinvis="false" noclick="true" >game_shop_label_requires</label>
 								</panel>
 								<panel height="7.0h" noclick="true">
-									<panel width="-1.1h" align="center" float="right" color="invisible" noclick="1">
+									<panel width="-1.0h" align="center" float="right" color="invisible" noclick="1">
 										<instance name="shop_item_component" watch="RecipeComponent" index="0" cmd="PurchaseComponent" description="recipe_component_description" tooltip="recipe_component_tooltip" width="25%" />
 										<instance name="shop_item_component" watch="RecipeComponent" index="1" cmd="PurchaseComponent" description="recipe_component_description" tooltip="recipe_component_tooltip" width="25%" />
 										<instance name="shop_item_component" watch="RecipeComponent" index="2" cmd="PurchaseComponent" description="recipe_component_description" tooltip="recipe_component_tooltip" width="25%" />
@@ -3257,7 +3260,7 @@
 									<label x="0.5h" align="left" font="dyn_12" textalign="left" textvalign="center" color="yellow" shadow="1" sticky="true" stickytoinvis="false" noclick="true" >game_shop_label_used_in</label>
 								</panel>
 								<panel height="7.0h" noclick="true">
-									<panel width="-1.1h" align="center" float="right" color="invisible" noclick="1">
+									<panel width="-1.0h" align="center" float="right" color="invisible" noclick="1">
 										<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="0" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip" width="25%" />
 										<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="1" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip" width="25%" />
 										<instance name="shop_item_component" usedin="usedin_" watch="RecipeUsedIn" index="2" cmd="PurchaseUsedIn" description="recipe_usedin_description" tooltip="recipe_usedin_tooltip" width="25%" />

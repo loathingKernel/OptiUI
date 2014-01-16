@@ -362,9 +362,9 @@
 					>
 						<label textalign="center" textvalign="center" color="white" shadow="true" font="dyn_10" noclick="true" watch="ShopKey{slot}" ontrigger="SetText(Translate(param));" content="{slot}" />
 					</frame>
-					<frame
+					<frame x="2" y="2" width="-4" height="-4"
 						borderthickness="1"
-						bordercolor="yellow"
+						bordercolor="orange"
 						color="invisible"
 						visible="true"
 						watch="ShopType"
@@ -373,7 +373,7 @@
 						noclick="true"
 						passivechildren="true"
 					>
-						<image x="1" y="1" width="-2" height="-2" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
+						<image x="2" y="2" width="-4" height="-4" color="orange" texture="/ui/fps/selected.tga" rendermode="additive"/>
 					</frame>
 				</panel>
 			</panel>
@@ -426,11 +426,6 @@
 					<!-- Cooldown -->
 					<piegraph x="1" y="1" width="-2" height="-2" start="270" end="-90" square="true" color="#000000cc" watch="ShopItem{index}" ontrigger="SetVisible(param21 gt 0); SetValue(param20);" noclick="true"/>
 
-					<!-- Cost -->
-					<panel x="1" y="-1" width="-2" height="27%" color="0 0 0 .7" valign="bottom" noclick="true">
-						<label textalign="center" textvalign="top" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontriggerlua="self:SetText(param4);" />
-					</panel>
-
 					<button
 						texture="/ui/elements/optiui_button_bevel.tga"
 						onmouseout="HideWidget('shop_item_tooltip{index}'); HideWidget('shop_item_tooltip_short{index}');"
@@ -477,6 +472,7 @@
 					</frame>
 
 					<frame
+						x="2" y="2" width="-4" height="-4"
 						borderthickness="1"
 						bordercolor="yellow"
 						color="invisible"
@@ -486,8 +482,13 @@
 						noclick="true"
 						passivechildren="true"
 					>
-						<image x="1" y="1" width="-2" height="-2" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
+						<image x="2" y="2" width="-4" height="-4" color="yellow" texture="/ui/fps/selected.tga" rendermode="additive"/>
 					</frame>
+
+					<!-- Cost -->
+					<panel x="1" y="-1" width="-2" height="27%" color="0 0 0 .7" valign="bottom" noclick="true">
+						<label textalign="center" textvalign="top" color="white" shadow="1" noclick="1" font="dyn_9" watch="{watch}{index}" ontriggerlua="self:SetText(param4);" />
+					</panel>
 
 					<image
 						texture="/ui/common/new_shop_interface/stash.tga"
