@@ -1,4 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package>
-	
+
+	<template name="game_top_center_voip_bar" >
+		<panel name="game_top_center_voip_bar_{index}" height="24%" visible="false" >
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .5" noclick="true" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+
+			<panel width="200@" >
+				<panel width="-0.5h" height="-0.5h" align="center" valign="center" clip="true" >
+					<image name="game_top_center_voip_bar_image_{index}" width="100%" height="100@" align="center" valign="center" clip="true" />
+				</panel>
+				<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+			</panel>
+
+			<label name="game_top_center_voip_bar_name_{index}" x="220@" fitx="1" textvalign="top" font="dyn_10" />
+
+			<panel width="100@" align="right" >
+				<image texture="/ui/elements/optiui_voip_talking.tga" width="-0.5h" height="-0.5h" align="center" valign="center" />
+				<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
+			</panel>
+		</panel>
+	</template>
+
+	<panel name="game_top_center_voip_bars_parent" y="5.0h" width="27.0h" height="8h" align="center" float="bottom" padding="1" color="invisible" passivechildren="true" noclick="true" >
+		<instance name="game_top_center_voip_bar" index="0" />
+		<instance name="game_top_center_voip_bar" index="1" />
+		<instance name="game_top_center_voip_bar" index="2" />
+		<instance name="game_top_center_voip_bar" index="3" />
+	</panel>
+
 </package>

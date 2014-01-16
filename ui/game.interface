@@ -1546,6 +1546,7 @@
 				onmouseoutlua="{onmouseoutlua}"
 				watch="{button_watch}"
 				ontriggerlua="{button_ontriggerlua}"
+				interactive="false"
 			/>
 
 			<!-- charges -->
@@ -2263,7 +2264,7 @@
 			onmouseoverlua="PlaySound('/shared/sounds/ui/ccpanel/button_over_02.wav')"
 			onloadlua="Set('right_click_ally_player_name_{index}', 'DefaultName', 'string');"
 			watch="AllyPlayerInfo{index}"
-			ontriggerlua="Set('right_click_ally_player_name_{index}', param0)"
+			ontriggerlua="Set('right_click_ally_player_name_{index}', StripClanTag(param0))"
 		>
 			<widgetstate statename="listbg">
 				<frame texture="/ui/frames/glass_header_big.tga" color="#233749" />
@@ -2298,7 +2299,7 @@
 					</panel>
 
 					<!--  Voip Mic  -->
-					<panel name="game_top_left_ally_voip_{index}" >
+					<panel name="game_top_left_ally_voip_{index}" visible="false" >
 						<panel color="0 0 0 .1"/>
 						<image texture="/ui/elements/optiui_voip_talking.tga" />
 					</panel>
@@ -2662,7 +2663,7 @@
 			name="button3"
 			label="game_disconnect"
 			id="game_disconnect"
-			y="8h"
+			y="5h"
 			height="3h"
 			width="15h"
 			align="center"
@@ -2899,70 +2900,67 @@
 	
 
 		<!-- Hero K/D/A -->
-		<panel y="0" width="11.0h" height="1.6h" align="left" noclick="true">
-			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
-			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
-			<label x="0.3h" width="40%" height="100%" textalign="left" textvalign="center" font="dyn_10" color="white" content="game_label_hero_kd_hero" noclick="1" />
-			<label name="game_player_score_1" width="75%" height="100%" align="right" textalign="center" textvalign="center" font="dyn_10" color="white" noclick="1" />
+		<panel width="11.0h" height="1.6h" noclick="true" passivechildren="true" >
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
+			<label x="0.5h" fitx="1" textalign="left" textvalign="center" font="dyn_10" color="white" content="game_label_hero_kd_hero" />
+			<label name="game_player_score_1" width="7.0h" align="right" textalign="center" textvalign="center" font="dyn_10" color="white" />
 		</panel>
 
 		<!-- Creep Kills -->
-		<panel y="0" width="11.0h" height="1.6h" align="left" valign="bottom" noclick="true">
-			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
-			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>			
-			<label x="0.3h" width="40%" height="100%" textalign="left" textvalign="center" font="dyn_10" color="white" content="game_label_creep_kills_creep" noclick="1"/>
-			<label name="game_player_score_2" width="60%" height="100%" align="right" textalign="center" textvalign="center" font="dyn_10" color="white" noclick="1" />
+		<panel width="11.0h" height="1.6h" valign="bottom" noclick="true" passivechildren="true">
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />			
+			<label x="0.5h" fitx="1" textalign="left" textvalign="center" font="dyn_10" color="white" content="game_label_creep_kills_creep" />
+			<label name="game_player_score_2" width="7.0h" align="right" textalign="center" textvalign="center" font="dyn_10" color="white" />
 		</panel>
 
 		<!-- Team Scores -->
-		<panel y="0" width="11.0h" height="1.6h" align="right" noclick="true">
+		<panel width="11.0h" height="1.6h" align="right" noclick="true" passivechildren="true">
 			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
 			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
-			<label x="0.5h" content="Kills:" height="100%" textalign="left" textvalign="center" font="dyn_10" color="white" noclick="1" />
-			<label x="7.0h" name="game_team_score_1" height="100%" textalign="left" textvalign="center" font="dyn_10" color="white" noclick="1" />
-			<label x="4.0h" name="game_team_score_2" height="100%" textalign="left" textvalign="center" font="dyn_10" color="1 1 1 1" noclick="1" />
+			<label x="0.5h" fitx="1" textvalign="center" font="dyn_10" color="white" content="Kills:" noclick="0" />
+			<label name="game_team_score_1" x="7.0zh" fitx="1" textvalign="center" font="dyn_10" color="white" noclick="0" />
+			<label name="game_team_score_2" x="4.0h" fitx="1" textvalign="center" font="dyn_10" color="1 1 1 1" noclick="0" />
 		</panel>
 
-		<panel width="11.0h" height="1.6h" align="right" valign="bottom" noclick="true">
-			<panel width="48%" align="left" valign="bottom" noclick="true">
-				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
-				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
+		<panel width="11.0h" height="1.6h" align="right" valign="bottom" noclick="true" passivechildren="true">
+			<panel width="48%" align="left" valign="bottom" >
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" />
+				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
 				<label
 					name="game_match_time_rune_label"
 					x="0.5h"
-					textalign="left" textvalign="top"
+					textalign="left" textvalign="center"
 					height="100%"
 					font="dyn_10"
 					color="white"
-					noclick="1"
 				/>
 			</panel>
-			<panel width="48%" align="right" valign="bottom" noclick="true">
-				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
-				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
+			<panel width="48%" align="right" valign="bottom" >
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" />
+				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
 				<label
 					name="game_match_time_rotation_label"
 					x="0.5h"
-					textalign="left" textvalign="top"
+					textalign="left" textvalign="center"
 					height="100%"
 					font="dyn_10"
 					color="white"
-					noclick="1"
 				/>
 			</panel>
 		</panel>
 
 		<!-- Game Time -->
-		<panel y="0.8h" width="5.3h" height="1.6h" align="center" valign="bottom" noclick="true">
-			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" noclick="true" />
-			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
+		<panel y="0.8h" width="5.3h" height="1.6h" align="center" valign="bottom" noclick="true" passivechildren="true" >
+			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .5" />
+			<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
 			<label
 				name="game_match_time_label"
 				textalign="center" textvalign="top"
 				height="100%"
 				font="dyn_10"
 				color="white"
-				noclick="1"
 			/>
 		</panel>
 	</panel>
@@ -3033,7 +3031,10 @@
 		<instance name="killBoardEntry" id="4" />
 	</panel>
 
-	<panel width="25h" height="6h" align="center" valign="center" color="0 0 0 0.5" noclick="true" passivechildren="true" watch="StatsStatus" ontriggerlua="self:SetVisible(param == 'submitting')">
+	<!-- OptiUI: VOIP bars -->
+	<include file="optiui_voip_bars.package" />
+
+	<panel width="25h" height="6h" align="center" valign="center" color="0 0 0 .5" noclick="true" passivechildren="true" watch="StatsStatus" ontriggerlua="self:SetVisible(param == 'submitting')">
 		<animatedimage hmargin="10@" vmargin="10%" width="100@" height="100%" texture="/ui/elements/throb/throb.tga" noclick="true" loop="1" fps="30" onshow="StartAnim(1);" />
 		<label width="-100@" align="right" font="dyn_14" textalign="center" textvalign="center" color="white" shadow="true" content="general_submitting_stats" noclick="1" />
 	</panel>
@@ -3225,7 +3226,7 @@
 	<panel name="game_dropdown_options" width="29.8h" height="7.45h" align="right" noclick="1">
 
 		<!-- Remake Confirm -->
-		<panel noclick="true" width="19h" align="right" x="-1.0h" y="-150%" visible="false" grow="true" regrow="true" name="remake_confirm"
+		<panel noclick="true" width="19h" align="right" x="-0.0h" y="-150%" visible="false" grow="true" regrow="true" name="remake_confirm"
 			onevent0lua="self:SetVisible(1) self:SlideY('2.5h', 250)"
 			onevent1lua="self:SlideY('-150%', 250) self:Sleep(250, function() self:SetVisible(0) end)"
 		>
@@ -3256,7 +3257,7 @@
 		</panel>
 
 		<!-- Conceed Confirm -->
-		<panel noclick="true" width="19h" align="right" x="-1.0h" y="-150%" visible="false" grow="true" regrow="true" name="concede_confirm"
+		<panel noclick="true" width="19h" align="right" x="-0.0h" y="-150%" visible="false" grow="true" regrow="true" name="concede_confirm"
 			onevent0lua="self:SetVisible(1) self:SlideY('2.5h', 250)"
 			onevent1lua="self:SlideY('-150%', 250) self:Sleep(250, function() self:SetVisible(0) end)"
 		>
@@ -3287,7 +3288,7 @@
 		</panel>
 
 		<!-- Kick Player List -->
-		<panel noclick="true" width="19h" align="right" x="-1.0h" y="-150%" visible="false" grow="true" regrow="true" name="game_kick_list"
+		<panel noclick="true" width="19h" align="right" x="-0.0h" y="-150%" visible="false" grow="true" regrow="true" name="game_kick_list"
 			onevent0lua="self:SetVisible(true) self:SlideY('2.5h', 250)"
 			onevent1lua="self:SlideY('-150%', 250) self:Sleep(250, function() self:SetVisible(0) end)"
 		>
@@ -3320,7 +3321,7 @@
 		</panel>
 
 		<!-- Spec Player List -->
-		<panel noclick="true" width="19h" align="right" x="-1.0h" y="-150%" visible="false" grow="true" regrow="true" name="spec_kick_list"
+		<panel noclick="true" width="19h" align="right" x="-0.0h" y="-150%" visible="false" grow="true" regrow="true" name="spec_kick_list"
 			onevent0lua="self:SetVisible(true) self:SlideY('2.5h', 250); GetWidget('game_menu_tip_spec', 'game'):SetVisible(0)"
 			onevent1lua="self:SlideY('-300%', 250) self:Sleep(250, function() self:FadeOut(50) end)"
 		>
@@ -3393,7 +3394,7 @@
 			<label x="0.8h" height="100%" textvalign="center" font="dyn_9" color="1 1 1 1" shadow="true" noclick="true" content="game_menu_menu" />
 		</panel>
 
-		<panel x="-9.6h" y="0.0h" width="9.5h" height="2.0h" align="right" noclick="true">
+		<panel x="-9.5h" y="0.0h" width="9.5h" height="2.0h" align="right" noclick="true">
 			<!-- Voting Combobox -->
 			<instance
 				name="gamecontrol_combobox"
@@ -5214,7 +5215,7 @@
 			watch="Dev EventEnterGame GamePhase" ontrigger="
 				Set('is_dev_game', Dev);
 				SetVisible(Dev and (!ui_isBotMatch or releaseStage_test));
-				If(ui_isBotMatch, g_disableFogOfWar = false);
+				If(ui_isBotMatch, Set('g_disableFogOfWar', false));
 				if((!Dev or (ui_isBotMatch and !releaseStage_test)) and WidgetExists('testpp_Win_Main'),
 					Split(
 						HideWidget('testpp_Win_Main'),

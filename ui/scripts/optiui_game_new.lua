@@ -180,8 +180,8 @@ end
 ----------------------------------------------------------
 local function InitMidBar()
 	---[[ Team scores
-	interface:RegisterWatch('ScoreboardTeam1', function(_, _, _, totalDeaths) GetWidget('game_team_score_1'):SetText('H: ^r' .. round(totalDeaths)) end)
-	interface:RegisterWatch('ScoreboardTeam2', function(_, _, _, totalDeaths) GetWidget('game_team_score_2'):SetText('L: ^g' .. round(totalDeaths)) end)
+	interface:RegisterWatch('ScoreboardTeam1', function(_, _, _, totalDeaths) GetWidget('game_team_score_1'):SetText('H:^r' .. round(totalDeaths)) end)
+	interface:RegisterWatch('ScoreboardTeam2', function(_, _, _, totalDeaths) GetWidget('game_team_score_2'):SetText('L:^g' .. round(totalDeaths)) end)
 
 	---[[ Clock
 	Game.game_match_time_label = GetWidget('game_match_time_label')
@@ -920,6 +920,7 @@ local function InitAllyInfo()
 
 	local function AllyHeroInfo(allyIndex, sourceWidget, displayName, iconPath, level)
 		GetWidget('game_top_left_ally_image_'..allyIndex):SetTexture(iconPath)
+		GetWidget('game_top_center_voip_bar_image_'..allyIndex):SetTexture(iconPath)
 		GetWidget('game_top_left_ally_level_label_'..allyIndex):SetText(level)
 		Game.PlayerIconPathsByIndex = Game.PlayerIconPathsByIndex or {}
 		Game.PlayerIconPathsByIndex[allyIndex] = iconPath
@@ -982,6 +983,9 @@ local function InitAllyInfo()
 		GetWidget('game_top_left_ally_level_bg_'..allyIndex):SetColor(playerColor)
 		GetWidget('game_top_left_ally_level_bg_'..allyIndex):SetBorderColor(playerColor)
 
+		GetWidget('game_top_center_voip_bar_name_'..allyIndex):SetText(playerName)
+		GetWidget('game_top_center_voip_bar_name_'..allyIndex):SetColor(playerColor)
+
 		Game.PlayerColorsByIndex = Game.PlayerColorsByIndex or {}
 		Game.PlayerColorsByIndex[allyIndex] = playerColor
 		
@@ -1042,7 +1046,13 @@ local function InitAllyInfo()
 
 	local function AllyVoice(allyIndex, sourceWidget, usingVOIP, statusVOIP)
 		local usingVOIP, statusVOIP = AtoB(usingVOIP), AtoB(statusVOIP)
-		GetWidget('game_top_left_ally_voip_'..allyIndex):SetVisible(usingVOIP)
+		if (GetCvarBool('optiui_ShowVoipBars')) then
+			GetWidget('game_top_left_ally_voip_'..allyIndex):SetVisible(false)
+			GetWidget('game_top_center_voip_bar_'..allyIndex):SetVisible(usingVOIP)
+		else
+			GetWidget('game_top_center_voip_bar_'..allyIndex):SetVisible(false)
+			GetWidget('game_top_left_ally_voip_'..allyIndex):SetVisible(usingVOIP)
+		end
 		if (statusVOIP) then
 			GetWidget('game_top_left_ally_voip_indicator_'..allyIndex):SetColor('red')
 		else
