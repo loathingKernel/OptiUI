@@ -428,6 +428,7 @@
 
 					<button
 						texture="/ui/elements/optiui_button_bevel.tga"
+						onmouseover="PlaySound('/shared/sounds/ui/button_over_03.wav'); ShowWidget('shop_item_tooltip{index}');"
 						onmouseout="HideWidget('shop_item_tooltip{index}'); HideWidget('shop_item_tooltip_short{index}');"
 						onclick="PlaySound('/shared/sounds/ui/button_click_02.wav'); Purchase('{index}');"
 						onrightclick=""
@@ -441,8 +442,6 @@
 								)
 							);
 						"
-						onmouseover="PlaySound('/shared/sounds/ui/button_over_03.wav');
-								ShowWidget('shop_item_tooltip{index}'); ShowWidget('shop_item_tooltip_short{index}');"
 						interactive="false"
 						name="shop_item_{index}"
 					/>
@@ -569,7 +568,7 @@
 
 					<button
 						texture="/ui/elements/optiui_button_bevel.tga"
-						onmouseoverlua="PlaySound('/shared/sounds/ui/button_over_03.wav') Trigger('shopGlobalItemTooltipIcon', Shop.recipe.cur.Texture) ShowWidget('{tooltip}{index}') ShowWidget('{tooltip}_short{index}')"
+						onmouseover="PlaySound('/shared/sounds/ui/button_over_03.wav'); ShowWidget('{tooltip}{index}');"
 						onmouseout="HideWidget('{tooltip}{index}'); HideWidget('{tooltip}_short{index}');"
 						onclick="PlaySound('/shared/sounds/ui/button_click_02.wav'); {cmd}('{index}');"
 						onrightclick=""

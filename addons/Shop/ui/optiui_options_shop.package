@@ -4,14 +4,14 @@
 	<instance mod_id="optiui_options" name="mod_header" label="Shop:" />
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="cg_useNewShop2"
-		label="Use the new shop interface"
+		label="Use the new shop interface (REQUIRES RESTART!)."
 		default="false"
 		tooltip="Disable this if you want to use the OptiShop version of the old shop."
 		tooltip_width="43h"
 	/>
 	<instance mod_id="optiui_options" name="mod_slider"
 		cvar="optiui_ShopAlphaValue"
-		label="Shop transparency (default size is 65%):"
+		label="Shop transparency (default is 65%):"
 		layout="default"
 		cvartype="int"
 		default="65"

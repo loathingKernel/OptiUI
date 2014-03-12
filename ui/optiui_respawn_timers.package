@@ -6,22 +6,32 @@
 			watch="ScoreboardPlayerRespawn{index}"
 			ontriggerlua="self:SetVisible((tonumber(param) > 0) and GetCvarBool('optiui_ShowRespawnTimers'))"
 		>
-			<panel width="4h" height="4h" align="center" color="invisible" >
-				<image 
-					watch="ScoreboardPlayer{index}" 
-					ontriggerlua="self:SetTexture(param2)"
+			<panel width="4h" height="5.6h" align="center" valign="bottom" >
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".5h" bordercolor="gray" color="gray" noclick="true"
+					watch="ScoreboardPlayer{index}"
+					ontriggerlua="self:SetColor(param3) self:SetBorderColor(param3)"
 				/>
-			</panel>
-			<panel width="4h" height="1.8h" align="center" valign="bottom" color="gray" watch="ScoreboardPlayer{index}" ontriggerlua="self:SetColor(param3)" >
-				<label textalign="center" textvalign="center" font="dyn_11" color="yellow" shadow="true" shadowcolor="black"
-					watch="ScoreboardPlayerRespawn{index}"
-					ontriggerlua="self:SetText(param)"
+				<panel height="4h" color="invisible" >
+					<image x="1" y="1" width="-2" height="-2"
+						watch="ScoreboardPlayer{index}" 
+						ontriggerlua="self:SetTexture(param2)"
+					/>
+				</panel>
+				<panel height="1.6h" color="invisible" valign="bottom" >
+					<label textalign="center" textvalign="center" font="dyn_11" color="yellow" shadow="true" shadowcolor="black"
+						watch="ScoreboardPlayerRespawn{index}"
+						ontriggerlua="self:SetText(param)"
+					/>
+				</panel>
+				<frame texture="/ui/frames/roundframe.tga" borderthickness=".5h" bordercolor="gray" color="gray" noclick="true"
+					watch="ScoreboardPlayer{index}"
+					ontriggerlua="self:SetBorderColor(param3)"
 				/>
 			</panel>
 		</panel>
  	</template>
 
-	<panel name="game_top_center_respawn_timers_lg" y="0" x="-41h" width="30h" height="5.8h" align="center" float="right" noclick="true" color="invisible" passivechildren="true"
+	<panel name="game_top_center_respawn_timers_lg" y="0" x="-41h" width="30h" height="5.6h" align="center" float="right" noclick="true" color="invisible" passivechildren="true"
 		watch="Team"
 		ontriggerlua="self:SetVisible((param == '2'))"
 	>
@@ -31,7 +41,7 @@
 		<instance name="respawn_timer_icon" index="3" />
 		<instance name="respawn_timer_icon" index="4" />
 	</panel>
-	<panel name="game_top_center_respawn_timers_hb" y="0" x="-41h"  width="30h" height="5.8h" align="center" float="right" noclick="true" color="invisible" passivechildren="true"
+	<panel name="game_top_center_respawn_timers_hb" y="0" x="-41h"  width="30h" height="5.6h" align="center" float="right" noclick="true" color="invisible" passivechildren="true"
 		watch="Team"
 		ontriggerlua="self:SetVisible((param == '1'))"
 	>

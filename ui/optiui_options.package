@@ -54,7 +54,7 @@
 	<instance mod_id="optiui_options" name="mod_header" label="Ally Info frames:" />
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_AllyFramesWide"
-		label="Use larger Ally Info frames (NEEDS RESTART!)."
+		label="Use larger Ally Info frames (REQUIRES RESTART!)."
 		default="false"
 		tooltip="When ^gchecked^w the allied heroes portraits will be wider to cover more of the empty space on the bottom bar. Useful with the previous option but can be enabled for the top left frames too. NEEDS RESTART TO WORK!"
 		tooltip_width="53h"
@@ -95,7 +95,7 @@
 
 	<instance mod_id="optiui_options" name="mod_slider"
 		cvar="optiui_MiniMapSize"
-		label="Minimap size (default: 50%):"
+		label="Minimap size (default is 50%):"
 		layout="default"
 		cvartype="int"
 		default="50"

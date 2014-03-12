@@ -298,10 +298,10 @@ local function InitMidBar()
 	
 	-- Base Health
 	local function BaseHealth(baseID, game_base_health_header, game_base_health_backer, game_base_health_bar, game_base_health_label, sourceWidget, healthPercent)
-		game_base_health_header:SetVisible(AtoN(healthPercent) < 1)
-		if AtoN(healthPercent) < 1 then
+		game_base_health_header:SetVisible(tonumber(healthPercent) < 1)
+		if tonumber(healthPercent) < 1 then
 			game_base_health_backer:SetVisible(AtoB(healthPercent))
-			game_base_health_backer:SetWidth(ToPercent(AtoN(healthPercent)))
+			game_base_health_backer:SetWidth(ToPercent(tonumber(healthPercent)))
 			game_base_health_bar:SetColor(GetHealthBarColor(healthPercent))
 			if (GetTrigger("GameMode"):GetLastValue() == "krosmode") then
 				game_base_health_label:SetText(Translate("game_krosmode_base_health", "health", math.floor(Game.KROSMODE_BASE_HEALTH * tonumber(healthPercent))))
@@ -489,7 +489,7 @@ function Game.HoverScoreboardHero(index)
 				Trigger('GameImagePreviewVis', '1', '250%')
 			end
 
-			if (AtoB(info.permaDead) and (AtoN(info.respawnTime) > 0)) then
+			if (AtoB(info.permaDead) and (tonumber(info.respawnTime) > 0)) then
 				Trigger('genericGameFloatingTip', '1',
 					math.max(GetStringWidth('dyn_12', info.heroName) + interface:GetWidthFromString('1.0h'), interface:GetWidthFromString('14.0h')),
 					'', info.heroName, 'team_tip_permadead', '', '',
@@ -540,7 +540,7 @@ local function InitScoreboard()
 
 	local function ScoreboardRespawn(index, widget, cooldown, permaDead)
 		-- OptiUI: Announce buybacks
-		-- if ((AtoN(Game.scoreboardInfo[index].respawnTime) > 2) and (AtoN(cooldown) == 0)) then
+		-- if ((tonumber(Game.scoreboardInfo[index].respawnTime) > 2) and (tonumber(cooldown) == 0)) then
 		-- 	widget:UICmd("TeamChat('^r" .. Game.scoreboardInfo[index].heroName .. "^* has bought back and respawned at the well.')")
 		-- end
 		-- OptiUI: End
@@ -621,7 +621,7 @@ local function InitPlayerTopLeftInfo()
 	interface:RegisterWatch('HeroRespawn', PreHeroRespawn)
 
 	local function HeroHealth(sourceWidget, health, maxHealth, healthPercent, healthShadow)
-		local health, maxHealth, tempHealthPercent, tempHealthShadow = AtoN(health), AtoN(maxHealth), ToPercent(AtoN(healthPercent)), ToPercent(AtoN(healthPercent))
+		local health, maxHealth, tempHealthPercent, tempHealthShadow = tonumber(health), tonumber(maxHealth), ToPercent(tonumber(healthPercent)), ToPercent(tonumber(healthPercent))
 		if GetCvarBoolMem('cg_showHeroHealthLerp') then
 			GetWidget('game_top_left_health_lerp'):ScaleWidth(tempHealthShadow, 500, -1)
 		else
@@ -641,7 +641,7 @@ local function InitPlayerTopLeftInfo()
 	interface:RegisterWatch('HeroHealth', HeroHealth)
 
 	local function HeroMana(sourceWidget, mana, maxMana, manaPercent, manaShadow)
-		local mana, maxMana, tempManaPercent, tempManaShadow = AtoN(mana), AtoN(maxMana), ToPercent(AtoN(manaPercent)), ToPercent(AtoN(manaPercent))
+		local mana, maxMana, tempManaPercent, tempManaShadow = tonumber(mana), tonumber(maxMana), ToPercent(tonumber(manaPercent)), ToPercent(tonumber(manaPercent))
 		if (maxMana > 0) then
 			GetWidget('game_top_left_mana_lerp'):SetVisible(true)
 			-- OptiUI: Fixed the small glitch with 0 width on bar elements
@@ -664,7 +664,7 @@ local function InitPlayerTopLeftInfo()
 	interface:RegisterWatch('HeroMana', HeroMana)
 
 	local function HeroLevel(sourceWidget, currentLevel, skillPoints)
-		local currentLevel, skillPoints = ceil(AtoN(currentLevel)), AtoN(skillPoints)
+		local currentLevel, skillPoints = ceil(tonumber(currentLevel)), tonumber(skillPoints)
 		GetWidget('game_top_left_hero_lvlup'):SetVisible(skillPoints >= 1)
 		GetWidget('game_top_left_hero_level_label'):SetText(currentLevel)
 	end
@@ -797,7 +797,7 @@ function Game:AllyRapRightClickSetVisFlag(clientNumber, allyIndex)
 	
 	Game.RapVisibleStates = Game.RapVisibleStates or {}
 	Game.RapVisibleStates[clientNumber] = Game.RapVisibleStates[clientNumber] or {}
-	Game.RapVisibleStates[clientNumber].allyIndex = AtoN(allyIndex)
+	Game.RapVisibleStates[clientNumber].allyIndex = tonumber(allyIndex)
 
 	RapButtonRefreshVis()
 end
@@ -1007,14 +1007,14 @@ local function InitAllyInfo()
 		local loadPercent = tonumber(loadPercent)
 		if (loadPercent < 1) then
 			GetWidget('game_top_left_ally_load_'..allyIndex):SetVisible(true)
-			GetWidget('game_top_left_ally_load_label_'..allyIndex):SetText(format("%.0d", (AtoN(loadPercent))*100)..'%')
+			GetWidget('game_top_left_ally_load_label_'..allyIndex):SetText(format("%.0d", (tonumber(loadPercent))*100)..'%')
 		else
 			GetWidget('game_top_left_ally_load_'..allyIndex):SetVisible(false)
 		end
 	end
 
 	local function AllyHealth(allyIndex, sourceWidget, health, maxHealth, healthPercent, healthShadow)
-		local health, maxHealth, tempHealthPercent, tempHealthShadow = AtoN(health), AtoN(maxHealth), ToPercent(AtoN(healthPercent)), ToPercent(AtoN(healthPercent))
+		local health, maxHealth, tempHealthPercent, tempHealthShadow = tonumber(health), tonumber(maxHealth), ToPercent(tonumber(healthPercent)), ToPercent(tonumber(healthPercent))
 		GetWidget('game_top_left_ally_health_'..allyIndex):SetVisible(health > 0)		
 		GetWidget('game_top_left_ally_health_'..allyIndex):SetWidth(tempHealthPercent)
 		GetWidget('game_top_left_ally_health_'..allyIndex):SetColor(GetHealthBarColor(healthPercent))
@@ -1028,7 +1028,7 @@ local function InitAllyInfo()
 	end
 
 	local function AllyMana(allyIndex, sourceWidget, mana, maxMana, manaPercent, manaShadow)
-		local mana, maxMana, tempManaPercent, tempManaShadow = AtoN(mana), AtoN(maxMana), ToPercent(AtoN(manaPercent)), ToPercent(AtoN(manaPercent))
+		local mana, maxMana, tempManaPercent, tempManaShadow = tonumber(mana), tonumber(maxMana), ToPercent(tonumber(manaPercent)), ToPercent(tonumber(manaPercent))
 		if (maxMana > 0) then
 			GetWidget('game_top_left_ally_mana_'..allyIndex):SetVisible(mana > 0)
 			GetWidget('game_top_left_ally_mana_'..allyIndex):SetWidth(tempManaPercent)
@@ -1381,6 +1381,7 @@ local function InitBottomCenterPanel()
 
 	-- OptiUI: Position elements in Bottom Center panel
 	local function PositionBottomCenter()
+		local optui3DPortrait = GetCvarBool('optiui_BottomCenter3DPortrait')
 		if GetCvarBool('optiui_BottomCenterAbilitiesBelowBars') then
 			GetWidget('game_center_health'):SetY('-8.2h')
 			GetWidget('game_center_mana'):SetY('-6.1h')
@@ -1391,8 +1392,8 @@ local function InitBottomCenterPanel()
 			GetWidget('game_center_abilities'):SetY('-4.6h')
 		end
 		GetWidget('item_shop_sign'):SetVisible(not GetCvarBool('optiui_BottomCenterHideItemShopSign'))
-		GetWidget('game_center_portrait_model_bg'):SetVisible(GetCvarBool('optiui_BottomCenter3DPortrait'))
-		GetWidget('game_center_portrait_model'):SetVisible(GetCvarBool('optiui_BottomCenter3DPortrait'))
+		GetWidget('game_center_portrait_model'):SetVisible(optui3DPortrait)
+		GetWidget('game_center_portrait_model_bg'):SetVisible(optui3DPortrait)
 	end
 	interface:RegisterWatch('optiui_BottomCenterPosition', PositionBottomCenter)
 	PositionBottomCenter()
@@ -1400,7 +1401,7 @@ local function InitBottomCenterPanel()
 
 	-- Health
 	local function ActiveHealth(sourceWidget, health, maxHealth, healthPercent, healthShadow)
-		local health, maxHealth, tempHealthPercent, tempHealthShadow = AtoN(health), AtoN(maxHealth), ToPercent(AtoN(healthPercent)), ToPercent(AtoN(healthPercent))
+		local health, maxHealth, tempHealthPercent, tempHealthShadow = tonumber(health), tonumber(maxHealth), ToPercent(tonumber(healthPercent)), ToPercent(tonumber(healthPercent))
 		if GetCvarBoolMem('cg_showHeroHealthLerp') and (health > 0) and (Game.lastHealthEntity == GetSelectedEntity()) then
 			GetWidget('game_center_health_lerp'):ScaleWidth(tempHealthShadow, 500, -1)
 		else
@@ -1423,14 +1424,14 @@ local function InitBottomCenterPanel()
 	interface:RegisterWatch('ActiveHealth', ActiveHealth)
 
 	local function ActiveHealthRegen(sourceWidget, baseHealthRegen, healthRegen)
-		local baseHealthRegen, healthRegen = AtoN(baseHealthRegen), AtoN(healthRegen)
+		local baseHealthRegen, healthRegen = tonumber(baseHealthRegen), tonumber(healthRegen)
 		GetWidget('game_center_health_regen_label'):SetText('+'..format("%.1f", healthRegen))
 	end
 	interface:RegisterWatch('ActiveHealthRegen', ActiveHealthRegen)
 
 	-- Mana
 	local function ActiveMana(sourceWidget, mana, maxMana, manaPercent, manaShadow)
-		local mana, maxMana, tempManaPercent, tempManaShadow = AtoN(mana), AtoN(maxMana), ToPercent(AtoN(manaPercent)), ToPercent(AtoN(manaPercent))
+		local mana, maxMana, tempManaPercent, tempManaShadow = tonumber(mana), tonumber(maxMana), ToPercent(tonumber(manaPercent)), ToPercent(tonumber(manaPercent))
 		if (maxMana > 0) then		
 			-- OptiUI: Small rename to keep things clean and fix for frame width = 0 graphic glitch
 			GetWidget('game_center_mana_bar_backer'):SetVisible(mana > 0)
@@ -1459,13 +1460,13 @@ local function InitBottomCenterPanel()
 	interface:RegisterWatch('ActiveMana', ActiveMana)
 
 	local function ActiveManaRegen(sourceWidget, baseManaRegen, manaRegen)
-		local baseManaRegen, manaRegen = AtoN(baseManaRegen), AtoN(manaRegen)
+		local baseManaRegen, manaRegen = tonumber(baseManaRegen), tonumber(manaRegen)
 		GetWidget('game_center_mana_regen_label'):SetText('+'..format("%.1f", manaRegen))
 	end
 	interface:RegisterWatch('ActiveManaRegen', ActiveManaRegen)
 
 	local function ActiveLevel(sourceWidget, currentLevel, skillPoints, showLevelup, _)
-		local currentLevel, skillPoints, showLevelup = ceil(AtoN(currentLevel)), AtoN(skillPoints), AtoB(showLevelup)
+		local currentLevel, skillPoints, showLevelup = ceil(tonumber(currentLevel)), tonumber(skillPoints), AtoB(showLevelup)
 		if (showLevelup or (skillPoints >= 1)) then
 			-- OptiUI: Disable gears and change location of lvlup buttons
 			GetWidget('game_center_levelup_btn_holder'):FadeIn(100)
@@ -1535,8 +1536,11 @@ local function InitBottomCenterPanel()
 		-- OptiUI: Removed model and added frame color
 		GetWidget('game_center_portrait_model'):UICmd("SetTeamColor('"..playerColor.."')")
 		GetWidget('game_center_portrait_model_bg'):SetColor(playerColor)
+		GetWidget('game_center_portrait_bg'):SetBorderColor(playerColor)
 		GetWidget('game_center_portrait_frame'):SetBorderColor(playerColor)
-		GetWidget('game_center_level_backer'):SetColor(playerColor)
+		GetWidget('game_center_level_bg'):SetColor(playerColor)
+		GetWidget('game_center_level_bg'):SetBorderColor(playerColor)
+		GetWidget('game_center_level_frame'):SetBorderColor(playerColor)
 	end
 	interface:RegisterWatch('ActivePlayerInfo', ActivePlayerInfo)
 
@@ -1556,7 +1560,7 @@ local function InitBottomCenterPanel()
 	interface:RegisterWatch('ToolTargetingEntity', ToolTargetingEntity)
 
 	local function ActiveLifetime(sourceWidget, remainingLifetime, actualLifetime, remainingPercent)
-		local remainingLifetime, actualLifetime, remainingPercent = AtoN(remainingLifetime), AtoN(actualLifetime), AtoN(remainingPercent)
+		local remainingLifetime, actualLifetime, remainingPercent = tonumber(remainingLifetime), tonumber(actualLifetime), tonumber(remainingPercent)
 		if (actualLifetime <= 0) then
 			GetWidget('game_center_exp_bar_backer'):SetVisible(true)
 			GetWidget('game_center_life_bar_backer'):SetVisible(false)
@@ -1583,9 +1587,9 @@ local function InitBottomCenterPanel()
 	interface:RegisterWatch('ActiveExperience', ActiveExperience)
 
 	local function ActiveDamage(sourceWidget, minAtkDmg, maxAtkDmg, avgAtkDmg)
-		local minAtkDmg, maxAtkDmg, avgAtkDmg = AtoN(minAtkDmg), AtoN(maxAtkDmg), AtoN(avgAtkDmg)
+		local minAtkDmg, maxAtkDmg, avgAtkDmg = tonumber(minAtkDmg), tonumber(maxAtkDmg), tonumber(avgAtkDmg)
 		GetWidget('game_center_damage'):SetVisible(maxAtkDmg ~= 0)
-		GetWidget('game_center_damage_label'):SetText(' ' .. ceil(minAtkDmg + avgAtkDmg) .. ' - ' .. ceil(maxAtkDmg + avgAtkDmg))
+		GetWidget('game_center_damage_label'):SetText(' ' .. ceil(minAtkDmg + avgAtkDmg) .. '-' .. ceil(maxAtkDmg + avgAtkDmg))
 	end
 	interface:RegisterWatch('ActiveDamage', ActiveDamage)
 
@@ -1593,7 +1597,7 @@ local function InitBottomCenterPanel()
 	Game.playerArmor = 0
 	Game.playerDamageMitigation = 0
 	local function ActiveArmor(sourceWidget, baseArmor, armor, mitigation)
-		local baseArmor, armor, mitigation = AtoN(baseArmor), AtoN(armor), AtoN(mitigation)
+		local baseArmor, armor, mitigation = tonumber(baseArmor), tonumber(armor), tonumber(mitigation)
 		GetWidget('game_center_armor_label'):SetText(' ' .. format("%.1f", armor) .. ' / ' .. format("%.1f", Game.playerMagicArmor) )
 		GetWidget('game_center_damage_mitigation_label'):SetText(' '.. FtoA(tonumber(mitigation) * 100, 1)..'% / '..FtoA(tonumber(Game.playerMagicDamageMitigation) * 100, 1)..'%')
 		Game.playerArmor = armor
@@ -1605,7 +1609,7 @@ local function InitBottomCenterPanel()
 	Game.playerMagicArmor = 0
 	Game.playerMagicDamageMitigation = 0
 	local function ActiveMagicArmor(sourceWidget, baseMagicArmor, magicArmor, mitigation)
-		local baseMagicArmor, magicArmor, mitigation = AtoN(baseMagicArmor), AtoN(magicArmor), AtoN(mitigation)
+		local baseMagicArmor, magicArmor, mitigation = tonumber(baseMagicArmor), tonumber(magicArmor), tonumber(mitigation)
 		GetWidget('game_center_armor_label'):SetText(' ' .. format("%.1f", Game.playerArmor) .. ' ^777/^999 ' .. format("%.1f", magicArmor) )
 		GetWidget('game_center_damage_mitigation_label'):SetText(' '..FtoA(tonumber(Game.playerDamageMitigation) * 100, 1)..'% / '.. FtoA(tonumber(mitigation) * 100, 1)..'%')
 		Game.playerMagicArmor = magicArmor
@@ -1614,7 +1618,7 @@ local function InitBottomCenterPanel()
 	interface:RegisterWatch('ActiveMagicArmor', ActiveMagicArmor)	
 	
 	local function ActiveMoveSpeed(sourceWidget, baseSpeed, speed)
-		local baseSpeed, speed = AtoN(baseSpeed), AtoN(speed)
+		local baseSpeed, speed = tonumber(baseSpeed), tonumber(speed)
 		GetWidget('game_center_speed_label'):SetText(' ' .. ceil(speed))
 	end
 	interface:RegisterWatch('ActiveMoveSpeed', ActiveMoveSpeed)
@@ -1626,7 +1630,7 @@ local function InitBottomCenterPanel()
 	interface:RegisterWatch('ActiveHasAttributes', ActiveHasAttributes)
 
 	local function ActiveAttributes(sourceWidget, strength, agility, intelligence, primaryAttribute)
-		local strength, agility, intelligence, primaryAttribute = AtoN(strength), AtoN(agility), AtoN(intelligence), AtoN(primaryAttribute)	
+		local strength, agility, intelligence, primaryAttribute = tonumber(strength), tonumber(agility), tonumber(intelligence), tonumber(primaryAttribute)	
 		if (primaryAttribute == 0) then
 			GetWidget('game_center_att_label'):SetText(' ^773' .. ceil(strength) .. '^* ' .. ceil(agility) .. ' ' .. ceil(intelligence))
 		elseif (primaryAttribute == 1) then
@@ -2067,7 +2071,7 @@ interface:RegisterWatch('MapEffect', MapEffect)
 local function InitBottomRight()
 	-- Health
 	local function SelectedHealth(targetWidget, sourceWidget, health, maxHealth, healthPercent, healthShadow)
-		local health, maxHealth, tempHealthPercent, tempHealthShadow = AtoN(health), AtoN(maxHealth), AtoN(healthPercent), ToPercent(AtoN(healthPercent))
+		local health, maxHealth, tempHealthPercent, tempHealthShadow = tonumber(health), tonumber(maxHealth), tonumber(healthPercent), ToPercent(tonumber(healthPercent))
 		if (maxHealth > 0) then
 			GetWidget('game_botright_health_bar_bg_'..targetWidget):SetVisible(true)
 			GetWidget('game_botright_health_bar_backer_'..targetWidget):SetColor(GetHealthBarColor(healthPercent))
@@ -2088,7 +2092,7 @@ local function InitBottomRight()
 
 	-- Mana
 	local function SelectedMana(targetWidget, sourceWidget, mana, maxMana, manaPercent, manaShadow)
-		local mana, maxMana, tempManaPercent, tempManaShadow = AtoN(mana), AtoN(maxMana), ToPercent(AtoN(manaPercent)), ToPercent(AtoN(manaPercent))
+		local mana, maxMana, tempManaPercent, tempManaShadow = tonumber(mana), tonumber(maxMana), ToPercent(tonumber(manaPercent)), ToPercent(tonumber(manaPercent))
 		if (maxMana > 0) then		
 			GetWidget('game_botright_mana_bar_bg_'..targetWidget):SetVisible(true)
 			GetWidget('game_botright_mana_bar_'..targetWidget):SetWidth(tempManaPercent)
@@ -2154,7 +2158,7 @@ local function InitBottomRight()
 	interface:RegisterWatch('SelectedEffect', SelectedEffect)
 
 	local function SelectedLifetime(sourceWidget, remainingLifetime, actualLifetime, remainingPercent)
-		local remainingLifetime, actualLifetime, remainingPercent = AtoN(remainingLifetime), AtoN(actualLifetime), AtoN(remainingPercent)
+		local remainingLifetime, actualLifetime, remainingPercent = tonumber(remainingLifetime), tonumber(actualLifetime), tonumber(remainingPercent)
 		if (actualLifetime <= 0) then
 			GetWidget('game_botright_life_bar_backer'):SetVisible(false)
 		else
@@ -2194,7 +2198,7 @@ local function InitBackpack()
 	end
 														--				0		  1           2          3       4          5            6         7            8           9         10       11         12          13    14
 	local function ActiveInventoryStatus(slotIndex, sourceWidget, canActivate, isActive, isDisabled, needMana, inUse, currentLevel, canLevelUp, maxLevel, isActiveSlot, canShare, isBorrowed, team, recentPurchase, index, iSlot)
-		local currentLevel, maxLevel = AtoN(currentLevel), AtoN(maxLevel)
+		local currentLevel, maxLevel = tonumber(currentLevel), tonumber(maxLevel)
 		if (AtoB(canActivate)) then
 			GetWidget('inventory_button_icon_'..slotIndex):UICmd("SetRenderMode('normal')")
 		else
@@ -2220,7 +2224,7 @@ local function InitBackpack()
 			GetWidget('inventory_button_color_overlay_'..slotIndex):SetVisible(false)
 		end
 		-- OptiUI: Item mana label parent
-		GetWidget('inventory_button_level_label_'..slotIndex):SetText(AtoN(currentLevel))
+		GetWidget('inventory_button_level_label_'..slotIndex):SetText(tonumber(currentLevel))
 		if (maxLevel > 1) then
 			GetWidget('inventory_button_level_parent_'..slotIndex):SetVisible(true)
 		else
@@ -2241,7 +2245,7 @@ local function InitBackpack()
 	end
 
 	local function ActiveInventoryCooldown(slotIndex, sourceWidget, remainingCDTime, ttCDTime, remainingCDPercent, CDTime)
-		local remainingCDTime, ttCDTime, remainingCDPercent, CDTime = AtoN(remainingCDTime), AtoN(ttCDTime), AtoN(remainingCDPercent), AtoN(CDTime)
+		local remainingCDTime, ttCDTime, remainingCDPercent, CDTime = tonumber(remainingCDTime), tonumber(ttCDTime), tonumber(remainingCDPercent), tonumber(CDTime)
 		if (ttCDTime > 0) then
 			GetWidget('inventory_button_cooldown_overlay_'..slotIndex):SetVisible(true)
 			GetWidget('inventory_button_cooldown_overlay_'..slotIndex):SetValue(remainingCDPercent)
@@ -2273,7 +2277,7 @@ local function InitBackpack()
 	end
 
 	local function ActiveInventoryTimer(slotIndex, sourceWidget, timer)
-		local timer = AtoN(timer)	
+		local timer = tonumber(timer)	
 		GetWidget('inventory_button_timer_'..slotIndex):SetText(convertTimeRange((timer + 949)/1000))
 	end
 
@@ -2284,7 +2288,7 @@ local function InitBackpack()
 	end
 
 	local function ActiveInventoryCharges(slotIndex, sourceWidget, charges)
-		local charges = AtoN(charges)
+		local charges = tonumber(charges)
 		if (charges) and (charges > 0) then
 			GetWidget('inventory_button_timer_'..slotIndex):SetY('0')
 			GetWidget('inventory_button_charges_parent_'..slotIndex):SetVisible(true)
@@ -2337,7 +2341,7 @@ end
 ----------------------------------------------------------
 local function InitChannelBar()
 	local function ChannelActiveInventoryChannel(slotIndex, sourceWidget, isChanneling, _, _, percent)
-		local isChanneling, percent = AtoB(isChanneling), AtoN(percent)
+		local isChanneling, percent = AtoB(isChanneling), tonumber(percent)
 		if (isChanneling ~= GetWidget('channel_bar_'..slotIndex):IsVisible()) then
 			if (isChanneling) then
 				GetWidget('channel_bar_'..slotIndex):SetVisible(true)
@@ -2408,7 +2412,7 @@ local function InitActiveInventory()
 	end
 														   --			   0           1         2           3       4          5            6         7           8           9           10      11        12           13     14
 	local function LvlUpActiveInventoryStatus(slotIndex, sourceWidget, canActivate, isActive, isDisabled, needMana, inUse, currentLevel, canLevelUp, maxLevel, isActiveSlot, canShare, isBorrowed, team, recentPurchase, index, iSlot)
-		if (AtoN(currentLevel) > 0) then
+		if (tonumber(currentLevel) > 0) then
 			GetWidget('ability_lvlup_button_label_parent_'..slotIndex):SetVisible(true)
 			GetWidget('ability_lvlup_button_label_'..slotIndex):SetText(currentLevel)
 		else
@@ -2461,7 +2465,7 @@ end
 function Game:RegisterAbilityPie(sourceWidget, abilitySlot)
 	local function ActiveInventoryCooldown(sourceWidget, param0, param1, param2)
 		sourceWidget:SetVisible(tonumber(param1) > 0)
-		sourceWidget:SetValue(AtoN(param2))
+		sourceWidget:SetValue(tonumber(param2))
 	end
 	sourceWidget:RegisterWatch('ActiveInventoryCooldown'..abilitySlot, ActiveInventoryCooldown)
 end
@@ -2469,8 +2473,8 @@ end
 function Game:RegisterAbilityCooldown(sourceWidget, abilitySlot)
 	local function ActiveInventoryCooldown(sourceWidget, param0, param1, param2)
 		sourceWidget:SetVisible(AtoB(param0))
-		--sourceWidget:SetText(convertTimeRange((AtoN(param0) + 949)/1000))
-		sourceWidget:SetText(ceil(AtoN(param0) / 1000)..'s')
+		--sourceWidget:SetText(convertTimeRange((tonumber(param0) + 949)/1000))
+		sourceWidget:SetText(ceil(tonumber(param0) / 1000)..'s')
 	end
 	sourceWidget:RegisterWatch('ActiveInventoryCooldown'..abilitySlot, ActiveInventoryCooldown)
 end
@@ -2482,7 +2486,7 @@ function Game:RegisterAbilityTimer(sourceWidget, abilitySlot)
 	sourceWidget:RegisterWatch('ActiveInventoryHasTimer'..abilitySlot, ActiveInventoryHasTimer)
 	
 	local function ActiveInventoryTimer(sourceWidget, param0)
-		sourceWidget:SetText(convertTimeRange((AtoN(param0) + 949)/1000))
+		sourceWidget:SetText(convertTimeRange((tonumber(param0) + 949)/1000))
 	end
 	sourceWidget:RegisterWatch('ActiveInventoryTimer'..abilitySlot, ActiveInventoryTimer)	
 end
@@ -2761,7 +2765,7 @@ interface:RegisterWatch('AllChatMessages', AllChatMessages)
 
 local function GLIncorrectDisplay(_, param)
 	if (not UIManager.GetInterface('main'):IsVisible()) then
-		if AtoB(param) then
+		if _G.toboolean(param) then
 			if (not GetCvarBool('ui_hideGLIncorrectWarning')) then
 				Trigger('TriggerDialogBoxWithComboboxGame', 'gl_incorrect_display', '', 'options_button_ok', '', '', 'gl_incorrect_display_desc', '', 'game_menu_dont_show_again', 'ui_hideGLIncorrectWarning')
 			end

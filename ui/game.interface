@@ -23,7 +23,7 @@
 	<childinterface file="/ui/testpp/game_dev.interface" />
 	<include file="game_radialmenu.package" />
 
-	<if condition="(releaseStage_dev or releaseStage_test) and !releaseStage_rc and !releaseStage_stable and !ui_disableQAChecklist" >
+	<if condition="(releaseStage_dev or releaseStage_test or releaseStage_rc) and !releaseStage_stable and !ui_disableQAChecklist" >
 		<panel y="-1" x="-26h" width="3.0h" height="3.0h" grow="1" align="right" name="game_qa_mini_button" visible="1" noclick="0" valign="top" passivechildren="1" color="0 0 0 1" onshow="BringToFront();"
 			onclicklua="local widg = GetWidget('game_qa_mini_panel_parent', 'game') widg:SetVisible(not widg:IsVisible())"
 		>
@@ -406,7 +406,7 @@
 
 					<label x="0h" fitx="1" align="left" textalign="center" textvalign="center" color="yellow" font="dyn_10" outline="1"
 						watch="ActiveInventoryStatus{slot}"
-						ontriggerlua="self:SetText(AtoN(param5)) self:SetVisible(AtoN(param5))"
+						ontriggerlua="self:SetText(tonumber(param5)) self:SetVisible(tonumber(param5))"
 					/>
 					<instance name="ability_frame_manacost" slot="{slot}" x="-05%" font="dyn_10" />
 				</panel>
@@ -450,7 +450,7 @@
 
 					<label x="0h" fitx="1" align="left" textalign="center" textvalign="center" color="yellow" font="dyn_10" outline="1"
 						watch="ActiveInventoryStatus{slot}"
-						ontriggerlua="self:SetText(AtoN(param5)) self:SetVisible(AtoN(param5))"
+						ontriggerlua="self:SetText(tonumber(param5)) self:SetVisible(tonumber(param5))"
 					/>
 					<instance name="ability_frame_manacost" slot="{slot_a}" x="-55%" font="dyn_10" />
 					<instance name="ability_frame_manacost" slot="{slot_b}" x="-05%" font="dyn_9" />
@@ -494,7 +494,7 @@
 
 					<label x="0h" fitx="1" align="left" textalign="center" textvalign="center" color="yellow" font="dyn_10" outline="1"
 						watch="ActiveInventoryStatus{slot}"
-						ontriggerlua="self:SetText(AtoN(param5)) self:SetVisible(AtoN(param5))"
+						ontriggerlua="self:SetText(tonumber(param5)) self:SetVisible(tonumber(param5))"
 					/>
 					<instance name="ability_frame_manacost" slot="{slot_a}" x="-55%" font="dyn_9" />
 					<instance name="ability_frame_manacost" slot="{slot_b}" x="-05%" font="dyn_9" />
@@ -577,7 +577,7 @@
 
 					<label x="0h" fitx="1" align="left" textalign="center" textvalign="center" color="yellow" font="dyn_10" outline="1"
 						watch="ActiveInventoryStatus{slot}"
-						ontriggerlua="self:SetText(AtoN(param5)) self:SetVisible(AtoN(param5))"
+						ontriggerlua="self:SetText(tonumber(param5)) self:SetVisible(tonumber(param5))"
 					/>
 					<instance name="ability_frame_manacost" slot="{slot}" x="-05%" font="dyn_10" />
 				</panel>
@@ -737,9 +737,10 @@
 					passivechildren="true"
 					color="0 0 0 .6"
 				>
-					<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_8"
+					<label width="100%" height="100%" textalign="center" textvalign="center" color="white" shadow="true" font="dyn_9"
 						watch="ActiveInventoryCharges{slot}"
-						ontriggerlua="self:SetText(param)"/>
+						ontriggerlua="self:SetText(param); if (tonumber(param) > 99) then self:SetFont('dyn_8') else self:SetFont('dyn_9') end"
+					/>
 					<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1" />
 				</panel>
 
@@ -1491,7 +1492,7 @@
 					</frame>
 					<frame width="60%" align="right" color="0 0 0 .6" bordercolor="gray" borderthickness="1"
 						watch="ActiveInventoryDescription{slot}"
-						ontriggerlua="self:SetVisible(AtoN(param2))"
+						ontriggerlua="self:SetVisible(tonumber(param2))"
 					>
 						<label textalign="center" textvalign="center" color="cyan" font="dyn_9" outline="1"
 							watch="ActiveInventoryDescription{slot}"
@@ -2708,7 +2709,18 @@
 
 						<!-- LvlUp Effect -->
 						<!-- OptiUI: Level up texture instead of effect -->
-						<image name="game_top_left_hero_lvlup" texture="/ui/legion/optiui_lvl_up_glow.tga" rendermode="additive" />
+						<modelpanel name="game_top_left_hero_lvlup"
+							noclick="true"
+							model="effects/portrait_lvlup/portrait_emitter.mdf"
+							anim="idle"
+							effect="effects/portrait_lvlup/portrait_lvlup.effect"
+							camerapos="-1 0 0"
+							cameraangles="0 0 180"
+							camerafov="55"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetEffect('/ui/effects/portrait_lvlup/portrait_lvlup.effect');"
+						/>
 
 						<!-- UIScript -->
 						<!-- OptiUI: Removed gloss from the Hero portraits -->
@@ -3615,10 +3627,15 @@
 			</panel>
 
 			<!-- OptiUI: Container panel for left side elements -->
-			<panel x="0.0h" y="0.0h" width="21.2h" height="10.1h" align="left" valign="bottom" color="invisible" >
+			<panel width="21.2h" height="10.1h" align="left" valign="bottom" color="invisible" >
 				<!-- Portrait -->
-				<panel x="0h" y="0h" width="8.0h" height="8.0h" valign="bottom" align="right" color="black" noclick="true">
-					<panel width="-10%" height="-10%" align="center" valign="center" >
+				<panel width="8.0h" height="8.0h" valign="bottom" align="right" color="invisible" noclick="true">
+
+					<!-- OptiUI: Player color frame -->
+					<frame name="game_center_portrait_bg"     texture="/ui/frames/rounded_bg_white.tga" borderthickness=".45h" bordercolor="gray" color="invisible" noclick="true"/>
+					<frame name="game_center_portrait_frame"  texture="/ui/frames/roundframe.tga" borderthickness=".45h" bordercolor="gray" color="invisible" noclick="true"/>
+
+					<panel width="-12%" height="-12%" align="center" valign="center" >
 						<image name="game_center_portrait_icon" 
 							onmouseldownlua="PlaySound('/shared/sounds/ui/center_view.wav') Action('PortraitCenter', 1.0)"
 							onmouseluplua="Action('PortraitCenter', 0.0)"
@@ -3636,7 +3653,18 @@
 						</panel>
 
 						<!-- OptiUI: Made levelup portrait glow a texture instead of a model -->
-						<image name="game_center_portrait_glow" texture="/ui/legion/optiui_lvl_up_glow.tga" rendermode="additive" noclick="true" />
+						<modelpanel name="game_center_portrait_glow"
+							noclick="true"
+							model="effects/portrait_lvlup/portrait_emitter.mdf"
+							anim="idle"
+							effect="effects/portrait_lvlup/portrait_lvlup.effect"
+							camerapos="-1 0 0"
+							cameraangles="0 0 180"
+							camerafov="55"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetEffect('/ui/effects/portrait_lvlup/portrait_lvlup.effect');"
+						/>
 
 						<modelpanel name="game_center_portrait_model"
 							visible="1"
@@ -3657,19 +3685,17 @@
 							onshow="SetAnim('portrait');"
 							lookupresource="true"
 						/>
+						<frame color="invisible" bordercolor="black" borderthickness="1" noclick="true" />
 					</panel>
 
-					<!-- OptiUI: Player color frame -->
-					<frame x="1" y="1" height="-2" width="-2" borderthickness="5%" bordercolor="black" color="invisible" noclick="1"/>
-					<frame name="game_center_portrait_frame" borderthickness="5%" bordercolor="gray" color="invisible" noclick="1"/>
 					<!-- OptiUI: and Level Indicator -->
-					<panel height="25%" width="25%" align="right" valign="bottom" color="black" noclick="true">
-						<panel name="game_center_level_backer" height="-1" width="-1" align="right" valign="bottom" color="invisible" passivechildren="true"
-							onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)"
-							onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)"
-						>
-							<label name="game_center_level_label" textalign="center" textvalign="center" font="dyn_10" color="yellow" outline="true" />
-						</panel>
+					<panel name="game_center_level_parent" height="25%" width="25%" align="right" valign="bottom" color="invisible" passivechildren="true"
+						onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)"
+						onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)"
+					>
+						<frame name="game_center_level_bg"    texture="/ui/frames/rounded_bg_white.tga" borderthickness=".45h" bordercolor="gray" color="invisible" noclick="true"/>
+						<frame name="game_center_level_frame" texture="/ui/frames/roundframe.tga" borderthickness=".45h" bordercolor="gray" color="invisible" noclick="true"/>
+						<label name="game_center_level_label" textalign="center" textvalign="bottom" font="dyn_10" color="yellow" outline="true" />
 					</panel>
 
 					<!-- Primary Icon -->
@@ -3828,7 +3854,6 @@
 						<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".5 0 0 .35" />
 						<image width="1.4h" height="1.4h" valign="center" texture="/ui/common/armor_icon.tga" />
 						<label name="game_center_armor_label" width="-2.0h" height="100%" align="right" font="dyn_9" color="white" outline="1" textalign="left" textvalign="top"/>
-						<!-- OptiUI: Added physical and magic armor reduction values. Idea taken from xUI -->
 						<label name="game_center_damage_mitigation_label" width="-2.0h" height="100%" align="right" font="dyn_8" color="gray" outline="1" textalign="left" textvalign="bottom"/>
 					</panel>
 					<!-- Attributes -->
@@ -4310,7 +4335,7 @@
 						cover_onmouseoverlua="GetWidget('dice_tooltip', 'game'):SetVisible(1)"
 						cover_onmouseoutlua="GetWidget('dice_tooltip', 'game'):SetVisible(0)"
 						charges_panel_watch="DiceInfo"
-						charges_panel_ontriggerlua="self:SetVisible(AtoN(param0) > 0)"
+						charges_panel_ontriggerlua="self:SetVisible(tonumber(param0) > 0)"
 						cooldown_timer=""
 						cooldown_percent=""
 					/>

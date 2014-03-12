@@ -13,7 +13,7 @@
 				<frame texture="/ui/frames/roundframe.tga" bordercolor=".3 .3 .3 1" borderthickness=".6h" noclick="true"/>
 			</panel>
 
-			<label name="game_top_center_voip_bar_name_{index}" x="220@" fitx="1" textvalign="top" font="dyn_10" />
+			<label name="game_top_center_voip_bar_name_{index}" x="220@" fitx="1" textvalign="center" font="dyn_10" />
 
 			<panel width="100@" align="right" >
 				<image texture="/ui/elements/optiui_voip_talking.tga" width="-0.5h" height="-0.5h" align="center" valign="center" />

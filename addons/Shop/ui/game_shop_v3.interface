@@ -2912,17 +2912,8 @@
 				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color=".1 .1 .1 .65" noclick="true" watch="optiui_ShopAlphaUpdate" ontrigger="SetColor('.1 .1 .1 ' # param / 100); SetBorderColor('.1 .1 .1 ' # param / 100);" />
 				<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor=".3 .3 .3 .65" noclick="true" watch="optiui_ShopAlphaUpdate" ontrigger="SetBorderColor('.3 .3 .3 ' # param / 100);" />
 
-				<panel
-					x="6.5h"
-					width="6.5h"
-					height="26.0h"
-					valign="bottom"
-					align="right"
-					color="invisible"
-					noclick="1"
-				>
+				<panel x="6.5h" width="6.5h" height="26.0h" valign="bottom" align="right" color="invisible" noclick="1" >
 					<!-- <image texture="/ui/common/new_shop_interface/shops_panel_close.tga" noclick="1"/> -->
-
 					<button
 						name="main_shop_close_btn"
 						y="0" x="0"
@@ -2940,7 +2931,6 @@
 							<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/close_shops_over.tga" />
 						</widgetstate>
 					</button>
-
 				</panel>
 
 				<!-- Shop Default -->
@@ -3002,6 +2992,28 @@
 						noclick="true"
 						color="invisible"
 					>
+
+						<panel x="6.5h" width="6.5h" height="26.0h" valign="bottom" align="right" color="invisible" noclick="1" >
+							<!-- <image texture="/ui/common/new_shop_interface/shops_panel_close.tga" noclick="1"/> -->
+							<button
+								name="item_shop_close_btn"
+								y="0" x="0"
+								width="3.3h" height="3.3h"
+								valign="center" align="left"
+								color="invisible"
+								onmouseover="PlaySound('/shared/sounds/ui/button_over_02.wav');"
+								onclick="PlaySound('/shared/sounds/ui/button_close_01.wav'); CloseShop();"
+								interactive="false"
+							>
+								<widgetstate statename="up">
+									<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/close_shops_up.tga" />
+								</widgetstate>
+								<widgetstate statename="over">
+									<image width="100%" height="100%" valign="center" align="center" texture="/ui/common/new_shop_interface/close_shops_over.tga" />
+								</widgetstate>
+							</button>
+						</panel>
+
 						<!-- Item BG -->
 						<!-- <image
 							x="-14.2h"
