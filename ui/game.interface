@@ -3628,8 +3628,9 @@
 
 			<!-- OptiUI: Container panel for left side elements -->
 			<panel width="21.2h" height="10.1h" align="left" valign="bottom" color="invisible" >
+
 				<!-- Portrait -->
-				<panel width="8.0h" height="8.0h" valign="bottom" align="right" color="invisible" noclick="true">
+				<panel width="8.0h" height="8.0h" valign="top" align="left" color="invisible" noclick="true">
 
 					<!-- OptiUI: Player color frame -->
 					<frame name="game_center_portrait_bg"     texture="/ui/frames/rounded_bg_white.tga" borderthickness=".45h" bordercolor="gray" color="invisible" noclick="true"/>
@@ -3667,6 +3668,7 @@
 						/>
 
 						<modelpanel name="game_center_portrait_model"
+							scenebuffer="true"
 							visible="1"
 							noclick="true"
 							model=""
@@ -3816,10 +3818,9 @@
 					</panel>
 				</panel>
 
-
 				<!-- Detail Stats -->
 				<!-- OptiUI: Made panels smaller to add a little more information to the UI -->
-				<panel width="13.0h" height="8.0h" align="left" valign="bottom" color="invisible" noclick="1">
+				<panel width="13.0h" height="8.0h" align="right" valign="top" color="invisible" noclick="1">
 					<!-- Damage -->
 					<!-- OptiUI: Added attack cooldown value -->
 					<panel name="game_center_damage" y="-6.5h" height="1.5h" valign="bottom" passivechildren="true"
@@ -3870,7 +3871,7 @@
 
 
 				<!-- Hero Name -->
-				<panel x="0h" y="0h" width="19.0h" height="1.9h" align="left" valign="top" color="0 0 0 .6" noclick="false" passivechildren="true"
+				<panel x="0h" y="0h" width="19.0h" height="1.9h" align="left" valign="bottom" color="0 0 0 .6" noclick="false" passivechildren="true"
 						onmouseoverlua="GetWidget('experience_tooltip', 'game'):SetVisible(1)"
 						onmouseoutlua="GetWidget('experience_tooltip', 'game'):SetVisible(0)"
 					>
@@ -3897,7 +3898,7 @@
 
 
 				<!-- Ability Selection Toggle -->
-				<panel x="0h" y="0h" width="1.9h" height="1.9h" align="right" valign="top">
+				<panel x="0h" y="0h" width="1.9h" height="1.9h" align="right" valign="bottom">
 					<panel x="0h" y="0h" width="1.9h" height="1.9h" color="black">
 						<button
 							x="0h" y="0"

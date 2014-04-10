@@ -1537,6 +1537,7 @@ local function InitBottomCenterPanel()
 		-- OptiUI: Removed model and added frame color
 		GetWidget('game_center_portrait_model'):UICmd("SetTeamColor('"..playerColor.."')")
 		GetWidget('game_center_portrait_model_bg'):SetColor(playerColor)
+		GetWidget('game_center_portrait_bg'):SetColor(playerColor)
 		GetWidget('game_center_portrait_bg'):SetBorderColor(playerColor)
 		GetWidget('game_center_portrait_frame'):SetBorderColor(playerColor)
 		GetWidget('game_center_level_bg'):SetColor(playerColor)

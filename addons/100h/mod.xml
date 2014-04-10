@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <modification
     application="Heroes of Newerth"
-    appversion="3.3"
+    appversion="3"
     mmversion="1.3"
     name="OptiUI_100h"
-    version="0.2.0"
-    date="2013/12/19"
+    version="0.2.1"
+    date="2014/04/10"
     description="OptiUI: Removes bottom bar"
     author="Trelokotsidu"
     weblink="http://forums.heroesofnewerth.com/showthread.php?508702"

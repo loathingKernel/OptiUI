@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <modification
     application="Heroes of Newerth"
-    appversion="3.3"
+    appversion="3"
     mmversion="1.3"
     name="OptiUI_Shop"
-    version="0.1.2"
-    date="2014/03/12"
+    version="0.1.3"
+    date="2014/04/10"
     description="OptiUI: Old Shop mod"
     author="Trelokotsidu"
     weblink="http://forums.heroesofnewerth.com/showthread.php?508702"
