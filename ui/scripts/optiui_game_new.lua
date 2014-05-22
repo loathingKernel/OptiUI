@@ -124,6 +124,7 @@ local function InitArcadeText()
 		['pirate'] = {3200, 2},
 		['bamf'] = {3200, 3},
 		['na_khom'] = {3200, 2},
+		['ninja'] = {3200, 2},
 	}
 
 	local function ArcadeMessage(message, condition, self, value, set)
@@ -1529,9 +1530,21 @@ local function InitBottomCenterPanel()
 	local function ActiveModel(sourceWidget, model)
 		if (model) then
 			GetWidget('game_center_portrait_model'):UICmd("SetModel('"..model.."')")
+			--println('Model = ' .. tostring(model) )
 		end
 	end
 	interface:RegisterWatch('ActiveModel', ActiveModel)
+
+    local function ActiveSkin(sourceWidget, skin)
+		if (skin) then
+			GetWidget('game_center_portrait_model'):SetSkin(skin)
+		else
+			GetWidget('game_center_portrait_model'):SetSkin('')
+		end
+		--println('Skin = ' .. tostring(skin) )
+	end
+	interface:RegisterWatch('ActiveSkin', ActiveSkin)
+
 
 	local function ActivePlayerInfo(sourceWidget, playerName, playerColor)
 		-- OptiUI: Removed model and added frame color
