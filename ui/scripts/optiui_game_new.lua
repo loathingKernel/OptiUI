@@ -7,7 +7,7 @@ local _G = getfenv(0)
 local ipairs, pairs, select, string, table, next, type, unpack, tinsert, tconcat, tremove, format, tostring, tonumber, tsort, ceil, floor, sub, find, gfind = _G.ipairs, _G.pairs, _G.select, _G.string, _G.table, _G.next, _G.type, _G.unpack, _G.table.insert, _G.table.concat, _G.table.remove, _G.string.format, _G.tostring, _G.tonumber, _G.table.sort, _G.math.ceil, _G.math.floor, _G.string.sub, _G.string.find, _G.string.gfind
 local interface = object
 local interfaceName = interface:GetName()
-RegisterScript2('Game', '35')
+RegisterScript2('Game', '36')
 Game = {}
 Game.MAX_ALLIES 			= 3
 Game.MAX_ENEMIES 			= 4
@@ -15,13 +15,14 @@ Game.MAX_ALLY_ABILITIES		= 3
 Game.ABILITIES_START		= 0
 Game.ABILITIES_END			= 4
 Game.FULL_ABILITIES_START  	= 0
-Game.FULL_ABILITIES_END    	= 8
-Game.STATE_START  			= 9
-Game.STATE_END    			= 32
-Game.INVENTORY_START     	= 36
-Game.INVENTORY_END       	= 41
+Game.FULL_ABILITIES_END    	= 12
+Game.STATE_START  			= 13
+Game.STATE_END    			= 44
+Game.INVENTORY_START     	= 48
+Game.INVENTORY_END       	= 53
 Game.INVENTORY_SPEC_1		= 8 	-- Taunt
-Game.INVENTORY_SPEC_2		= 33	-- Fortification
+Game.INVENTORY_SPEC_2		= 45	-- Fortification
+Game.INVENTORY_SPEC_3		= 9		-- Courier
 Game.KROSMODE_BASE_HEALTH	= 5000
 
 Game.lastHealthEntity = nil
@@ -1137,7 +1138,7 @@ local function InitAllyInfo()
 	end
 
 	local function AllyDisplay(sourceWidget, displayAllies)
-		local displayAllies = AtoB(displayAllies)
+		local displayAllies = (AtoB(displayAllies) and GameUIManager.FeatureEnabled('AllyInfo'))
 		GetWidget('game_ally_display_holder'):SetVisible(displayAllies)
 		GetWidget('game_top_left_ally_expand_btn'):SetVisible(not displayAllies)
 	end
@@ -1385,13 +1386,11 @@ local function InitBottomCenterPanel()
 	local function PositionBottomCenter()
 		local optui3DPortrait = GetCvarBool('optiui_BottomCenter3DPortrait')
 		if GetCvarBool('optiui_BottomCenterAbilitiesBelowBars') then
-			GetWidget('game_center_health'):SetY('-8.2h')
-			GetWidget('game_center_mana'):SetY('-6.1h')
-			GetWidget('game_center_abilities'):SetY('0.0h')
+			GetWidget('game_center_health_mana'):SetVAlign('top')
+			GetWidget('game_center_abilities'):SetVAlign('bottom')
 		else
-			GetWidget('game_center_health'):SetY('-2.1h')
-			GetWidget('game_center_mana'):SetY('0.0h')
-			GetWidget('game_center_abilities'):SetY('-4.6h')
+			GetWidget('game_center_health_mana'):SetVAlign('bottom')
+			GetWidget('game_center_abilities'):SetVAlign('top')
 		end
 		GetWidget('item_shop_sign'):SetVisible(not GetCvarBool('optiui_BottomCenterHideItemShopSign'))
 		GetWidget('game_center_portrait_model'):SetVisible(optui3DPortrait)
@@ -1490,10 +1489,13 @@ local function InitBottomCenterPanel()
 	interface:RegisterWatch('ActiveLevel', ActiveLevel)
 
 	--Portrait
-	local function ActivePortrait(sourceWidget, icon)
+	local function ActivePortrait(sourceWidget, icon, portraitCamPos, portraitAngles, portraitScale)
 		if (icon) then
 			GetWidget('game_center_portrait_icon'):SetTexture(icon)
 		end
+		GetWidget('game_center_portrait_model'):UICmd("SetCameraPos('"..portraitCamPos.."');")
+		GetWidget('game_center_portrait_model'):UICmd("SetModelAngles('"..portraitAngles.."');")
+		GetWidget('game_center_portrait_model'):UICmd("SetModelScale('"..portraitScale.."');")
 	end
 	interface:RegisterWatch('ActivePortrait', ActivePortrait)
 
@@ -1529,8 +1531,7 @@ local function InitBottomCenterPanel()
 	-- OptiUI: Removed to fix console spam --
 	local function ActiveModel(sourceWidget, model)
 		if (model) then
-			GetWidget('game_center_portrait_model'):UICmd("SetModel('"..model.."')")
-			--println('Model = ' .. tostring(model) )
+			GetWidget('game_center_portrait_model'):SetModel(model)
 		end
 	end
 	interface:RegisterWatch('ActiveModel', ActiveModel)
@@ -1541,7 +1542,6 @@ local function InitBottomCenterPanel()
 		else
 			GetWidget('game_center_portrait_model'):SetSkin('')
 		end
-		--println('Skin = ' .. tostring(skin) )
 	end
 	interface:RegisterWatch('ActiveSkin', ActiveSkin)
 
@@ -1788,72 +1788,33 @@ local function InitBottomSection()
 			GetWidget('game_selected_info_orders_pos'):SetX('0')
 
 			GetWidget('game_selected_info_unit'):SetAlign('right')
-			-- GetWidget('game_selected_info_unit_bg'):SetAlign('right')
 			GetWidget('game_selected_info_unit_icon'):SetAlign('right')
 			GetWidget('game_selected_info_unit_icon'):SetX('0.0h')
-			-- GetWidget('game_selected_info_unit_item_catcher'):SetAlign('right')
-			-- GetWidget('game_selected_info_unit_item_catcher'):SetX('-17.1h')
 			GetWidget('game_botright_info_unit_status_parent'):SetAlign('left')
 			GetWidget('game_botright_info_unit_status_parent'):SetX('0.7h')
-			-- GetWidget('game_botright_name_label_0B_parent'):SetVisible(false)
-			-- GetWidget('game_botright_name_label_0_parent'):SetAlign('right')
-			-- GetWidget('game_botright_name_label_0_parent'):SetX('-1.2h')
-			-- GetWidget('game_botright_name_label_0_parent'):SetVisible(true)
-			-- GetWidget('game_botright_name_label_0'):SetAlign('right')
 			GetWidget('game_botright_name_label_0'):SetX('-0.5h')
 			GetWidget('game_botright_name_label_0'):SetVisible(true)
 			GetWidget('game_botright_name_label_0B'):SetVisible(false)
-			-- GetWidget('game_botright_health_bar_bg_0'):SetAlign('left')
-			-- GetWidget('game_botright_health_bar_bg_0'):SetX('-1.2h')
-			-- GetWidget('game_botright_mana_bar_bg_0'):SetAlign('left')
-			-- GetWidget('game_botright_mana_bar_bg_0'):SetX('-1.2h')
 			GetWidget('game_selected_info_unit_inventory_parent'):SetAlign('left')
-			-- GetWidget('game_selected_info_unit_inventory'):SetAlign('right')
-			-- GetWidget('game_selected_info_unit_inventory'):SetX('-1.2h')
-			-- GetWidget('game_selected_info_unit_inventory_cover'):SetAlign('right')
-			-- GetWidget('game_selected_info_unit_inventory_cover'):SetX('-1.2h')
 			GetWidget('game_botright_level_bg_0'):SetAlign('left') 		
-			-- GetWidget('game_botright_level_bg_0'):SetX('0.0h')
 			GetWidget('game_selected_info_unit_stats'):SetAlign('right')
-			-- GetWidget('game_selected_info_unit_stats'):SetX('0.0h')
-			
+
 			GetWidget('game_selected_info_building'):SetAlign('right')
-			-- GetWidget('game_selected_info_building_bg'):SetAlign('right')
-			-- OptiUI: Changed from right to left
 			GetWidget('game_selected_info_building_icon'):SetAlign('right')
-			-- GetWidget('game_selected_info_building_icon'):SetX('-17.1h')
-			-- GetWidget('game_selected_info_building_item_catcher'):SetAlign('right')
-			-- GetWidget('game_selected_info_building_item_catcher'):SetX('-17.1h')
 			GetWidget('game_botright_info_building_status_parent'):SetAlign('left')
 			GetWidget('game_botright_info_building_status_parent'):SetX('0.7h')
-			-- GetWidget('game_botright_health_bar_bg_1'):SetAlign('right')
-			-- GetWidget('game_botright_health_bar_bg_1'):SetX('-1.2h')
 			GetWidget('game_selected_info_building_shared_abilities'):SetAlign('left')
-			-- GetWidget('game_selected_info_building_shared_abilities'):SetX('-1.2h')
-			-- GetWidget('game_selected_info_building_shared_abilities_pos'):SetAlign('right')
+			
 			-- OptiUI: Shared abilities on buildings alignment
-			GetWidget('ability_frame_shared_33'):SetAlign('left')
-			GetWidget('ability_frame_shared_35'):SetAlign('right')
-			-- GetWidget('game_selected_info_building_shared_abilities_pos'):SetX('0.0h')
-			-- OptiUI: Changed from right to left
+			GetWidget('ability_frame_shared_45'):SetAlign('left')
+			GetWidget('ability_frame_shared_47'):SetAlign('right')
 			GetWidget('game_botright_level_bg_1'):SetAlign('left')
-			-- GetWidget('game_botright_level_bg_1'):SetX('-0.7h')
-			-- GetWidget('game_botright_name_label_1B_parent'):SetVisible(false)
-			-- GetWidget('game_botright_name_label_1_parent'):SetAlign('right')
-			-- GetWidget('game_botright_name_label_1_parent'):SetX('-1.2h')
-			-- GetWidget('game_botright_name_label_1_parent'):SetVisible(true)
-			-- GetWidget('game_botright_name_label_1'):SetAlign('right')
-			-- GetWidget('game_botright_name_label_1'):SetX('-0.5h')
 			GetWidget('game_botright_name_label_1'):SetVisible(true)
 			GetWidget('game_botright_name_label_1B'):SetVisible(false)
 			-- OptiUI: Changed from right to left
 			GetWidget('game_selected_info_building_stats'):SetAlign('right')
-			--GetWidget('game_selected_info_building_stats'):SetX('-14.9h')
 			
 			GetWidget('game_selected_info_mult'):SetAlign('right')
-			-- GetWidget('game_selected_info_mult_backer'):SetAlign('right')
-			-- GetWidget('game_selected_info_mult_units'):SetAlign('right')
-			-- GetWidget('game_selected_info_mult_units'):SetX('-2')
 			
 			GetWidget('game_stash_icon'):SetAlign('left')
 			GetWidget('game_stash_icon'):SetX('0.3h')
@@ -1863,19 +1824,8 @@ local function InitBottomSection()
 				GetWidget('stash_parent'):SetWidth('22.0h')
 				GetWidget('stash_parent'):SetX('0.0h')
 				GetWidget('stash_parent'):SetAlign('right')
-				-- GetWidget('stash'):SetAlign('right')
 				GetWidget('game_stash_parent'):SetAlign('left')
 				GetWidget('game_stash_parent'):SetX('0.7h')
-				-- GetWidget('game_stash_buttons'):SetAlign('left')
-				-- GetWidget('game_stash_buttons'):SetX('0.7h')
-				-- GetWidget('game_stash_bg'):SetVisible(true)
-				-- GetWidget('game_stash_bg_alt'):SetVisible(false)
-				-- GetWidget('game_stash_label_parent'):SetAlign('left')
-				-- GetWidget('game_stash_label_parent'):SetX('0.7h')
-				-- GetWidget('game_stash_icon'):SetX('-14.2h')
-				-- GetWidget('game_stash_label'):SetAlign('right')
-				-- GetWidget('game_stash_label'):SetX('-6.0h')
-				-- GetWidget('stash_courier_button'):SetX('-1.1h')
 				GetWidget('stash_courier_status'):SetVisible(true)
 				GetWidget('stash_courier_button'):SetVisible(true)
 			end
@@ -1916,72 +1866,34 @@ local function InitBottomSection()
 			GetWidget('game_selected_info_orders_pos'):SetX('0')
 
 			GetWidget('game_selected_info_unit'):SetAlign('left')
-			-- GetWidget('game_selected_info_unit_bg'):SetAlign('left')
 			GetWidget('game_selected_info_unit_icon'):SetAlign('left')
 			GetWidget('game_selected_info_unit_icon'):SetX('0.0h')
-			-- GetWidget('game_selected_info_unit_item_catcher'):SetAlign('left')
-			-- GetWidget('game_selected_info_unit_item_catcher'):SetX('17.1h')
 			GetWidget('game_botright_info_unit_status_parent'):SetAlign('right')
 			GetWidget('game_botright_info_unit_status_parent'):SetX('-0.7h')
-			-- GetWidget('game_botright_name_label_0_parent'):SetVisible(false)			
-			-- GetWidget('game_botright_name_label_0B_parent'):SetAlign('left')
-			-- GetWidget('game_botright_name_label_0B_parent'):SetX('1.2h')
-			-- GetWidget('game_botright_name_label_0B_parent'):SetVisible(true)
-			-- GetWidget('game_botright_name_label_0B'):SetAlign('left')
 			GetWidget('game_botright_name_label_0B'):SetX('0.5h')
 			GetWidget('game_botright_name_label_0B'):SetVisible(true)
 			GetWidget('game_botright_name_label_0'):SetVisible(false)
 			GetWidget('game_botright_health_bar_bg_0'):SetAlign('right')
-			-- GetWidget('game_botright_health_bar_bg_0'):SetX('1.2h')
-			-- GetWidget('game_botright_mana_bar_bg_0'):SetAlign('right')
-			-- GetWidget('game_botright_mana_bar_bg_0'):SetX('1.2h')		
 			GetWidget('game_selected_info_unit_inventory_parent'):SetAlign('right')
-			-- GetWidget('game_selected_info_unit_inventory'):SetAlign('left')
-			-- GetWidget('game_selected_info_unit_inventory'):SetX('1.2h')
-			-- GetWidget('game_selected_info_unit_inventory_cover'):SetAlign('left')
-			-- GetWidget('game_selected_info_unit_inventory_cover'):SetX('1.2h')
 			GetWidget('game_botright_level_bg_0'):SetAlign('right')
-			-- GetWidget('game_botright_level_bg_0'):SetX('0.0h')
 			GetWidget('game_selected_info_unit_stats'):SetAlign('left')
-			-- GetWidget('game_selected_info_unit_stats'):SetX('0.0h')
 			
 			GetWidget('game_selected_info_building'):SetAlign('left')
-			-- GetWidget('game_selected_info_building_bg'):SetAlign('left')
-			-- OptiUI: Changed from left to right
 			GetWidget('game_selected_info_building_icon'):SetAlign('left')
-			-- GetWidget('game_selected_info_building_icon'):SetX('17.1h')
-			-- GetWidget('game_selected_info_building_item_catcher'):SetAlign('left')
-			-- GetWidget('game_selected_info_building_item_catcher'):SetX('17.1h')
 			GetWidget('game_botright_info_building_status_parent'):SetAlign('right')
 			GetWidget('game_botright_info_building_status_parent'):SetX('-0.7h')
-			-- GetWidget('game_botright_health_bar_bg_1'):SetAlign('left')
-			-- GetWidget('game_botright_health_bar_bg_1'):SetX('1.2h')
 			GetWidget('game_selected_info_building_shared_abilities'):SetAlign('right')
-			-- GetWidget('game_selected_info_building_shared_abilities'):SetX('1.2h')
-			-- GetWidget('game_selected_info_building_shared_abilities_pos'):SetAlign('left')
+
 			-- OptiUI: Shared abilities on buildings alignment
-			GetWidget('ability_frame_shared_33'):SetAlign('right')
-			GetWidget('ability_frame_shared_35'):SetAlign('left')
-			-- GetWidget('game_selected_info_building_shared_abilities_pos'):SetX('-0.4h')
-			-- OptiUI: Changed from left to right
+			GetWidget('ability_frame_shared_45'):SetAlign('right')
+			GetWidget('ability_frame_shared_47'):SetAlign('left')
 			GetWidget('game_botright_level_bg_1'):SetAlign('right')
-			-- GetWidget('game_botright_level_bg_1'):SetX('0.0h')
-			-- GetWidget('game_botright_name_label_1_parent'):SetVisible(false)
-			-- GetWidget('game_botright_name_label_1B_parent'):SetAlign('left')
-			-- GetWidget('game_botright_name_label_1B_parent'):SetX('1.2h')
-			-- GetWidget('game_botright_name_label_1B_parent'):SetVisible(true)
-			-- GetWidget('game_botright_name_label_1B'):SetAlign('left')
-			-- GetWidget('game_botright_name_label_1B'):SetX('0.5h')
 			GetWidget('game_botright_name_label_1B'):SetVisible(true)
 			GetWidget('game_botright_name_label_1'):SetVisible(false)
 			-- OptiUI: Changed from left to right
 			GetWidget('game_selected_info_building_stats'):SetAlign('left')
-			-- GetWidget('game_selected_info_building_stats'):SetX('16.6h')
 
 			GetWidget('game_selected_info_mult'):SetAlign('left')
-			-- GetWidget('game_selected_info_mult_backer'):SetAlign('left')
-			-- GetWidget('game_selected_info_mult_units'):SetAlign('left')
-			-- GetWidget('game_selected_info_mult_units'):SetX('2')
 
 			GetWidget('game_stash_tip_stash'):SetAlign('left')
 			GetWidget('game_stash_tip_stash'):SetX('0.3h')
@@ -1991,19 +1903,8 @@ local function InitBottomSection()
 				GetWidget('stash_parent'):SetWidth('22.0h')
 				GetWidget('stash_parent'):SetX('0.0h')
 				GetWidget('stash_parent'):SetAlign('left')
-				-- GetWidget('stash'):SetAlign('left')
 				GetWidget('game_stash_parent'):SetAlign('right')
 				GetWidget('game_stash_parent'):SetX('-0.7h')
-				-- GetWidget('game_stash_buttons'):SetAlign('right')
-				-- GetWidget('game_stash_buttons'):SetX('-0.7h')
-				-- GetWidget('game_stash_bg'):SetVisible(false)
-				-- GetWidget('game_stash_bg_alt'):SetVisible(true)
-				-- GetWidget('game_stash_label_parent'):SetAlign('right')
-				-- GetWidget('game_stash_label_parent'):SetX('-0.7h')
-				-- GetWidget('game_stash_icon'):SetX('8.0h')
-				-- GetWidget('game_stash_label'):SetAlign('left')
-				-- GetWidget('game_stash_label'):SetX('8.5h')
-				-- GetWidget('stash_courier_button'):SetX('1.1h')
 				GetWidget('stash_courier_status'):SetVisible(true)
 				GetWidget('stash_courier_button'):SetVisible(true)				
 			end

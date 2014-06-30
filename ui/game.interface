@@ -7,9 +7,11 @@
 >
 	<!-- Search for 'UIScript' to find stuff that still needs to be replaced with LUA, also probably search for UICmd -->
 
+	<lua file="/ui/scripts/game_ui_manager.lua" />
+
 	<lua file="/ui/scripts/optiui_game_new.lua" />
 
-	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '35') Game:InitializeGameInterface()"/> 
+	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '36') Game:InitializeGameInterface()"/> 
 
 	<!-- Packages -->
 	<childinterface file="ui_items_1.interface" />
@@ -376,6 +378,45 @@
 	</template>
 
 	<!-- ability frame templates-->
+	<template name="ability_frame_multi_slots">
+		<!-- SINGLE, used for the multiabilities feature-->
+		<panel
+			width="5.9h"
+			height="4.9h"
+			align="center"
+			valign="center"
+			color="invisible"
+			sticky="true"
+			stickytoinvis="false"
+			visible="true"
+			noclick="1"
+		>
+			<panel align="center" width="100@" height="100%" color="invisible" noclick="true">
+				<frame borderthickness="1" bordercolor="gray" color="black" noclick="true" />
+				
+				<instance name="ability_button" slot="{slot}"/>
+
+				<!-- mana cost -->
+				<panel x="1" y="-1" width="-2" height="30.0%" valign="bottom" passivechildren="true" noclick="true"
+					watch="ActiveInventoryExists{slot}"
+					ontriggerlua="self:SetVisible(AtoB(param))"
+				>
+					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" />
+					<frame texture="/ui/frames/roundframe.tga" borderthickness=".6h" bordercolor="0 0 0 .7" />
+
+					<label x="0h" fitx="1" align="left" textalign="center" textvalign="center" color="yellow" font="dyn_10" outline="1"
+						watch="ActiveInventoryStatus{slot}"
+						ontriggerlua="self:SetText(tonumber(param5)) self:SetVisible(tonumber(param5))"
+					/>
+					<label x="0h" fitx="1" align="right" textalign="center" textvalign="center" color="cyan" font="dyn_10" outline="1"
+						watch="ActiveInventoryHotkeys{slot}"
+						ontriggerlua="self:SetText(param1)"
+					/>
+				</panel>
+			</panel>
+		</panel>
+	</template>
+
 	<template name="ability_frame_single">
 		<!-- SINGLE-->
 		<panel
@@ -1077,7 +1118,7 @@
 			<image texture="/ui/legion/ability_coverup.tga"/>
 			<panel name="ability_lvlup_button_{slot}">
 				<image name="ability_lvlup_button_icon_{slot}" noclick="1" />
-				<button  name="ability_lvlup_button_button_{slot}"
+				<button name="ability_lvlup_button_button_{slot}"
 					color="invisible"
 					onmouseoverlua="if (GetCvarBool('cg_useLongTooltips')) then GetWidget('ability_levelup_tooltip{slot}', 'game'):SetVisible(1) else GetWidget('ability_levelup_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(1) end"
 					onmouseoutlua="if (GetCvarBool('cg_useLongTooltips')) then GetWidget('ability_levelup_tooltip{slot}', 'game'):SetVisible(0) else GetWidget('ability_levelup_tooltip_simple{slot}', 'game_shop_shared'):SetVisible(0) end"
@@ -2820,42 +2861,47 @@
 		</panel>
 		
 
-		<panel width="1.3h" height="1.3h" align="right" valign="bottom" color="invisible" noclick="true">
+		<panel width="1.3h" height="1.3h" align="right" valign="bottom" color="invisible" noclick="true"
+			onloadlua="GameUIManager.RegisterSection(self, 'AllyInfo')"
+		>
 			<!-- Collapse Team Icons Button -->
 			<!-- UIScript -->
-			<button
-				color="invisible"
-				onclick="ToggleAllies();"
-				interactive="false"
-			>
-				<widgetstate statename="up">
-					<image texture="/ui/info/combobox_button_up.tga" rotation="180" />
-				</widgetstate>
-				<widgetstate statename="over">
-					<image texture="/ui/info/combobox_button_over.tga" rotation="180" />
-				</widgetstate>
-				<widgetstate statename="down">
-					<image y="1" x="1" texture="/ui/info/combobox_button_up.tga" rotation="180" />
-				</widgetstate>
-			</button>
+			<panel name="game_top_left_ally_collapse_btn" noclick="true" color="invisible" >
+				<button
+					color="invisible"
+					onclick="ToggleAllies();"
+					interactive="false"
+				>
+					<widgetstate statename="up">
+						<image texture="/ui/info/combobox_button_up.tga" rotation="180" />
+					</widgetstate>
+					<widgetstate statename="over">
+						<image texture="/ui/info/combobox_button_over.tga" rotation="180" />
+					</widgetstate>
+					<widgetstate statename="down">
+						<image y="1" x="1" texture="/ui/info/combobox_button_up.tga" rotation="180" />
+					</widgetstate>
+				</button>
+			</panel>
 			<!-- Expand Team Icons Button -->
 			<!-- UIScript -->
-			<button
-				name="game_top_left_ally_expand_btn"
-				color="invisible"
-				onclick="ToggleAllies();"
-				interactive="false"
-			>
-				<widgetstate statename="up">
-					<image texture="/ui/info/combobox_button_up.tga"  />
-				</widgetstate>
-				<widgetstate statename="over">
-					<image texture="/ui/info/combobox_button_over.tga" />
-				</widgetstate>
-				<widgetstate statename="down">
-					<image y="1" x="1" texture="/ui/info/combobox_button_up.tga" />
-				</widgetstate>
-			</button>
+			<panel name="game_top_left_ally_expand_btn" noclick="true" color="invisible" >
+				<button
+					color="invisible"
+					onclick="ToggleAllies();"
+					interactive="false"
+				>
+					<widgetstate statename="up">
+						<image texture="/ui/info/combobox_button_up.tga"  />
+					</widgetstate>
+					<widgetstate statename="over">
+						<image texture="/ui/info/combobox_button_over.tga" />
+					</widgetstate>
+					<widgetstate statename="down">
+						<image y="1" x="1" texture="/ui/info/combobox_button_up.tga" />
+					</widgetstate>
+				</button>
+			</panel>
 		</panel>
 	</panel>
 
@@ -3531,7 +3577,9 @@
 
 			<!-- Abilities -->
 			<!-- OptiUI: Adjustments to ability buttons panel size -->
-			<panel name="game_center_abilities" x="2.6h" y="-4.6h" width="36.2h" height="5.5h" align="center" valign="bottom" noclick="1" float="right" color="invisible" >
+			<panel name="game_center_abilities" x="2.6h" y="0h" width="36.2h" height="5.5h" align="center" valign="top" noclick="1" float="right" color="invisible"
+				onloadlua="GameUIManager.RegisterSection(self, 'DefaultAbilities')"
+			>
 				<panel width="9.0h" noclick="1" >
 					<instance name="ability_frame_single" slot="0"/>
 					<instance name="ability_frame_single_plus_one" slot="0" slot_a="0" slot_b="5"/>
@@ -3562,68 +3610,83 @@
 				</panel>
 			</panel>
 
-			<!-- Health -->
-			<panel
-				name="game_center_health"
-				x="2.6h"
-				y="-2.1h"
-				width="36.2h"
-				height="1.9h"
-				align="center"
-				valign="bottom"
-				color="invisible"
-				watch="ActiveHealth"
-				ontriggerlua="self:SetVisible(tonumber(param1) > 0)"
-				onmouseoverlua="GetWidget('health_tooltip', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('health_tooltip', 'game'):SetVisible(0)"
-				passivechildren="true"
+			<panel name="game_center_abilities_multi" x="2.6h" y="0h" width="36.2h" height="10.1h" align="center" valign="bottom" noclick="1" color="invisible"
+				onloadlua="GameUIManager.RegisterSection(self, 'MultiAbilities')"
 			>
-				<panel color="0 0 0 .5"/>
-				<image texture="/ui/legion/behind_bar.tga" rendermode="additive" color="0 .9 0 .2"/>
-				<panel name="game_center_health_lerp">
-					<image texture="/ui/legion/optiui_behind_bar.tga" rendermode="normal" color="1 0 0 1"/>
-					<image align="center" valign="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
-					<!-- <instance name="statusbar_overlay" barimage="optiui_behind_bar.tga" rendermode="" barcolor="1 0 0 1"/> -->
+				<panel float="right" width="30.0h" height="4.9h" noclick="true" align="center" valign="top" >
+					<instance name="ability_frame_multi_slots" slot="0"/>
+					<instance name="ability_frame_multi_slots" slot="1"/>
+					<instance name="ability_frame_multi_slots" slot="2"/>
+					<instance name="ability_frame_multi_slots" slot="3"/>
+					<instance name="ability_frame_multi_slots" slot="5"/>
 				</panel>
-				<panel name="game_center_health_bar_backer" color="0 0 0 0">
-					<image name="game_center_health_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" color=".2 1 .3 1" noclick="1"/>
-					<instance name="statusbar_overlay"/>
+				<panel float="right" width="30.0h" height="4.9h" noclick="true" align="center" valign="bottom" >
+					<instance name="ability_frame_multi_slots" slot="6"/>
+					<instance name="ability_frame_multi_slots" slot="7"/>
+					<instance name="ability_frame_multi_slots" slot="9"/>
+					<instance name="ability_frame_multi_slots" slot="10"/>
+					<instance name="ability_frame_multi_slots" slot="11"/>
 				</panel>
-				<label name="game_center_health_label" x="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-				<label name="game_center_health_regen_label" x="-0.5h" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
-				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
 
-			<!-- Mana -->
-			<panel
-				name="game_center_mana"
-				x="2.6h"
-				y="0.0h"
-				width="36.2h"
-				height="1.9h"
-				align="center"
-				valign="bottom"
-				color="invisible"
-				watch="ActiveMana"
-				ontriggerlua="self:SetVisible(tonumber(param1) > 0)"
-				onmouseoverlua="GetWidget('mana_tooltip', 'game'):SetVisible(1)"
-				onmouseoutlua="GetWidget('mana_tooltip', 'game'):SetVisible(0)"
-				passivechildren="true"
-			>
-				<panel color="0 0 0 .5"/>
-				<image texture="/ui/legion/behind_bar2.tga" rendermode="additive" color="0 .3 .9 .2"/>
-				<panel name="game_center_mana_lerp" >
-					<image texture="/ui/legion/optiui_behind_bar.tga" rendermode="normal" color="0.75 0.75 0.75 1"/>
-					<image align="center" valign="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
-					<!-- <instance name="statusbar_overlay" barimage="optiui_behind_bar.tga" rendermode="" barcolor="0.75 0.75 0.75 1" /> -->
+			<panel name="game_center_health_mana" x="2.6h" y="0h" width="36.2h" height="4.0h" align="center" valign="bottom" noclick="1" color="invisible" >
+				<!-- Health -->
+				<panel
+					name="game_center_health"
+					height="1.9h"
+					align="center"
+					valign="top"
+					color="invisible"
+					watch="ActiveHealth"
+					ontriggerlua="self:SetVisible(tonumber(param1) > 0)"
+					onmouseoverlua="GetWidget('health_tooltip', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('health_tooltip', 'game'):SetVisible(0)"
+					passivechildren="true"
+				>
+					<panel color="0 0 0 .5"/>
+					<image texture="/ui/legion/behind_bar.tga" rendermode="additive" color="0 .9 0 .2"/>
+					<panel name="game_center_health_lerp">
+						<image texture="/ui/legion/optiui_behind_bar.tga" rendermode="normal" color="1 0 0 1"/>
+						<image align="center" valign="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+						<!-- <instance name="statusbar_overlay" barimage="optiui_behind_bar.tga" rendermode="" barcolor="1 0 0 1"/> -->
+					</panel>
+					<panel name="game_center_health_bar_backer" color="0 0 0 0">
+						<image name="game_center_health_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" color=".2 1 .3 1" noclick="1"/>
+						<instance name="statusbar_overlay"/>
+					</panel>
+					<label name="game_center_health_label" x="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+					<label name="game_center_health_regen_label" x="-0.5h" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 				</panel>
-				<panel name="game_center_mana_bar_backer" >
-					<image name="game_center_mana_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" color="0 .4 1 1" noclick="1"/>
-					<instance name="statusbar_overlay"/>
+
+				<!-- Mana -->
+				<panel
+					name="game_center_mana"
+					height="1.9h"
+					align="center"
+					valign="bottom"
+					color="invisible"
+					watch="ActiveMana"
+					ontriggerlua="self:SetVisible(tonumber(param1) > 0)"
+					onmouseoverlua="GetWidget('mana_tooltip', 'game'):SetVisible(1)"
+					onmouseoutlua="GetWidget('mana_tooltip', 'game'):SetVisible(0)"
+					passivechildren="true"
+				>
+					<panel color="0 0 0 .5"/>
+					<image texture="/ui/legion/behind_bar2.tga" rendermode="additive" color="0 .3 .9 .2"/>
+					<panel name="game_center_mana_lerp" >
+						<image texture="/ui/legion/optiui_behind_bar.tga" rendermode="normal" color="0.75 0.75 0.75 1"/>
+						<image align="center" valign="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
+						<!-- <instance name="statusbar_overlay" barimage="optiui_behind_bar.tga" rendermode="" barcolor="0.75 0.75 0.75 1" /> -->
+					</panel>
+					<panel name="game_center_mana_bar_backer" >
+						<image name="game_center_mana_bar" onloadlua="self:SetVScale(self:GetHeight()..'p') self:DoEvent()" color="0 .4 1 1" noclick="1"/>
+						<instance name="statusbar_overlay"/>
+					</panel>
+					<label name="game_center_mana_label" x="-1" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
+					<label name="game_center_mana_regen_label" x="-0.5h" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
+					<frame name="game_center_mana_bar_frame" borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 				</panel>
-				<label name="game_center_mana_label" x="-1" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="center" textvalign="center" />
-				<label name="game_center_mana_regen_label" x="-0.5h" y="-1" font="dyn_10" color="white" outline="1" width="100%" height="100%" textalign="right" textvalign="center" visible="1" />
-				<frame name="game_center_mana_bar_frame" borderthickness="1" bordercolor="gray" color="invisible" noclick="1" />
 			</panel>
 
 			<!-- OptiUI: Container panel for left side elements -->
@@ -3898,7 +3961,9 @@
 
 
 				<!-- Ability Selection Toggle -->
-				<panel x="0h" y="0h" width="1.9h" height="1.9h" align="right" valign="bottom">
+				<panel x="0h" y="0h" width="1.9h" height="1.9h" align="right" valign="bottom"
+					onloadlua="GameUIManager.RegisterSection(self, 'LevelupButtons')"
+				>
 					<panel x="0h" y="0h" width="1.9h" height="1.9h" color="black">
 						<button
 							x="0h" y="0"
@@ -3937,7 +4002,15 @@
 					<panel x="0h" y="0h" width="1.9h" height="1.9h" color="black" watch="ActiveLevel" ontriggerlua="self:SetVisible(tonumber(param1) > 0);">
 						<label x="0h" y="0h" width="100%" height="100%" textalign="center" textvalign="center" font="dyn_10" watch="ActiveLevel" color="yellow" shadow="true" ontriggerlua="self:SetText(param1);" noclick="true"/>
 					</panel>
-					<!-- <image texture="/ui/common/optiui_ability_toggle.tga" noclick="1" /> -->
+					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
+				</panel>
+
+				<panel x="0h" y="0h" width="1.9h" height="1.9h" align="right" valign="bottom"
+					onloadlua="GameUIManager.RegisterSection(self, 'MultiAbilities')"
+				>
+					<panel x="0h" y="0h" width="1.9h" height="1.9h" color="black">
+						<instance name="ability_button" slot="45"/>
+					</panel>
 					<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="true" />
 				</panel>
 			</panel>
@@ -3958,30 +4031,71 @@
 			</panel>
 
 			<!-- Backpack -->
-			<panel x="0.0h" y="0.0h" width="16.0h" height="10.1h" align="right" valign="bottom" color="invisible" noclick="true" >
+			<panel x="0.0h" y="0.0h" width="16.0h" height="10.1h" align="right" valign="bottom" color="invisible" noclick="true"
+				onloadlua="
+					GameUIManager.RegisterFeatureAndSection(self, 'Inventory',
+					function(map)
+						return (map ~= 'prophets')
+					end,
+					nil,
+					function()
+						GetWidget('bottom_center_inventory_cover', 'game'):SetVisible(1)
+					end
+					)
+				"
+			>
 				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h">
-						<instance name="inventory_button" slot="36"/>
+						<instance name="inventory_button" slot="48"/>
 					</panel>
 				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" align="center">
-						<instance name="inventory_button" slot="37"/>
+						<instance name="inventory_button" slot="49"/>
 					</panel>
 				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" align="right">
-						<instance name="inventory_button" slot="38"/>
+						<instance name="inventory_button" slot="50"/>
 					</panel>
 
 				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom">
-						<instance name="inventory_button" slot="39"/>
+						<instance name="inventory_button" slot="51"/>
 					</panel>
 				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom" align="center">
-						<instance name="inventory_button" slot="40"/>
+						<instance name="inventory_button" slot="52"/>
 					</panel>
 				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom" align="right">
-						<instance name="inventory_button" slot="41"/>
+						<instance name="inventory_button" slot="53"/>
 				</panel>
 			</panel>
 
+			<panel noclick="1"
+				onloadlua="
+					GameUIManager.RegisterFeatureAndSection(self, 'MultiAbilities',
+					function(map)
+						return (map == 'prophets')
+					end,
+					function()
+						GetWidget('game_center_health_mana', 'game'):SetY('-11.2h')
+						GetWidget('channel_bars', 'game'):SetY('-11.2h')
+					end
+					)
+				"
+			>
+			</panel>
+			<panel noclick="1"
+				onloadlua="
+					GameUIManager.RegisterFeatureAndSection(self, 'DefaultAbilities',
+					function(map)
+						return (map ~= 'prophets')
+					end,
+					function()
+						GetWidget('game_center_health_mana', 'game'):SetY('0')
+						GetWidget('channel_bars', 'game'):SetY('-25h')
+					end
+					)
+				"
+			>
+			</panel>
+
 			<!-- Inventory Cover -->
-			<panel x="0.0h" y="0.0h" width="16.0h" height="10.1h" align="right" valign="bottom" color="black" noclick="true" watch="ActiveHasInventory" ontriggerlua="self:SetVisible(not AtoB(param))">
+			<panel name="bottom_center_inventory_cover" x="0.0h" y="0.0h" width="16.0h" height="10.1h" align="right" valign="bottom" color="black" noclick="true" watch="ActiveHasInventory" ontriggerlua="self:SetVisible(not AtoB(param))">
 				<image width="20.2h" texture="/ui/common/optiui_inventory_cover.tga" noclick="true"/>
 				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="0" />
 			</panel>
@@ -4031,34 +4145,44 @@
 
 		<!-- Level Up Buttons -->
 		<!-- OptiUI: Moved ability level up button holder above everything else -->
-		<panel name="game_center_levelup_btn_holder" x="0.6h" y="-11.2h" width="40.2h" height="4.0h" align="center" valign="bottom" color="invisible" noclick="true" >
-			<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .4" noclick="true" />
-			<frame name="game_center_levelup_btn_holder_frame" texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
+		<panel name="game_center_levelup_btn_holder_parent" x="0.6h" y="-11.2h" width="40.2h" height="4.0h" align="center" valign="bottom" color="invisible" noclick="true"
+			onloadlua="
+				GameUIManager.RegisterFeatureAndSection(self, 'LevelupButtons',
+				function(map)
+					return (map ~= 'prophets')
+				end
+				)
+			"
+		>
+			<panel name="game_center_levelup_btn_holder" color="invisible" noclick="true" >
+				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .4" noclick="true" />
+				<frame name="game_center_levelup_btn_holder_frame" texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" noclick="true"/>
 
-			<panel float="right" noclick="true"> 
-				<panel width="4.0h" noclick="1" >
-					<panel valign="center" align="center" height="70%" width="70@" >
-						<instance name="ability_button_lvlup" slot="4"/>
+				<panel float="right" noclick="true"> 
+					<panel width="4.0h" noclick="1" >
+						<panel valign="center" align="center" height="70%" width="70@" >
+							<instance name="ability_button_lvlup" slot="4"/>
+						</panel>
 					</panel>
-				</panel>
-				<panel width="9.0h" noclick="1" >
-					<panel valign="center" align="center" height="80%" width="80@" >
-						<instance name="ability_button_lvlup" slot="0"/>
+					<panel width="9.0h" noclick="1" >
+						<panel valign="center" align="center" height="80%" width="80@" >
+							<instance name="ability_button_lvlup" slot="0"/>
+						</panel>
 					</panel>
-				</panel>
-				<panel width="9.0h" noclick="1" >
-					<panel valign="center" align="center" height="80%" width="80@" >
-						<instance name="ability_button_lvlup" slot="1"/>
+					<panel width="9.0h" noclick="1" >
+						<panel valign="center" align="center" height="80%" width="80@" >
+							<instance name="ability_button_lvlup" slot="1"/>
+						</panel>
 					</panel>
-				</panel>
-				<panel width="9.0h"  noclick="1" >
-					<panel valign="center" align="center" height="80%" width="80@" >
-						<instance name="ability_button_lvlup" slot="2"/>
+					<panel width="9.0h"  noclick="1" >
+						<panel valign="center" align="center" height="80%" width="80@" >
+							<instance name="ability_button_lvlup" slot="2"/>
+						</panel>
 					</panel>
-				</panel>
-				<panel width="9.0h" noclick="1" >
-					<panel valign="center" align="center" height="80%" width="80@" >
-						<instance name="ability_button_lvlup" slot="3"/>
+					<panel width="9.0h" noclick="1" >
+						<panel valign="center" align="center" height="80%" width="80@" >
+							<instance name="ability_button_lvlup" slot="3"/>
+						</panel>
 					</panel>
 				</panel>
 			</panel>
@@ -4067,7 +4191,7 @@
 		<!-- Error Messages -->
 		<textbuffer name="game_center_error_messages"
 			x="2.6h"
-			y="-18.0h"
+			y="-18.75h"
 			width="63h"
 			height="7h"
 			align="center"
@@ -4347,7 +4471,7 @@
 				</panel>
 				<!-- fortification -->
 				<panel name="game_info_fortification" x="0" y="0" width="4.9h" height="4.9h" align="center" valign="bottom">
-					<instance name="inventory_button" slot="33" simple_tooltip_interface="game_shop_shared"/>
+					<instance name="inventory_button" slot="45" simple_tooltip_interface="game_shop_shared"/>
 				</panel>
 				<!-- Courier Status Icon -->
 				<panel name="game_info_courier_status" x="0" y="0" width="4.9h" height="4.9h" align="right" valign="top">
@@ -4567,22 +4691,22 @@
 				<panel name="game_selected_info_unit_inventory_parent" y="-0.5h" width="12.0h" height="7.7h" valign="bottom" color="invisible" noclick="true" >
 					<!-- <panel name="game_selected_info_unit_inventory" color="invisible" noclick="true"> -->
 						<panel height="48%" width="48@" align="left" valign="top" color="invisible">
-							<instance name="inventory_info" slot="36" bordercolor=".3 .3 .3 1" />
+							<instance name="inventory_info" slot="48" bordercolor=".3 .3 .3 1" />
 						</panel>
 						<panel height="48%" width="48@" align="center" valign="top" color="invisible">
-							<instance name="inventory_info" slot="37" bordercolor=".3 .3 .3 1" />
+							<instance name="inventory_info" slot="49" bordercolor=".3 .3 .3 1" />
 						</panel>
 						<panel height="48%" width="48@" align="right" valign="top" color="invisible">
-							<instance name="inventory_info" slot="38" bordercolor=".3 .3 .3 1" />
+							<instance name="inventory_info" slot="50" bordercolor=".3 .3 .3 1" />
 						</panel>
 						<panel height="48%" width="48@" align="left" valign="bottom" color="invisible">
-							<instance name="inventory_info" slot="39" bordercolor=".3 .3 .3 1" />
+							<instance name="inventory_info" slot="51" bordercolor=".3 .3 .3 1" />
 						</panel>
 						<panel height="48%" width="48@" align="center" valign="bottom" color="invisible">
-							<instance name="inventory_info" slot="40" bordercolor=".3 .3 .3 1" />
+							<instance name="inventory_info" slot="52" bordercolor=".3 .3 .3 1" />
 						</panel>
 						<panel height="48%" width="48@" align="right" valign="bottom" color="invisible">
-							<instance name="inventory_info" slot="41" bordercolor=".3 .3 .3 1" />
+							<instance name="inventory_info" slot="53" bordercolor=".3 .3 .3 1" />
 						</panel>
 					<!-- </panel> -->
 
@@ -4752,9 +4876,9 @@
 				<!-- Shared abilities -->
 				<panel name="game_selected_info_building_shared_abilities" width="12.0h" height="6.0h" align="left" valign="bottom" color="invisible" noclick="true" >
 					<panel name="game_selected_info_building_shared_abilities_pos" width="100%" align="center" color="invisible" padding="0" noclick="true" >
-						<instance name="ability_frame_shared" align="left"   slot="33" bordercolor=".3 .3 .3 1" />
-						<instance name="ability_frame_shared" align="center" slot="34" bordercolor=".3 .3 .3 1" />
-						<instance name="ability_frame_shared" align="right"  slot="35" bordercolor=".3 .3 .3 1" />
+						<instance name="ability_frame_shared" align="left"   slot="45" bordercolor=".3 .3 .3 1" />
+						<instance name="ability_frame_shared" align="center" slot="46" bordercolor=".3 .3 .3 1" />
+						<instance name="ability_frame_shared" align="right"  slot="47" bordercolor=".3 .3 .3 1" />
 					</panel>
 				</panel>
 
@@ -4854,7 +4978,19 @@
 	<!-- OptiUI: MOVABLE TEAM ICONS -->
 	<!-- Team Icons -->
 	<!-- Top left position -->
-	<panel name="game_ally_display_holder" x="0.0h" y="6.1h" width="5.8h" height="26.6h" color="invisible" noclick="true" reverse="true" direction="1">
+	<panel name="game_ally_display_holder" x="0.0h" y="6.1h" width="5.8h" height="26.6h" color="invisible" noclick="true" reverse="true" direction="1"
+		onloadlua="
+			GameUIManager.RegisterFeatureAndSection(self, 'AllyInfo',
+			function(map)
+				return (map ~= 'prophets')
+			end,
+			function()
+				local displayAllies = GetCvarBool('cg_displayAllies')
+				GetWidget('game_ally_display_holder', 'game'):SetVisible(displayAllies)
+				GetWidget('game_top_left_ally_expand_btn', 'game'):SetVisible(not displayAllies)
+			end)
+		"
+	>
 		<!-- OptiUI: Instances are generated inside the lua script -->
 	</panel>
 	<!-- OptiUI: END MOVABLE TEAM ICONS -->
@@ -4940,6 +5076,10 @@
 		<instance name="ability_tooltip" id="ability_tooltip6" slot="6" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip7" slot="7" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip8" slot="8" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip9" slot="9" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip10" slot="10" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip11" slot="11" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip12" slot="12" help="true" />
 
 		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip0" slot="0" help="true" />
 		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip1" slot="1" help="true" />
@@ -4947,14 +5087,16 @@
 		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip3" slot="3" help="true" />
 		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip4" slot="4" help="true" />
 
-		<instance name="ability_tooltip" id="ability_tooltip33" slot="33" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip45" slot="45" help="true" />
 
-		<instance name="ability_tooltip" id="ability_tooltip36" slot="36" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip37" slot="37" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip38" slot="38" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip39" slot="39" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip40" slot="40" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip41" slot="41" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip63" slot="63" help="true" />
+		
+		<instance name="ability_tooltip" id="ability_tooltip48" slot="48" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip49" slot="49" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip50" slot="50" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip51" slot="51" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip52" slot="52" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip53" slot="53" help="true" />
 
 		<instance name="ability_tooltip" id="stash_tooltip0" slot="52" help="false" />
 		<instance name="ability_tooltip" id="stash_tooltip1" slot="53" help="false" />
@@ -4963,10 +5105,6 @@
 		<instance name="ability_tooltip" id="stash_tooltip4" slot="56" help="false" />
 		<instance name="ability_tooltip" id="stash_tooltip5" slot="57" help="false" />
 
-		<instance name="ability_tooltip" id="state_tooltip9" slot="9" help="false" />
-		<instance name="ability_tooltip" id="state_tooltip10" slot="10" help="false" />
-		<instance name="ability_tooltip" id="state_tooltip11" slot="11" help="false" />
-		<instance name="ability_tooltip" id="state_tooltip12" slot="12" help="false" />
 		<instance name="ability_tooltip" id="state_tooltip13" slot="13" help="false" />
 		<instance name="ability_tooltip" id="state_tooltip14" slot="14" help="false" />
 		<instance name="ability_tooltip" id="state_tooltip15" slot="15" help="false" />
@@ -4974,14 +5112,20 @@
 		<instance name="ability_tooltip" id="state_tooltip17" slot="17" help="false" />
 		<instance name="ability_tooltip" id="state_tooltip18" slot="18" help="false" />
 		<instance name="ability_tooltip" id="state_tooltip19" slot="19" help="false" />
+		<instance name="ability_tooltip" id="state_tooltip20" slot="20" help="false" />
+		<instance name="ability_tooltip" id="state_tooltip21" slot="21" help="false" />
+		<instance name="ability_tooltip" id="state_tooltip22" slot="22" help="false" />
+		<instance name="ability_tooltip" id="state_tooltip23" slot="23" help="false" />
 
-		<instance name="ability_tooltip" id="ability_tooltip_shared33" slot="33" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip_shared34" slot="34" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip_shared35" slot="35" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_shared45" slot="45" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_shared46" slot="46" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_shared47" slot="47" help="true" />
 
-		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared33" slot="33" help="true" />
-		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared34" slot="34" help="true" />
-		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared35" slot="35" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_shared63" slot="63" help="true" />
+		
+		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared45" slot="45" help="true" />
+		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared46" slot="46" help="true" />
+		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared47" slot="47" help="true" />
 
 		<instance name="attack_tooltip" />
 		<instance name="defense_tooltip" />
@@ -5022,17 +5166,13 @@
 		<instance name="mana_tooltip_hero" />
 		<instance name="experience_tooltip_hero" />
 
-		<instance name="ability_info_tooltip" id="inventory_info_tooltip36" slot="36" help="true" />
-		<instance name="ability_info_tooltip" id="inventory_info_tooltip37" slot="37" help="true" />
-		<instance name="ability_info_tooltip" id="inventory_info_tooltip38" slot="38" help="true" />
-		<instance name="ability_info_tooltip" id="inventory_info_tooltip39" slot="39" help="true" />
-		<instance name="ability_info_tooltip" id="inventory_info_tooltip40" slot="40" help="true" />
-		<instance name="ability_info_tooltip" id="inventory_info_tooltip41" slot="41" help="true" />
+		<instance name="ability_info_tooltip" id="inventory_info_tooltip48" slot="48" help="true" />
+		<instance name="ability_info_tooltip" id="inventory_info_tooltip49" slot="49" help="true" />
+		<instance name="ability_info_tooltip" id="inventory_info_tooltip50" slot="50" help="true" />
+		<instance name="ability_info_tooltip" id="inventory_info_tooltip51" slot="51" help="true" />
+		<instance name="ability_info_tooltip" id="inventory_info_tooltip52" slot="52" help="true" />
+		<instance name="ability_info_tooltip" id="inventory_info_tooltip53" slot="53" help="true" />
 
-		<instance name="ability_info_tooltip" id="state_info_tooltip9" slot="9" help="false" />
-		<instance name="ability_info_tooltip" id="state_info_tooltip10" slot="10" help="false" />
-		<instance name="ability_info_tooltip" id="state_info_tooltip11" slot="11" help="false" />
-		<instance name="ability_info_tooltip" id="state_info_tooltip12" slot="12" help="false" />
 		<instance name="ability_info_tooltip" id="state_info_tooltip13" slot="13" help="false" />
 		<instance name="ability_info_tooltip" id="state_info_tooltip14" slot="14" help="false" />
 		<instance name="ability_info_tooltip" id="state_info_tooltip15" slot="15" help="false" />
@@ -5040,11 +5180,11 @@
 		<instance name="ability_info_tooltip" id="state_info_tooltip17" slot="17" help="false" />
 		<instance name="ability_info_tooltip" id="state_info_tooltip18" slot="18" help="false" />
 		<instance name="ability_info_tooltip" id="state_info_tooltip19" slot="19" help="false" />
+		<instance name="ability_info_tooltip" id="state_info_tooltip20" slot="20" help="false" />
+		<instance name="ability_info_tooltip" id="state_info_tooltip21" slot="21" help="false" />
+		<instance name="ability_info_tooltip" id="state_info_tooltip22" slot="22" help="false" />
+		<instance name="ability_info_tooltip" id="state_info_tooltip23" slot="23" help="false" />
 
-		<instance name="ability_hero_tooltip" id="hero_state_tooltip9" slot="9" help="false" />
-		<instance name="ability_hero_tooltip" id="hero_state_tooltip10" slot="10" help="false" />
-		<instance name="ability_hero_tooltip" id="hero_state_tooltip11" slot="11" help="false" />
-		<instance name="ability_hero_tooltip" id="hero_state_tooltip12" slot="12" help="false" />
 		<instance name="ability_hero_tooltip" id="hero_state_tooltip13" slot="13" help="false" />
 		<instance name="ability_hero_tooltip" id="hero_state_tooltip14" slot="14" help="false" />
 		<instance name="ability_hero_tooltip" id="hero_state_tooltip15" slot="15" help="false" />
@@ -5052,18 +5192,22 @@
 		<instance name="ability_hero_tooltip" id="hero_state_tooltip17" slot="17" help="false" />
 		<instance name="ability_hero_tooltip" id="hero_state_tooltip18" slot="18" help="false" />
 		<instance name="ability_hero_tooltip" id="hero_state_tooltip19" slot="19" help="false" />
+		<instance name="ability_hero_tooltip" id="hero_state_tooltip20" slot="20" help="false" />
+		<instance name="ability_hero_tooltip" id="hero_state_tooltip21" slot="21" help="false" />
+		<instance name="ability_hero_tooltip" id="hero_state_tooltip22" slot="22" help="false" />
+		<instance name="ability_hero_tooltip" id="hero_state_tooltip23" slot="23" help="false" />
 
 		<instance name="hero_tooltip" id="ally_tooltip0" type="Ally" slot="0" help="false" />
 		<instance name="hero_tooltip" id="ally_tooltip1" type="Ally" slot="1" help="false" />
 		<instance name="hero_tooltip" id="ally_tooltip2" type="Ally" slot="2" help="false" />
 		<instance name="hero_tooltip" id="ally_tooltip3" type="Ally" slot="3" help="false" />
 
-		<instance name="ability_tooltip" id="ability_tooltip_simple36" slot="36" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip_simple37" slot="37" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip_simple38" slot="38" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip_simple39" slot="39" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip_simple40" slot="40" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip_simple41" slot="41" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_simple48" slot="48" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_simple49" slot="49" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_simple50" slot="50" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_simple51" slot="51" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_simple52" slot="52" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_simple53" slot="53" help="true" />
 
 		<instance name="ability_tooltip" id="stash_tooltip_simple0" slot="52" help="false" />
 		<instance name="ability_tooltip" id="stash_tooltip_simple1" slot="53" help="false" />
@@ -5084,13 +5228,15 @@
 		<instance name="ability_tooltip" id="state_tooltip_simple18" slot="18" help="false" />
 		<instance name="ability_tooltip" id="state_tooltip_simple19" slot="19" help="false" />
 
-		<instance name="ability_tooltip" id="ability_tooltip_shared_simple33" slot="33" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip_shared_simple34" slot="34" help="true" />
-		<instance name="ability_tooltip" id="ability_tooltip_shared_simple35" slot="35" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_shared_simple45" slot="45" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_shared_simple46" slot="46" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_shared_simple47" slot="47" help="true" />
 
-		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared_simple33" slot="33" help="true" />
-		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared_simple34" slot="34" help="true" />
-		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared_simple35" slot="35" help="true" />
+		<instance name="ability_tooltip" id="ability_tooltip_shared_simple63" slot="63" help="true" />
+		
+		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared_simple45" slot="45" help="true" />
+		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared_simple46" slot="46" help="true" />
+		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared_simple47" slot="47" help="true" />
 
 		<instance name="courier_state_tooltip" />
 		<instance name="courier_status_tooltip" />
@@ -5526,7 +5672,7 @@
 	-->
 
 	<!-- Channeling bar -->
-	<panel
+	<panel name="channel_bars"
 		x="3.4h" y="-25h"
 		width="27h"
 		valign="bottom"
@@ -5573,14 +5719,26 @@
 		<instance name="channel_bar" slot="30" />
 		<instance name="channel_bar" slot="31" />
 		<instance name="channel_bar" slot="32" />
-
-		<!-- Backpack slots -->
+		<instance name="channel_bar" slot="33" />
+		<instance name="channel_bar" slot="34" />
+		<instance name="channel_bar" slot="35" />
 		<instance name="channel_bar" slot="36" />
 		<instance name="channel_bar" slot="37" />
 		<instance name="channel_bar" slot="38" />
 		<instance name="channel_bar" slot="39" />
 		<instance name="channel_bar" slot="40" />
 		<instance name="channel_bar" slot="41" />
+		<instance name="channel_bar" slot="42" />
+		<instance name="channel_bar" slot="43" />
+		<instance name="channel_bar" slot="44" />
+
+		<!-- Backpack slots -->
+		<instance name="channel_bar" slot="48" />
+		<instance name="channel_bar" slot="49" />
+		<instance name="channel_bar" slot="50" />
+		<instance name="channel_bar" slot="51" />
+		<instance name="channel_bar" slot="52" />
+		<instance name="channel_bar" slot="53" />
 
 	</panel>
 	<!-- /Channeling bar -->
