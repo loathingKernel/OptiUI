@@ -1471,12 +1471,8 @@ local function InitBottomCenterPanel()
 		if (showLevelup or (skillPoints >= 1)) then
 			-- OptiUI: Disable gears and change location of lvlup buttons
 			GetWidget('game_center_levelup_btn_holder'):FadeIn(100)
-			--GetWidget('game_center_levelup_btn_holder'):SlideY('14h', 150)
-			--GetWidget('game_center_large_gear'):Rotate(0, 250)
 		else
 			GetWidget('game_center_levelup_btn_holder'):FadeOut(100)
-			--GetWidget('game_center_levelup_btn_holder'):SlideY('22.6h', 150)
-			--GetWidget('game_center_large_gear'):Rotate(30, 250)
 		end
 		if (skillPoints >= 1) then
 			GetWidget('game_center_levelup_btn_holder_frame'):SetBorderColor("purple")

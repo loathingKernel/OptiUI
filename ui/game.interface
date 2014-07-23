@@ -4072,8 +4072,8 @@
 						return (map == 'prophets')
 					end,
 					function()
-						GetWidget('game_center_health_mana', 'game'):SetY('-11.2h')
-						GetWidget('channel_bars', 'game'):SetY('-11.2h')
+						GetWidget('game_center_health_mana', 'game'):SetY('-10.8h')
+						GetWidget('channel_bars', 'game'):SetY('-15.2h')
 					end
 					)
 				"
@@ -4109,7 +4109,7 @@
 
 					<!-- UIScript -->
 					<image x="1" y="-1" height="2.1h" width="2.1h" valign="bottom" align="left" texture="common/optiui_gold.tga"/>
-					<label name="game_center_gold_label" y="0.0h" x="2.3h" height="100%" align="left" textalign="left" textvalign="bottom" font="dyn_10" color="white" outline="1" />
+					<label name="game_center_gold_label" y="0.0h" x="2.3h" fitx="1" height="100%" align="left" textalign="left" textvalign="bottom" font="dyn_10" color="white" outline="1" />
 					<!-- UIScript -->
 					<button
 						color="invisible"
@@ -5098,12 +5098,12 @@
 		<instance name="ability_tooltip" id="ability_tooltip52" slot="52" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip53" slot="53" help="true" />
 
-		<instance name="ability_tooltip" id="stash_tooltip0" slot="52" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip1" slot="53" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip2" slot="54" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip3" slot="55" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip4" slot="56" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip5" slot="57" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip0" slot="64" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip1" slot="65" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip2" slot="66" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip3" slot="67" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip4" slot="68" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip5" slot="69" help="false" />
 
 		<instance name="ability_tooltip" id="state_tooltip13" slot="13" help="false" />
 		<instance name="ability_tooltip" id="state_tooltip14" slot="14" help="false" />
@@ -5209,12 +5209,12 @@
 		<instance name="ability_tooltip" id="ability_tooltip_simple52" slot="52" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip_simple53" slot="53" help="true" />
 
-		<instance name="ability_tooltip" id="stash_tooltip_simple0" slot="52" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip_simple1" slot="53" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip_simple2" slot="54" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip_simple3" slot="55" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip_simple4" slot="56" help="false" />
-		<instance name="ability_tooltip" id="stash_tooltip_simple5" slot="57" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip_simple0" slot="64" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip_simple1" slot="65" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip_simple2" slot="66" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip_simple3" slot="67" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip_simple4" slot="68" help="false" />
+		<instance name="ability_tooltip" id="stash_tooltip_simple5" slot="69" help="false" />
 
 		<instance name="ability_tooltip" id="state_tooltip_simple9" slot="9" help="false" />
 		<instance name="ability_tooltip" id="state_tooltip_simple10" slot="10" help="false" />
@@ -5824,7 +5824,7 @@
 						watch="AltCourierList{slot}"
 						ontrigger="SetModel(param4); SetEffect(param5); SetModelPos(param6); SetModelAngles(param7); SetModelScale(param8);"
 					/>
-					<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="1"
+					<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="true"
 						watch="AltCourierList{slot}" ontriggerlua="if (AtoB(param14)) then self:SetBorderColor('#57420c') else self:SetBorderColor('0.2 .2 .2 1') end"
 					/>
 
@@ -5836,7 +5836,7 @@
 							watch="AltCourierList{slot}"
 							ontriggerlua="self:SetTexture(param3);"
 						/>
-						<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="1"
+						<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="true"
 							watch="AltCourierList{slot}" ontriggerlua="if (AtoB(param14)) then self:SetBorderColor('#57420c') else self:SetBorderColor('0.2 .2 .2 1') end"
 						/>
 					</panel>
@@ -5874,7 +5874,7 @@
 						watch="AltCourierList{slot}"
 						ontrigger="SetModel(param18); SetEffect(param19); SetModelPos(param20); SetModelAngles(param21); SetModelScale(param22);"
 					/>
-					<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="1"
+					<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="true"
 						watch="AltCourierList{slot}" ontriggerlua="if (AtoB(param14)) then self:SetBorderColor('#57420c') else self:SetBorderColor('0.2 .2 .2 1') end"
 					/>
 
@@ -5886,7 +5886,7 @@
 							watch="AltCourierList{slot}"
 							ontriggerlua="self:SetTexture(param17);"
 						/>
-						<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="1"
+						<frame color="invisible" bordercolor=".2 .2 .2 1" borderthickness="1" noclick="true"
 							watch="AltCourierList{slot}" ontriggerlua="if (AtoB(param14)) then self:SetBorderColor('#57420c') else self:SetBorderColor('0.2 .2 .2 1') end"
 						/>
 					</panel>
@@ -6557,7 +6557,7 @@
 			<panel grow="1" regrow="1" growinvis="0" width="100%" noclick="true">
 				<panel width="11.0h" height="11.0h" valign="top">
 					<image name="game_hero_tip_icon" texture="$invis" noclick="1" visible="0"  />
-					<frame color="invisible" bordercolor=".4 .4 .4 1" borderthickness="1" noclick="1" />
+					<frame color="invisible" bordercolor=".4 .4 .4 1" borderthickness="1" noclick="true" />
 				</panel>
 				<panel grow="1" regrow="1" growinvis="0" width="-12.0h" align="right" noclick="1" float="bottom" padding="0.3h">
 					<label name="game_hero_tip_icon_label" fity="true" color="red" outline="1" font="dyn_16" textalign="left" content="" noclick="1" visible="0" />
