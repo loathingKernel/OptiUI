@@ -11,7 +11,7 @@
 
 	<lua file="/ui/scripts/optiui_game_new.lua" />
 
-	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '36') Game:InitializeGameInterface()"/> 
+	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '37') Game:InitializeGameInterface()"/> 
 
 	<!-- Packages -->
 	<childinterface file="ui_items_1.interface" />
@@ -24,8 +24,8 @@
 	<childinterface file="/ui/confirmations.interface" />
 	<childinterface file="/ui/testpp/game_dev.interface" />
 	<include file="game_radialmenu.package" />
-
-	<if condition="(releaseStage_dev or releaseStage_test or releaseStage_rc) and !releaseStage_stable and !ui_disableQAChecklist" >
+		
+	<if condition="(releaseStage_dev or releaseStage_test) and !releaseStage_stable and !ui_disableQAChecklist" >
 		<panel y="-1" x="-26h" width="3.0h" height="3.0h" grow="1" align="right" name="game_qa_mini_button" visible="1" noclick="0" valign="top" passivechildren="1" color="0 0 0 1" onshow="BringToFront();"
 			onclicklua="local widg = GetWidget('game_qa_mini_panel_parent', 'game') widg:SetVisible(not widg:IsVisible())"
 		>
@@ -6063,11 +6063,73 @@
 		watch="AltCourierAccess"
 		ontriggerlua="if (not AtoB(param1)) then self:SetVisible(0) end"
 	>
-		<panel y="-1.2h" width="105%" height="107%" align="center" valign="top" noclick="true" >
+		<panel y="-1.2h" width="105%" height="101.75%" align="center" valign="top" noclick="true" >
 			<panel width="-1.6h" height="-1.6h" align="center" valign="center" color="0 0 0 .8" noclick="true" />
 			<frame texture="/ui/frames/standard.tga" borderthickness="2.3h" blockinput="false" noclick="true"/>
 		</panel>
 
+		<panel name="altcourier_container" x="-1%" y="4.2h" height="74h" width="120h" align="center" noclick="1" clip="1" >
+			<panel name="altcourier_slider" noclick="1" >
+				<panel grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
+					<instance name="altcourier_item" slot="0" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="1" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="2" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="3" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="4" PurchaseAv="true" />
+				</panel>
+				<panel y="18.3h" grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
+					<instance name="altcourier_item" slot="5" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="6" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="7" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="8" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="9" PurchaseAv="true" />
+				</panel>
+				<panel y="36.6h" grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
+					<instance name="altcourier_item" slot="10" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="11" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="12" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="13" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="14" PurchaseAv="true" />
+				</panel>
+				<panel y="54.9h" grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
+					<instance name="altcourier_item" slot="15" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="16" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="17" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="18" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="19" PurchaseAv="true" />
+				</panel>
+				<panel y="73.2h" grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
+					<instance name="altcourier_item" slot="20" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="21" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="22" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="23" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="24" PurchaseAv="true" />
+				</panel>
+				<panel y="91.5h" grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
+					<instance name="altcourier_item" slot="25" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="26" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="27" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="28" PurchaseAv="true" />
+					<instance name="altcourier_item" slot="29" PurchaseAv="true" />
+				</panel>
+			</panel>
+			<panel name="altcourier_scroll_catcher" processonlyscroll="true" />
+		</panel>
+
+		<scrollbar
+			name="altcourier_scroller"
+			visible="true"
+			align="right" width="2.0h" y="4.2h" height="74h" x="0.6h"
+			texture="/ui/info/newstoreslider.tga"
+			minvalue="0"
+			maxvalue="1"
+			handlewidth="2h"
+			handleheight="2h"
+			vertical="true"
+			slotwidth="0.6h" slotheight="1"
+		>
+		</scrollbar>
+		
 		<!-- Store Title -->
 		<panel x="0.2h" y="-1.3h" width="99%" height="5.4h" align="center" noclick="true">
 			<image x="-50@" height="100%" width="-80@" align="right" utile="true" uscale=".4" texture="/ui/fe2/store/store_tab_center.tga" noclick="true"/>
@@ -6154,37 +6216,8 @@
 			</panel>
 
 		</panel>
-
-		<panel y="4.2h" grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
-			<instance name="altcourier_item" slot="0" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="1" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="2" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="3" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="4" PurchaseAv="true" />
-		</panel>
-		<panel y="22.5h" grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
-			<instance name="altcourier_item" slot="5" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="6" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="7" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="8" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="9" PurchaseAv="true" />
-		</panel>
-		<panel y="40.8h" grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
-			<instance name="altcourier_item" slot="10" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="11" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="12" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="13" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="14" PurchaseAv="true" />
-		</panel>
-		<panel y="59.1h" grow="true" float="right" padding="0" height="18.0h" align="center" noclick="true">
-			<instance name="altcourier_item" slot="15" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="16" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="17" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="18" PurchaseAv="true" />
-			<instance name="altcourier_item" slot="19" PurchaseAv="true" />
-		</panel>
-
-		<!-- Confirmation/etc. popups -->
+		
+		<!-- Confirmation/etc. popups -->		
 		<panel width="100%" height="100%" color="0 0 0 0.5" name="game_buycourier_confirmation" onevent0lua="self:FadeIn(150)" onevent1lua="self:FadeOut(150)" visible="false">
 			<panel width="35h" grow="true" regrow="true" align="center" valign="center" noclick="1">
 			<frame color="0 0 0 .8" bordercolor="#455166" borderthickness="1" noclick="1" />

@@ -7,7 +7,7 @@ local _G = getfenv(0)
 local ipairs, pairs, select, string, table, next, type, unpack, tinsert, tconcat, tremove, format, tostring, tonumber, tsort, ceil, floor, sub, find, gfind = _G.ipairs, _G.pairs, _G.select, _G.string, _G.table, _G.next, _G.type, _G.unpack, _G.table.insert, _G.table.concat, _G.table.remove, _G.string.format, _G.tostring, _G.tonumber, _G.table.sort, _G.math.ceil, _G.math.floor, _G.string.sub, _G.string.find, _G.string.gfind
 local interface = object
 local interfaceName = interface:GetName()
-RegisterScript2('Game', '36')
+RegisterScript2('Game', '37')
 Game = {}
 Game.MAX_ALLIES 			= 3
 Game.MAX_ENEMIES 			= 4
@@ -27,7 +27,6 @@ Game.KROSMODE_BASE_HEALTH	= 5000
 
 Game.lastHealthEntity = nil
 Game.lastManaEntity = nil
-
 
 local function GetWidgetGame(widget, fromInterface, hideErrors)
 	--println('GetWidget ' .. tostring(widget) .. ' in interface ' .. tostring(fromInterface)) 
@@ -2206,7 +2205,7 @@ local function InitBackpack()
 			GetWidget('inventory_button_charges_parent_'..slotIndex):SetVisible(true)
 			GetWidget('inventory_button_charges_label_'..slotIndex):SetText(charges)
 			if (charges < 10) then
-				-- OptiUI: Smaller font size for single digit charges
+				-- OptiUI: Bigger font size for single digit charges
 				GetWidget('inventory_button_charges_label_'..slotIndex):SetFont('dyn_9')
 			else
 				GetWidget('inventory_button_charges_label_'..slotIndex):SetFont('dyn_8')
@@ -2581,6 +2580,59 @@ local function InitDynamicProducts()
 	DynamicProductUpdate()
 end
 
+local function InitCourierSelect()
+	local numCouriers = 0
+
+	local scrollbar = GetWidget('altcourier_scroller')
+
+	scrollbar:SetCallback('onslide', function(self)
+		GetWidget('altcourier_slider'):SetY(-tonumber(scrollbar:GetValue())..'h')
+	end)
+
+	local function UpdateSlider()
+		-- 5 couriers per row
+		local numRows = math.ceil(numCouriers / 5)
+
+		local numScrollRows = (numRows - 4)	-- we can display 4 rows
+
+		if (numScrollRows <= 0) then -- don't need to scroll
+			scrollbar:SetValue(0)
+			scrollbar:SetMaxValue(0)
+		else
+			local newMaxValue = numScrollRows * 18.3 	-- based on 'h' height, each row is 18.3h
+
+			local currValue = tonumber(scrollbar:GetValue())
+			if (currValue > newMaxValue) then
+				scrollbar:SetValue(newMaxValue)
+			end
+
+			scrollbar:SetMaxValue(newMaxValue)
+		end
+	end
+
+	-- Register a watch on each courier trigger to help us determine the max we need so we know scrollbar values
+	for i=0,29 do
+		GetWidget('altcourier_container'):RegisterWatch('AltCourierList'..i, function(self, modifier)
+			local courierNumber = (i + 1)
+			if (NotEmpty(modifier)) then
+				numCouriers = math.max(courierNumber, numCouriers)
+			elseif (numCouriers >= courierNumber) then
+				numCouriers = courierNumber - 1
+			end
+
+			UpdateSlider()
+		end)
+	end
+
+	-- scrollcatcher
+	GetWidget('altcourier_scroll_catcher'):SetCallback('onmousewheelup', function(self)
+		scrollbar:SetValue(scrollbar:GetValue() - 3)	-- will scroll it by 3h
+	end)
+	GetWidget('altcourier_scroll_catcher'):SetCallback('onmousewheeldown', function(self)
+		scrollbar:SetValue(scrollbar:GetValue() + 3)	-- will scroll it by 3h
+	end)
+end
+
 ----------------------------------------------------------
 -- 						Init	   						 --
 ----------------------------------------------------------
@@ -2603,6 +2655,7 @@ function Game:InitializeGameInterface()
 	--InitAbililties()
 	InitReactiveTips()
 	InitDynamicProducts()
+	InitCourierSelect()
 	
 	InitSounds = nil
 	InitArcadeText = nil
@@ -2621,8 +2674,8 @@ function Game:InitializeGameInterface()
 	InitActiveInventory = nil
 	--InitAbililties = nil	
 	InitReactiveTips = nil
-	InitWaveTicker = nil
 	InitDynamicProducts = nil
+	InitCourierSelect = nil
 	
 	self.InitializeGameInterface = nil
 end
