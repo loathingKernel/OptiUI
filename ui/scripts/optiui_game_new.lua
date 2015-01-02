@@ -7,7 +7,7 @@ local _G = getfenv(0)
 local ipairs, pairs, select, string, table, next, type, unpack, tinsert, tconcat, tremove, format, tostring, tonumber, tsort, ceil, floor, sub, find, gfind = _G.ipairs, _G.pairs, _G.select, _G.string, _G.table, _G.next, _G.type, _G.unpack, _G.table.insert, _G.table.concat, _G.table.remove, _G.string.format, _G.tostring, _G.tonumber, _G.table.sort, _G.math.ceil, _G.math.floor, _G.string.sub, _G.string.find, _G.string.gfind
 local interface = object
 local interfaceName = interface:GetName()
-RegisterScript2('Game', '37')
+RegisterScript2('Game', '38')
 Game = {}
 Game.MAX_ALLIES 			= 3
 Game.MAX_ENEMIES 			= 4
@@ -23,6 +23,7 @@ Game.INVENTORY_END       	= 53
 Game.INVENTORY_SPEC_1		= 8 	-- Taunt
 Game.INVENTORY_SPEC_2		= 45	-- Fortification
 Game.INVENTORY_SPEC_3		= 9		-- Courier
+Game.INVENTORY_SPEC_4		= 63	-- Ward
 Game.KROSMODE_BASE_HEALTH	= 5000
 
 Game.lastHealthEntity = nil
@@ -125,6 +126,7 @@ local function InitArcadeText()
 		['bamf'] = {3200, 3},
 		['na_khom'] = {3200, 2},
 		['ninja'] = {3200, 2},
+		['ursa'] = {3200, 2},
 	}
 
 	local function ArcadeMessage(message, condition, self, value, set)
@@ -305,13 +307,12 @@ local function InitMidBar()
 			game_base_health_backer:SetVisible(AtoB(healthPercent))
 			game_base_health_backer:SetWidth(ToPercent(tonumber(healthPercent)))
 			game_base_health_bar:SetColor(GetHealthBarColor(healthPercent))
-			if (GetTrigger("GameMode"):GetLastValue() == "krosmode") then
-				game_base_health_label:SetText(Translate("game_krosmode_base_health", "health", math.floor(Game.KROSMODE_BASE_HEALTH * tonumber(healthPercent))))
-				game_base_health_label:SetVisible(1)
-			else
-				game_base_health_label:SetVisible(0)
-			end
-
+			-- if (GetTrigger("GameMode"):GetLastValue() == "krosmode") then
+			-- 	game_base_health_label:SetText(Translate("game_krosmode_base_health", "health", math.floor(Game.KROSMODE_BASE_HEALTH * tonumber(healthPercent))))
+			-- 	game_base_health_label:SetVisible(1)
+			-- else
+			game_base_health_label:SetVisible(0)
+			-- end
 		end
 	end
 	for i=0,1,1 do
@@ -524,10 +525,19 @@ local function InitScoreboard()
 		-- OptiUI: End
 	end
 
-	local function ScoreboardPlayer(index, widget, name, heroName)
+	local function ScoreboardPlayer(index, widget, name, heroName, heroIcon, playerColor)
 		Game.scoreboardInfo[index].name = name
 		Game.scoreboardInfo[index].heroName = heroName
 
+		Game.PlayerIndexByName			= Game.PlayerIndexByName or {}
+		Game.PlayerIndexByName[name]	= index
+		
+		Game.PlayerColorsByIndex		= Game.PlayerColorsByIndex or {}
+		Game.PlayerColorsByIndex[index]	= playerColor
+		
+		Game.PlayerIconPathsByIndex = Game.PlayerIconPathsByIndex or {}
+		Game.PlayerIconPathsByIndex[index] = heroIcon
+		
 		if (name and string.len(name) > 0) then
 			Game.scoreboardVisible[index] = true
 		else
@@ -924,8 +934,8 @@ local function InitAllyInfo()
 		GetWidget('game_top_left_ally_image_'..allyIndex):SetTexture(iconPath)
 		GetWidget('game_top_center_voip_bar_image_'..allyIndex):SetTexture(iconPath)
 		GetWidget('game_top_left_ally_level_label_'..allyIndex):SetText(level)
-		Game.PlayerIconPathsByIndex = Game.PlayerIconPathsByIndex or {}
-		Game.PlayerIconPathsByIndex[allyIndex] = iconPath
+		-- Game.PlayerIconPathsByIndex = Game.PlayerIconPathsByIndex or {}
+		-- Game.PlayerIconPathsByIndex[allyIndex] = iconPath
 	end
 
 	local function AllyStatus(allyIndex, sourceWidget, status)
@@ -987,13 +997,13 @@ local function InitAllyInfo()
 
 		GetWidget('game_top_center_voip_bar_name_'..allyIndex):SetText(playerName)
 		GetWidget('game_top_center_voip_bar_name_'..allyIndex):SetColor(playerColor)
-
+		--[[
 		Game.PlayerColorsByIndex = Game.PlayerColorsByIndex or {}
 		Game.PlayerColorsByIndex[allyIndex] = playerColor
 		
 		Game.PlayerIndexByName = Game.PlayerIndexByName or {}
 		Game.PlayerIndexByName[playerName] = allyIndex
-		
+		--]]
 		--printdb('Ally index:            ' .. Game.PlayerIndexByName[playerName])
 		
 		Game.playerNameToClient = Game.playerNameToClient or {}
@@ -1065,8 +1075,8 @@ local function InitAllyInfo()
 			end
 		end	
 	end
-																--			0			1			2			3			4		  5			  6				  7		           8			9			10			11		12          13         14        15
-	local function AllyAbilityInfo(allyIndex, slotIndex, sourceWidget, abilityValid, unLeveled, canActivate, isActive, isDisabled, needMana, abilityLevel, remainingCooldown, maxCooldown, null,       displayName, iconPath, isPassive, entityName, charges, maxCharges)
+																--			0			1			2			3			4		  5			  6				7			8		9          10         11        12                13            14
+	local function AllyAbilityInfo(allyIndex, slotIndex, sourceWidget, abilityValid, unLeveled, canActivate, isActive, isDisabled, needMana, abilityLevel, displayName, iconPath, isPassive, entityName, charges, maxCharges, remainingCooldown, maxCooldown)
 		local remainingCooldownTime = round(remainingCooldown / 1000)
 		local unLeveled, isDisabled, isPassive, needMana, canActivate, isActive = AtoB(unLeveled), AtoB(isDisabled), AtoB(isPassive), AtoB(needMana), AtoB(canActivate), AtoB(isActive)
 		local remainingCooldown, maxCooldown = AtoB(remainingCooldown), AtoB(maxCooldown)
@@ -1790,7 +1800,10 @@ local function InitBottomSection()
 			GetWidget('game_botright_name_label_0'):SetX('-0.5h')
 			GetWidget('game_botright_name_label_0'):SetVisible(true)
 			GetWidget('game_botright_name_label_0B'):SetVisible(false)
+			GetWidget('game_botright_health_bar_bg_0'):SetAlign('right')
+			GetWidget('game_botright_mana_bar_bg_0'):SetAlign('right')
 			GetWidget('game_selected_info_unit_inventory_parent'):SetAlign('left')
+			GetWidget('game_selected_info_unit_inventory_ward'):SetAlign('left')
 			GetWidget('game_botright_level_bg_0'):SetAlign('left') 		
 			GetWidget('game_selected_info_unit_stats'):SetAlign('right')
 
@@ -1868,8 +1881,10 @@ local function InitBottomSection()
 			GetWidget('game_botright_name_label_0B'):SetX('0.5h')
 			GetWidget('game_botright_name_label_0B'):SetVisible(true)
 			GetWidget('game_botright_name_label_0'):SetVisible(false)
-			GetWidget('game_botright_health_bar_bg_0'):SetAlign('right')
+			GetWidget('game_botright_health_bar_bg_0'):SetAlign('left')
+			GetWidget('game_botright_mana_bar_bg_0'):SetAlign('left')
 			GetWidget('game_selected_info_unit_inventory_parent'):SetAlign('right')
+			GetWidget('game_selected_info_unit_inventory_ward'):SetAlign('right')
 			GetWidget('game_botright_level_bg_0'):SetAlign('right')
 			GetWidget('game_selected_info_unit_stats'):SetAlign('left')
 			
@@ -2229,6 +2244,7 @@ local function InitBackpack()
 	end
 	tinsert(Game.InventorySlotTable, Game.INVENTORY_SPEC_1)
 	tinsert(Game.InventorySlotTable, Game.INVENTORY_SPEC_2)
+	tinsert(Game.InventorySlotTable, Game.INVENTORY_SPEC_4)
 
 	for _,i in ipairs(Game.InventorySlotTable) do
 		-- Indexed Triggers
@@ -2246,6 +2262,40 @@ local function InitBackpack()
 		GetWidget('inventory_button_refresh_'..i):SetCallback('onshow', function() GetWidget('inventory_button_refresh_'..i):UICmd("PlaySound('/shared/sounds/ui/ability_refresh.wav')") end)
 		GetWidget('inventory_button_refresh_'..i):RefreshCallbacks()
 	end
+
+	local activeCanInteract = false
+	local activeIsCourier = false
+	local slotVis = false
+
+	local function HasWard(widget, canInteract, isCourier)
+		local shouldShow = false
+
+		if (canInteract and (not isCourier)) then
+			shouldShow = true
+		end
+
+		if (shouldShow ~= slotVis) then
+			slotVis = shouldShow
+
+			if (slotVis) then
+				widget:Sleep(0, function() end)
+				widget:SlideY('-10.5h', 250)
+			else
+				widget:Sleep(150, function()
+					widget:SlideY('-5.2h', 250)
+				end)
+			end
+		end
+	end
+	GetWidget('game_ward_slot'):RegisterWatch('ActiveCanInteractWithWardSlot', function(widget, canInteract)
+		activeCanInteract = AtoB(canInteract)
+		HasWard(widget, activeCanInteract, activeIsCourier)
+	end)
+
+	GetWidget('game_ward_slot'):RegisterWatch('ActiveCourier', function(widget, courier)
+		activeIsCourier = AtoB(courier)
+		HasWard(widget, activeCanInteract, activeIsCourier)
+	end)
 end
 ----------------------------------------------------------
 -- 					Channel Bar							--
@@ -2471,8 +2521,8 @@ local function InitReactiveTips()
 	
 	local function EnemyHeroInfo(enemyIndex, sourceWidget, displayName, iconPath, heroLevel, heroEntity)
 		--println('EnemyHeroInfo = ' .. tostring(heroEntity) )
-		Game.PlayerIconPathsByIndex = Game.PlayerIconPathsByIndex or {}
-		Game.PlayerIconPathsByIndex[enemyIndex + 5] = iconPath
+		-- Game.PlayerIconPathsByIndex = Game.PlayerIconPathsByIndex or {}
+		-- Game.PlayerIconPathsByIndex[enemyIndex + 5] = iconPath
 		if (heroEntity) and NotEmpty(heroEntity) and (Game.canLoadEnemyTips) then
 			for i = 1,4,1 do
 				if Translate('hero_tip_defensive_tip_'..heroEntity..'_'..i) ~= ('hero_tip_defensive_tip_'..heroEntity..'_'..i) then
@@ -2485,11 +2535,11 @@ local function InitReactiveTips()
 
 	local function EnemyPlayerInfo(enemyIndex, sourceWidget, playerName, playerColor, clientNumber)
 		
-		Game.PlayerColorsByIndex = Game.PlayerColorsByIndex or {}
-		Game.PlayerColorsByIndex[enemyIndex + 5] = playerColor
+		-- Game.PlayerColorsByIndex = Game.PlayerColorsByIndex or {}
+		-- Game.PlayerColorsByIndex[enemyIndex + 5] = playerColor
 		
-		Game.PlayerIndexByName = Game.PlayerIndexByName or {}
-		Game.PlayerIndexByName[playerName] = enemyIndex + 5
+		-- Game.PlayerIndexByName = Game.PlayerIndexByName or {}
+		-- Game.PlayerIndexByName[playerName] = enemyIndex + 5
 		
 		--printdb('Enemy index:            ' .. Game.PlayerIndexByName[playerName])
 	end

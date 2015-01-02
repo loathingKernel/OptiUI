@@ -11,7 +11,7 @@
 
 	<lua file="/ui/scripts/optiui_game_new.lua" />
 
-	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '37') Game:InitializeGameInterface()"/> 
+	<panel name="lod_game_unload_delay" noclick="1" onloadlua="RegisterScript2('Game_Interface', '38') Game:InitializeGameInterface()"/>
 
 	<!-- Packages -->
 	<childinterface file="ui_items_1.interface" />
@@ -63,15 +63,22 @@
 				GetWidget('game_buycourier_Error', 'game'):DoEventN(0)
 			elseif (tonumber(param1) == 3) then
 				GetWidget('game_buycourier_Success', 'game'):DoEventN(0)
+
 				self:UICmd('ChatRefreshUpgrades(); ClientRefreshUpgrades(); ServerRefreshUpgrades()')
 			end
 		"
 
 		watch2="gameBuycourierStatus"
 		ontrigger2lua="
-			if (tonumber(param0) == 3) then
+			local requestStatus = tonumber(param0)
+			
+			if (requestStatus == 3) then
 				GetWidget('game_buycourier_Error', 'game'):DoEventN(0)
 			end
+		"
+		watch3="UpgradesRefreshed"
+		ontrigger3lua="
+			UpdateAltCourierList()
 		"
 	/>
 
@@ -114,6 +121,8 @@
 			onenter="{onenter}"
 			onenterlua="PlaySound('{sound='/shared/sounds/ui/ccpanel/button_click_02.wav}') {onenterlua}"
 			onshow="{onshow}"
+			onhide="{onhide}"
+			onhidelua="{onhidelua}"
 			hotkey="{hotkey}"
 			onhotkey="{onhotkey}"
 			onhotkeylua="PlaySound('{sound=/shared/sounds/ui/ccpanel/button_click_02.wav}') {onhotkeylua}"
@@ -1667,6 +1676,49 @@
 		</panel>
 	</template>
 
+	<template name="inventory_info_ward" >
+		<panel noclick="1" visible="0"
+			watch="SelectedInventoryExists{slot}"
+			ontriggerlua="self:SetVisible(AtoB(param))"
+		>
+			<panel align="center" valign="center" 
+				onmouseoverlua="GetWidget('inventory_info_tooltip{slot}', 'game'):SetVisible(1)"
+				onmouseoutlua="GetWidget('inventory_info_tooltip{slot}', 'game'):SetVisible(0)"
+				onhidelua="GetWidget('inventory_info_tooltip{slot}', 'game'):SetVisible(0)"
+			>
+				<image usealphamask="true" alphamaskfile="/ui/masks/circle_mask.tga" noclick="true"
+					watch="SelectedInventoryIcon{slot}"
+					ontriggerlua="self:SetTexture(param)"
+				/>
+
+				<piegraph start="270" end="-90" color="#000000cc" noclick="true"
+					watch="SelectedInventoryCooldown{slot}"
+					ontriggerlua="self:SetVisible(tonumber(param1) > 0) self:SetValue(param2)"
+				/>
+
+				<!-- Info Charges -->
+				<panel
+					width="50.00%"
+					height="50.00%"
+					align="right"
+					valign="top"
+					watch="SelectedInventoryCharges{slot}"
+					ontriggerlua="self:SetVisible(tonumber(param) > 0)"
+					noclick="true"
+					passivechildren="true"
+					color="0 0 0 .6"
+				>
+					<label textalign="center" textvalign="center" color="white" font="dyn_10"
+						watch="SelectedInventoryCharges{slot}"
+						ontriggerlua="self:SetText(param);"
+					/>
+					<frame borderthickness="1" bordercolor="{bordercolor=gray}" color="invisible"/>
+				</panel>
+			</panel>
+			<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1" />
+		</panel>
+	</template>
+
 	<template name="inventory_info">
 		<panel>
 			<panel
@@ -2512,6 +2564,24 @@
 		</panel>
 	</template>
 
+	<template name="minimap_inventory_item_hiding">
+		<panel width="100@" height="100%" noclick="true" sticky="1" stickytoinvis="0"
+			watch="MinimapHover"
+			ontriggerlua="self:SetVisible(NotEmpty(param{param}))"
+		>
+			<image texture="/ui/common/empty_pack.tga" color=".6 .6 .6 1" watch="MinimapHover"
+				ontriggerlua="	if (param{param} ~= '') then
+									self:SetTexture(param{param})
+									self:SetColor('1 1 1 1')
+								else
+									self:SetTexture('/ui/common/empty_pack.tga')
+									self:SetColor('.6 .6 .6 1')
+								end"
+			/>			
+			<frame color="invisible" borderthickness="1" bordercolor=".1 .1 .1 1"/>
+		</panel>
+	</template>
+
 	<template name="minimap_inventory_item">
 		<panel width="100@" height="100%" noclick="true">
 			<image texture="/ui/common/empty_pack.tga" color=".6 .6 .6 1" watch="MinimapHover"
@@ -3250,6 +3320,7 @@
 				"
 				onmouseoverlua="GetWidget('game_menu_tip_kick', 'game'):SetVisible(1)"
 				onmouseoutlua="GetWidget('game_menu_tip_kick', 'game'):SetVisible(0)"
+				onhidelua="GetWidget('game_menu_tip_kick', 'game'):SetVisible(0)"
 			/>
 
 			<!-- Spec VOIP -->
@@ -3808,7 +3879,7 @@
 							texture="/ui/common/optiui_alt_courier.tga"
 							onmouseoverlua="GetWidget('alt_courier_select_tip', 'game'):SetVisible(1)"
 							onmouseoutlua="GetWidget('alt_courier_select_tip', 'game'):SetVisible(0)"
-							onclicklua="GetWidget('altcourier_select', 'game'):SetVisible(1)"
+							onclicklua="GetWidget('altcourier_select', 'game'):DoEventN(0)"
 							interactive="false"
 							enabled="true"
 						/>
@@ -4016,10 +4087,10 @@
 			</panel>
 
 			<!-- Shop Indicator -->
-			<panel name="item_shop_sign" y="-10.8h" width="4.5h" height="4.5h" align="right" valign="bottom" visible="true" >
+			<panel name="item_shop_sign" x="-5.5h" y="-10.8h" width="4.0h" height="4.0h" align="right" valign="bottom" visible="true" >
 				<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" />
 				<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
-				<image height="4.5h" width="4.5h" y="0h" valign="top" align="center" texture="common/optiui_sign.tga" />
+				<image valign="top" align="center" texture="common/optiui_sign.tga" />
 				<!-- UIScript -->
 				<button
 					color="invisible"
@@ -4028,41 +4099,6 @@
 					onclick="PlaySound('/shared/sounds/ui/shop.wav'); If(ItemCursorVisible and PlayerCanShop, Sell(), ToggleShop());"
 					interactive="false"
 				/>
-			</panel>
-
-			<!-- Backpack -->
-			<panel x="0.0h" y="0.0h" width="16.0h" height="10.1h" align="right" valign="bottom" color="invisible" noclick="true"
-				onloadlua="
-					GameUIManager.RegisterFeatureAndSection(self, 'Inventory',
-					function(map)
-						return (map ~= 'prophets')
-					end,
-					nil,
-					function()
-						GetWidget('bottom_center_inventory_cover', 'game'):SetVisible(1)
-					end
-					)
-				"
-			>
-				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h">
-						<instance name="inventory_button" slot="48"/>
-					</panel>
-				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" align="center">
-						<instance name="inventory_button" slot="49"/>
-					</panel>
-				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" align="right">
-						<instance name="inventory_button" slot="50"/>
-					</panel>
-
-				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom">
-						<instance name="inventory_button" slot="51"/>
-					</panel>
-				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom" align="center">
-						<instance name="inventory_button" slot="52"/>
-					</panel>
-				<panel x="0.0h" y="0.0h" width="4.9h" height="4.9h" valign="bottom" align="right">
-						<instance name="inventory_button" slot="53"/>
-				</panel>
 			</panel>
 
 			<panel noclick="1"
@@ -4100,16 +4136,61 @@
 				<frame borderthickness="1" bordercolor="gray" color="invisible" noclick="0" />
 			</panel>
 
+			<!-- Ward Slot -->
+			<panel name="game_ward_slot" width="4.9h" height="4.9h" align="right" valign="bottom" noclick="1"
+				watch="ActiveCourier"
+				ontriggerlua="self:SetVisible(not AtoB(param))"
+			>
+				<panel noclick="1" align="center" valign="center" >
+					<instance name="inventory_button" slot="63" />
+				</panel>
+			</panel>
+
+			<!-- Backpack -->
+			<panel width="16.0h" height="10.1h" align="right" valign="bottom" color="invisible" noclick="true"
+				onloadlua="
+					GameUIManager.RegisterFeatureAndSection(self, 'Inventory',
+					function(map)
+						return (map ~= 'prophets')
+					end,
+					nil,
+					function()
+						GetWidget('bottom_center_inventory_cover', 'game'):SetVisible(1)
+					end
+					)
+				"
+			>
+				<panel width="4.9h" height="4.9h">
+						<instance name="inventory_button" slot="48"/>
+					</panel>
+				<panel width="4.9h" height="4.9h" align="center">
+						<instance name="inventory_button" slot="49"/>
+					</panel>
+				<panel width="4.9h" height="4.9h" align="right">
+						<instance name="inventory_button" slot="50"/>
+					</panel>
+
+				<panel width="4.9h" height="4.9h" valign="bottom">
+						<instance name="inventory_button" slot="51"/>
+					</panel>
+				<panel width="4.9h" height="4.9h" valign="bottom" align="center">
+						<instance name="inventory_button" slot="52"/>
+					</panel>
+				<panel width="4.9h" height="4.9h" valign="bottom" align="right">
+						<instance name="inventory_button" slot="53"/>
+				</panel>
+			</panel>
+
 			<!-- Inventory -->
-			<panel name="inventory" x="0.0h" y="0.0h" width="16.0h" height="13.0h" align="right" valign="bottom" color="invisible" noclick="true">
+			<panel name="inventory" width="16.0h" height="13.0h" align="right" valign="bottom" color="invisible" noclick="true">
 				<!-- Gold Amt / Shop Button -->
-				<panel name="shop_button" width="8.4h" height="2.3h" >
+				<panel name="shop_button" width="6.4h" height="2.3h" >
 					<frame texture="/ui/frames/rounded_bg_white.tga" borderthickness=".6h" color="0 0 0 .6" />
 					<frame texture="/ui/frames/roundframe.tga" bordercolor="gray" borderthickness=".6h" />
 
 					<!-- UIScript -->
-					<image x="1" y="-1" height="2.1h" width="2.1h" valign="bottom" align="left" texture="common/optiui_gold.tga"/>
-					<label name="game_center_gold_label" y="0.0h" x="2.3h" fitx="1" height="100%" align="left" textalign="left" textvalign="bottom" font="dyn_10" color="white" outline="1" />
+					<image x="1" y="-1" height="2.2h" width="2.2h" valign="bottom" align="left" texture="common/optiui_gold.tga"/>
+					<label name="game_center_gold_label" y="0.0h" x="1.6h" fitx="1" height="100%" align="left" textalign="left" textvalign="bottom" font="dyn_11" color="white" outline="1" />
 					<!-- UIScript -->
 					<button
 						color="invisible"
@@ -4121,24 +4202,7 @@
 				</panel>
 
 				<!-- Gold Report -->
-				<floater name="shop_tooltip_gold_report" height="14h" width="38h" x="-4h" y="1.5h" align="left" valign="bottom" color="invisible" noclick="true" visible="false" onload="ForceToFront();">
-					<panel growinvis="false" color="0 0 0 .6" noclick="true">
-						<frame color="invisible" borderthickness="1" bordercolor=".2 .2 .2 1" />
-						<panel valign="center" padding="1%" vpadding="1%">
-							<panel valign="center" height="100%" width="100%" >
-								<label x="0.75h" y="0.75h" font="dyn_10" content="" color=".8 .6 .0 1" outline="true" outlineoffset="1" outlinecolor="0 0 0 1" textalign="left" textvalign="center" align="left" valign="center"
-								onloadlua="self:SetText(Translate('game_gold_report'));" />
-							</panel>
-							<panel valign="center" height="100%" width="100%" >
-								<label x="-0.25h" y="0.75h" font="dyn_10" content="" color=".8 .6 .0 1" outline="true" outlineoffset="1" outlinecolor="0 0 0 1" textalign="right" textvalign="center" align="right" valign="center" watch="GoldReport"
-								ontriggerlua="self:SetText(FormatStringNewline( '^870' .. param0 .. '\\n^870' .. param1 .. '\\n^870' .. param2 .. '\\n^870' .. param4 .. '\\n^r' .. param3 .. '\\n^v' .. param5 .. '\\n^v' .. param6 .. '\\n^w' .. param7 .. '\\n' ))"
-								onloadlua="self:SetText(FormatStringNewline( '^8700\\n ^8700\\n ^8700\\n ^8700\\n ^r0\\n ^v0\\n ^v0\\n ^w0\\n'))"/>
-							</panel>
-						</panel>
-					</panel>
-				</floater>
-
-				<instance name="simple_tooltip" tip_id="shop_tooltip" x="-4.2h" y="-3.8h" width="13.0h" height="2.8h" color="1 1 1 1" align="left" label="game_button_open_close_shop" visible="0"/>
+				<instance name="simple_tooltip" tip_id="shop_tooltip" x="6.65h" y="-7.5h" width="13.0h" height="2.8h" color="1 1 1 1" align="right" label="game_button_open_close_shop" visible="0"/>
 			</panel>
 
 		</panel>
@@ -4297,7 +4361,7 @@
 	<!-- Map Hover Popup
 		Needs to align left or right based on mini map location selection
 	-->
-	<floater grow="true" x="0.5h" y="1.0h" align="left" valign="bottom" color="invisible" noclick="true" name="mini_map_hover" onloadlua="self:ForceToFront()" visible="false"
+	<floater grow="true" regrow="1" x="0.5h" y="1.0h" align="left" valign="bottom" color="invisible" noclick="true" name="mini_map_hover" onloadlua="self:ForceToFront()" visible="false"
 		watch="MinimapHover"
 		ontriggerlua="
 			if (GetCvarBool('ui_minimap_rightside')) then
@@ -4321,6 +4385,7 @@
 			<panel
 				visible="false"
 				grow="true"
+				regrow="true"
 				float="bottom"
 				watch="MinimapHover"
 				ontriggerlua="if (AtoB(param0)) then self:SetVisible(AtoB(param1) and (not AtoB(param2))) end"
@@ -4365,7 +4430,7 @@
 				</panel>
 				<panel width="100%" height="0.2h" />
 				<!-- Inventory -->
-				<panel grow="true" height="1.7h" float="right" padding="0.1h">
+				<panel grow="true" regrow="1" growinvis="0" height="1.7h" float="right" padding="0.1h" >
 					<panel width="0.3h" height="100%"/>
 					<instance name="minimap_inventory_item" param="7" />
 					<instance name="minimap_inventory_item" param="8" />
@@ -4373,7 +4438,8 @@
 					<instance name="minimap_inventory_item" param="10" />
 					<instance name="minimap_inventory_item" param="11" />
 					<instance name="minimap_inventory_item" param="12" />
-					<panel width="0.3h" height="100%"/>
+					<instance name="minimap_inventory_item_hiding" param="13" />
+					<panel width="0.3h" height="100%" sticky="1" stickytoinvis="0"/>
 				</panel>
 
 				<panel width="100%" height="0.2h" />
@@ -4422,8 +4488,7 @@
 				>
 					<panel width="-0.6h" align="center">
 						<panel width="2" color="1 0 0 1"/>
-						<panel watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetWidth(FtoP(param5)) if (not AtoB(param13)) then self:SetColor(Saturate(1 - (tonumber(param5) - 0.50) / 0.50), (tonumber(param5) + (((tonumber(param5) - 0.05) / 1.0) * 0.2)) / 0.45, 0, 1) else self:SetColor('1 1 0') end end" color="0 1 0 0">
-							<frame color="invisible" borderthickness="1" bordercolor="0 0 0 1" />
+						<panel watch="MinimapHover" ontriggerlua="if (AtoB(param0)) then self:SetWidth(FtoP(param5)) if (not AtoB(param14)) then self:SetColor(Saturate(1 - (tonumber(param5) - 0.50) / 0.50), (tonumber(param5) + (((tonumber(param5) - 0.05) / 1.0) * 0.2)) / 0.45, 0, 1) else self:SetColor('1 1 0') end end" color="0 1 0 0">							<frame color="invisible" borderthickness="1" bordercolor="0 0 0 1" />
 						</panel>
 					</panel>
 				</panel>
@@ -4653,6 +4718,8 @@
 					<!-- Health -->
 					<panel name="game_botright_health_bar_bg_0"
 						height="1.5h"
+						width="12.5h"
+						align="right"
 						color="invisible"
 						onmouseoverlua="GetWidget('health_tooltip_info', 'game'):SetVisible(1)"
 						onmouseoutlua="GetWidget('health_tooltip_info', 'game'):SetVisible(0)"
@@ -4671,6 +4738,8 @@
 					<!-- Mana -->
 					<panel name="game_botright_mana_bar_bg_0"
 						height="1.5h"
+						width="12.5h"
+						align="right"
 						color="invisible"
 						onmouseoverlua="GetWidget('mana_tooltip_info', 'game'):SetVisible(1)"
 						onmouseoutlua="GetWidget('mana_tooltip_info', 'game'):SetVisible(0)"
@@ -4707,6 +4776,15 @@
 						</panel>
 						<panel height="48%" width="48@" align="right" valign="bottom" color="invisible">
 							<instance name="inventory_info" slot="53" bordercolor=".3 .3 .3 1" />
+						</panel>
+					<!-- </panel> -->
+
+					<!-- Ward Slot -->
+					<!-- <panel width="12.0h" height="7.7h" align="right" valign="bottom" color="invisible" noclick="1" > -->
+						<panel name="game_selected_info_unit_inventory_ward" height="3.1h" width="3.1h" y="-8.1h" valign="bottom" noclick="1" >
+							<image texture="/ui/legion/empty_pack.tga"/>
+							<frame color="invisible" bordercolor=".3 .3 .3 1" borderthickness="1" noclick="1" />
+							<instance name="inventory_info_ward" slot="63" bordercolor=".3 .3 .3 1" />
 						</panel>
 					<!-- </panel> -->
 
@@ -5089,14 +5167,14 @@
 
 		<instance name="ability_tooltip" id="ability_tooltip45" slot="45" help="true" />
 
-		<instance name="ability_tooltip" id="ability_tooltip63" slot="63" help="true" />
-		
 		<instance name="ability_tooltip" id="ability_tooltip48" slot="48" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip49" slot="49" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip50" slot="50" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip51" slot="51" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip52" slot="52" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip53" slot="53" help="true" />
+
+		<instance name="ability_tooltip" id="ability_tooltip63" slot="63" help="true" />
 
 		<instance name="ability_tooltip" id="stash_tooltip0" slot="64" help="false" />
 		<instance name="ability_tooltip" id="stash_tooltip1" slot="65" help="false" />
@@ -5120,8 +5198,6 @@
 		<instance name="ability_tooltip" id="ability_tooltip_shared45" slot="45" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip_shared46" slot="46" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip_shared47" slot="47" help="true" />
-
-		<instance name="ability_tooltip" id="ability_tooltip_shared63" slot="63" help="true" />
 		
 		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared45" slot="45" help="true" />
 		<instance name="ability_levelup_tooltip" id="ability_levelup_tooltip_shared46" slot="46" help="true" />
@@ -5173,6 +5249,8 @@
 		<instance name="ability_info_tooltip" id="inventory_info_tooltip52" slot="52" help="true" />
 		<instance name="ability_info_tooltip" id="inventory_info_tooltip53" slot="53" help="true" />
 
+		<instance name="ability_info_tooltip" id="inventory_info_tooltip63" slot="63" help="true" />
+
 		<instance name="ability_info_tooltip" id="state_info_tooltip13" slot="13" help="false" />
 		<instance name="ability_info_tooltip" id="state_info_tooltip14" slot="14" help="false" />
 		<instance name="ability_info_tooltip" id="state_info_tooltip15" slot="15" help="false" />
@@ -5208,6 +5286,8 @@
 		<instance name="ability_tooltip" id="ability_tooltip_simple51" slot="51" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip_simple52" slot="52" help="true" />
 		<instance name="ability_tooltip" id="ability_tooltip_simple53" slot="53" help="true" />
+
+		<instance name="ability_tooltip" id="ability_tooltip_simple63" slot="63" help="true" />
 
 		<instance name="ability_tooltip" id="stash_tooltip_simple0" slot="64" help="false" />
 		<instance name="ability_tooltip" id="stash_tooltip_simple1" slot="65" help="false" />
@@ -5388,6 +5468,7 @@
 				Set('is_dev_game', Dev);
 				SetVisible(Dev and (!ui_isBotMatch or releaseStage_test));
 				If(ui_isBotMatch, Set('g_disableFogOfWar', false));
+				If(ui_isBotMatch, Set('testpp_autoRefresh', false));
 				if((!Dev or (ui_isBotMatch and !releaseStage_test)) and WidgetExists('testpp_Win_Main'),
 					Split(
 						HideWidget('testpp_Win_Main'),
@@ -6057,7 +6138,7 @@
 		grow="true" align="center" valign="center" y="-7.0h"
 		visible="false"
 		cangrab="true"
-		onevent0lua="self:SetVisible(true)"
+		onevent0lua="self:SetVisible(true); UpdateAltCourierList()"
 		onevent1lua="self:SetVisible(false)"
 		onevent2lua="self:SetVisible(false)"
 		watch="AltCourierAccess"
@@ -6631,6 +6712,34 @@
 
 	<instance name="generic_dialog_box_game_template" />
 	<instance name="generic_dialog_box_combo_game_template" />
+		
+	<!-- Gold Report -->
+	<template name="goldReportField">
+		<panel height="2.5h">
+			<frame texture="/ui/frames/rounded_bg_white.tga" color="{bgcolor=1 1 1 0.075}" bordercolor="{bgcolor=1 1 1 0.075}" borderthickness="0.25h"/>
+			<panel hmargin="0.25h" vmargin="0.5h">
+				<label textvalign="center" color="{color=white}" outline="true" font="dyn_10" content="{label}"/>
+				<label textvalign="center" color="{color=white}" outline="true" textalign="right" font="dyn_10" content="-" watch="GoldReport" ontriggerlua="self:SetText({param})"/>
+			</panel>
+		</panel>
+	</template>
+	
+	<floater name="shop_tooltip_gold_report" grow="true" regrow="true" width="34h" x="-4h" y="2h" valign="bottom" color="invisible" visible="false">
+		<frame texture="/ui/frames/tooltip_bg.tga" color="0 0 0 .8" borderthickness="0.5h" />
+		<frame texture="/ui/frames/roundframe.tga" color="#A0A0A0" borderthickness="0.5h" />	
+		<panel grow="true" align="center" width="-1h" float="bottom" padding="0">
+			<panel height="0.5h"/>
+			<instance name="goldReportField" label="gold_report_kills" param="param0"/>
+			<instance name="goldReportField" label="gold_report_assists" param="param1" bgcolor="0 0 0 0.15"/>
+			<instance name="goldReportField" label="gold_report_buildings" param="param2"/>
+			<instance name="goldReportField" label="gold_report_creeps" param="param4" bgcolor="0 0 0 0.15"/>
+			<instance name="goldReportField" label="gold_report_lost_to_death" param="param3" color="#FF2222"/>
+			<instance name="goldReportField" label="gold_report_buyback_cost" param="param5" bgcolor="0 0 0 0.15" color="#999999"/>
+			<instance name="goldReportField" label="gold_report_to_lose_on_death" param="param6" color="#999999"/>
+			<instance name="goldReportField" label="gold_report_gpm" param="param7" bgcolor="0 0 0 0.15" color="#FFCC00"/>
+			<panel height="0.5h"/>
+		</panel>
+	</floater>
 
 	<!--
 		Generic Floating Tooltip System

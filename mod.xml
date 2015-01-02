@@ -4,13 +4,13 @@
     appversion="3*"
     mmversion="1.3"
     name="OptiUI"
-    version="0.2.2.2"
-    date="2014/10/23"
+    version="0.2.3"
+    date="2015/1/2"
     description="
         Optimized User Interface
 
         In this version:
-        Update to the courier inteface.
+        Added the ward slot.
 	"
     author="Trelokotsidu"
     weblink="http://forums.heroesofnewerth.com/showthread.php?508702"
