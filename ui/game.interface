@@ -95,6 +95,24 @@
 	/>
 
 	<!-- Templates -->
+	<template name="promptReviveButtonOKState">
+		<widgetstate statename="{statename}" x="{x}" y="{y}">
+			<image texture="{texture=/ui/common/prompt_revive_button_ok.tga}" rendermode="{rendermode=normal}" color="{color=white}"/>
+		</widgetstate>
+	</template>
+
+	<template name="promptReviveButtonOK">
+		<button name="{id}" width="{width=100%}" height="{height=100%}" x="{x}" y="{y}" align="{align}" valign="{valign}" color="invisible" watch="{watch}" ontriggerlua="{ontriggerlua}">
+			<instance name="promptReviveButtonOKState" texture="{texture=/ui/common/prompt_revive_button_ok.tga}" statename="up" color="0.9 0.9 0.9"/>
+			<instance name="promptReviveButtonOKState" texture="{texture=/ui/common/prompt_revive_button_ok.tga}" statename="over"/>
+			<instance name="promptReviveButtonOKState" texture="{texture=/ui/common/prompt_revive_button_ok.tga}" statename="down" color="0.65 0.65 0.65" x="1" y="1"/>
+			<instance name="promptReviveButtonOKState" texture="{texture=/ui/common/prompt_revive_button_ok.tga}" statename="disabled" rendermode="grayscale" color="0.75 0.75 0.75"/>
+		</button>
+	</template>
+
+	<template name="promptReviveButtonCancel">
+		<instance name="promptReviveButtonOK" id="{id}" width="{width=100%}" height="{height=100%}" x="{x}" y="{y}" align="{align}" valign="{valign}" texture="{texture=/ui/common/prompt_revive_button_ok.tga}" watch="{watch}" ontriggerlua="{ontriggerlua}"/>
+	</template>
 	<template name="kick_button">
 		<button
 			x="{x=}" y="{y=}" width="{width=100%}" height="{height=100%}" align="{align=}" valign="{valign=}"
@@ -6736,6 +6754,48 @@
 				/>
 			</panel>
 		</panel>
+	</panel>
+	
+	<trigger name="deadlift_do_you_want_rezzed" />
+	<trigger name="hide_deadlift_do_you_want_rezzed" />
+
+	<panel name="deadliftTest" align="center" valign="center" width="35h" height="35h" noclick="true" visible="false" watch="deadlift_do_you_want_rezzed" ontriggerlua="self:SetVisible(1)" watch2="hide_deadlift_do_you_want_rezzed" ontrigger2lua="self:SetVisible(0)">
+		<image texture="/ui/common/prompt_revive_backer.tga" noclick="true"/>
+		<instance name="promptReviveButtonOK" id="promptReviveButtonOK" width="33@" height="16.5%" x="12@" y="55.35%"
+			watch="deadlift_do_you_want_rezzed"
+			ontriggerlua="
+				local index = tonumber(param2)
+				self:SetCallback('onclick', function()
+					SendScriptMessage('deadlift_yes_i_want_rezzed', '1', index)
+					GetWidget('deadliftTest', 'game'):SetVisible(0)
+				end)
+			"/>
+		<instance name="promptReviveButtonOK" id="promptReviveButtonCancel" width="33@" height="16.5%" x="55@" y="55.35%" texture="/ui/common/prompt_revive_button_cancel.tga"
+			watch="deadlift_do_you_want_rezzed"
+			ontriggerlua="
+				local index = tonumber(param2)
+				self:SetCallback('onclick', function()
+					SendScriptMessage('deadlift_yes_i_want_rezzed', '-1', index)
+					GetWidget('deadliftTest', 'game'):SetVisible(0)
+				end)
+			"/>
+
+		<label name="promptReviveTitle" noclick="true" align="center" height="3h" valign="bottom" y="-93%" color="white" outline="true" font="dyn_18" textalign="center" textvalign="center" content="game_prompt_revive_title"/><!-- U wanna rez bby? -->
+		<label name="promptReviveTime" noclick="true" align="center" y="72.26%" width="24@" height="11%" font="dyn_14" color="white" textalign="center" textvalign="center" outline="true" content=":00"
+			watch="deadlift_do_you_want_rezzed"
+			ontriggerlua="
+			local time = ((tonumber(param0) * 1000) + tonumber(GetTrigger('GameTime'):GetLastValue()))
+			self:RegisterWatch('GameTime', function(self, gameTime)
+				gameTime = tonumber(gameTime)
+				local timeDiff = time - gameTime
+
+				if (0 >= timeDiff) then
+					GetWidget('deadliftTest', 'game'):SetVisible(0)
+					self:UnregisterWatch('GameTime')
+				end
+				self:SetText(round(timeDiff / 1000, 1)..'s')
+			end)
+		"/>
 	</panel>
 
 	<instance name="generic_dialog_box_game_template" />
