@@ -131,7 +131,8 @@ local function InitArcadeText()
 
 	local function ArcadeMessage(message, condition, self, value, set)
 		-- OptiUI: Option to disable arcade messages
-		if (not GetCvarBool('optiui_ArcadeMessagesDisabled')) then
+		local arcadeMessages = not GetCvarBool('optiui_ArcadeMessagesDisabled') 
+		if (arcadeMessages == true) then
 			if (condition == true) or (condition == tonumber(value)) then		
 				local modelPanel = GetWidget('game_arcade_model_'..Game.arcadeSetTable[set][2], 'game')
 				if (not modelPanel) then
@@ -755,7 +756,8 @@ local function RapButtonRefreshVis()
 		-- we have an ignore selection in the menu now, this is always visible minus for bots
 		if (visState.allyIndex) then
 			-- OptiUI: Added option to disable right click menu
-			if ((not localSpectator) and (not visState.isBot) and (not GetCvarBool('optiui_AllyFramesDisableRightClick'))) then
+			local disableRightClick = GetCvarBool('optiui_AllyFramesDisableRightClick')
+			if ((not localSpectator) and (not visState.isBot) and (not disableRightClick)) then
 			-- OptiUI: end
 				GetWidget('ally_right_click_menu_button_' .. visState.allyIndex):SetCallback('onrightclick', function() interface:UICmd("CallEvent('ally_right_click_menu_".. visState.allyIndex .."');") end )
 			else
@@ -841,7 +843,8 @@ end
 local function InitAllyInfo()
 
 	-- OptiUI: Position ally icons based on option
-	if GetCvarBoolMem('optiui_AllyFramesWide') then
+	local wideAllyFrames = GetCvarBoolMem('optiui_AllyFramesWide')
+	if wideAllyFrames then
 		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon_wide', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','0')
 		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon_wide', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','1')
 		GetWidget('game_ally_display_holder'):Instantiate('team_member_icon_wide', 'group','team_member_icon_group', 'y','0%', 'align','left', 'index','2')
@@ -857,7 +860,8 @@ local function InitAllyInfo()
 
 		--groupfcall('team_member_icon_group', function(index, widget, groupName) widget:Destroy() end)
 
-		if GetCvarBool('optiui_AllyFramesWidescreen') then
+		local bottomAllyFrames = GetCvarBool('optiui_AllyFramesWidescreen')
+		if bottomAllyFrames then
 			GetWidget('game_ally_display_holder'):SetAlign("center")
 			GetWidget('game_ally_display_holder'):SetVAlign("bottom")
 			GetWidget('game_ally_display_holder'):SetY("-1.0h")
@@ -865,7 +869,7 @@ local function InitAllyInfo()
 			GetWidget('game_ally_display_holder'):SetWidth("107.0h")
 			GetWidget('game_ally_display_holder'):SetHeight("10.1h")
 
-			if GetCvarBoolMem('optiui_AllyFramesWide') then
+			if wideAllyFrames then
 				GetWidget('game_top_left_ally_parent_1'):SetVAlign("bottom")
 				GetWidget('game_top_left_ally_parent_1'):SetX('0.0h')
 
@@ -901,7 +905,7 @@ local function InitAllyInfo()
 			GetWidget('game_ally_display_holder'):SetVAlign("left")
 			GetWidget('game_ally_display_holder'):SetY("6.1h")
 
-			if GetCvarBoolMem('optiui_AllyFramesWide') then
+			if wideAllyFrames then
 				GetWidget('game_ally_display_holder'):SetWidth("13.5h")
 				GetWidget('game_ally_display_holder'):SetHeight("21.0h")
 			else
@@ -917,8 +921,9 @@ local function InitAllyInfo()
 			end
 		end
 
+		local showGold = GetCvarBool('optiui_AllyFramesShowGold')
 		for i=0,Game.MAX_ALLIES,1 do
-			GetWidget('game_top_left_ally_gold_'..i):SetVisible(GetCvarBool('optiui_AllyFramesShowGold'))
+			GetWidget('game_top_left_ally_gold_'..i):SetVisible(showGold)
 		end
 
 	end
@@ -1031,7 +1036,7 @@ local function InitAllyInfo()
 		GetWidget('game_top_left_ally_health_'..allyIndex):SetWidth(tempHealthPercent)
 		GetWidget('game_top_left_ally_health_'..allyIndex):SetColor(GetHealthBarColor(healthPercent))
 		-- OptiUI: Print maxHealth in wide frames
-		if GetCvarBoolMem('optiui_AllyFramesWide') then
+		if wideAllyFrames then
 			GetWidget('game_top_left_ally_health_label_'..allyIndex):SetText(round(health)..'/'..round(maxHealth))
 		else
 			GetWidget('game_top_left_ally_health_label_'..allyIndex):SetText(round(health))
@@ -1045,7 +1050,7 @@ local function InitAllyInfo()
 			GetWidget('game_top_left_ally_mana_'..allyIndex):SetVisible(mana > 0)
 			GetWidget('game_top_left_ally_mana_'..allyIndex):SetWidth(tempManaPercent)
 			-- OptiUI: Print maxHealth in wide frames
-			-- if GetCvarBoolMem('optiui_AllyFramesWide') then
+			-- if wideAllyFrames then
 				-- GetWidget('game_top_left_ally_mana_label_'..allyIndex):SetText(round(mana)..'/'..round(maxMana))
 			-- else
 				GetWidget('game_top_left_ally_mana_label_'..allyIndex):SetText(round(mana))
@@ -1058,7 +1063,8 @@ local function InitAllyInfo()
 
 	local function AllyVoice(allyIndex, sourceWidget, usingVOIP, statusVOIP)
 		local usingVOIP, statusVOIP = AtoB(usingVOIP), AtoB(statusVOIP)
-		if (GetCvarBool('optiui_ShowVoipBars')) then
+		local showVoip = GetCvarBool('optiui_ShowVoipBars')
+		if (showVoip) then
 			GetWidget('game_top_left_ally_voip_'..allyIndex):SetVisible(false)
 			GetWidget('game_top_center_voip_bar_'..allyIndex):SetVisible(usingVOIP)
 		else
@@ -1393,17 +1399,22 @@ local function InitBottomCenterPanel()
 
 	-- OptiUI: Position elements in Bottom Center panel
 	local function PositionBottomCenter()
-		local optui3DPortrait = GetCvarBool('optiui_BottomCenter3DPortrait')
-		if GetCvarBool('optiui_BottomCenterAbilitiesBelowBars') then
+		local belowBars  = GetCvarBool('optiui_BottomCenterAbilitiesBelowBars')
+		local hideSign   = GetCvarBool('optiui_BottomCenterHideItemShopSign')
+		local portrait   = GetCvarBool('optiui_BottomCenter3DPortrait')
+		local background = GetCvarBool('optiui_BottomCenter3DPortraitBackground')
+		if (belowBars) then
 			GetWidget('game_center_health_mana'):SetVAlign('top')
 			GetWidget('game_center_abilities'):SetVAlign('bottom')
 		else
 			GetWidget('game_center_health_mana'):SetVAlign('bottom')
 			GetWidget('game_center_abilities'):SetVAlign('top')
 		end
-		GetWidget('item_shop_sign'):SetVisible(not GetCvarBool('optiui_BottomCenterHideItemShopSign'))
-		GetWidget('game_center_portrait_model'):SetVisible(optui3DPortrait)
-		GetWidget('game_center_portrait_model_bg'):SetVisible(optui3DPortrait)
+		GetWidget('item_shop_sign'):SetVisible(not hideSign)
+		GetWidget('game_center_portrait_model'):SetVisible(portrait)
+		GetWidget('game_center_portrait_model_bg'):SetVisible(portrait)
+		GetWidget('game_center_portrait_model_bg_image'):SetVisible(background)
+		GetWidget('game_center_portrait_model_bg_effect'):SetVisible(background)
 	end
 	interface:RegisterWatch('optiui_BottomCenterPosition', PositionBottomCenter)
 	PositionBottomCenter()
@@ -1511,18 +1522,25 @@ local function InitBottomCenterPanel()
 		elseif (Game.ActiveStatus) then
 			GetWidget('game_center_portrait_icon'):SetColor('white')
 			GetWidget('game_center_portrait_icon'):UICmd("SetRenderMode('normal')")
+			-- OptiUI: Model background
+			GetWidget('game_center_portrait_model_bg_image'):SetColor('white')
+			GetWidget('game_center_portrait_model_bg_image'):UICmd("SetRenderMode('normal')")
 		else
 			GetWidget('game_center_portrait_icon'):SetColor('gray')
 			GetWidget('game_center_portrait_icon'):UICmd("SetRenderMode('grayscale')")
+			-- OptiUI: Model background
+			GetWidget('game_center_portrait_model_bg_image'):SetColor('gray')
+			GetWidget('game_center_portrait_model_bg_image'):UICmd("SetRenderMode('grayscale')")
 		end
 	end
 
 	-- OptiUI: changed to 'icon' to fix console spam --
 	local function ActiveStatus(sourceWidget, status)
-		local status = AtoB(status)
+		local status   = AtoB(status)
+		local portrait = GetCvarBool('optiui_BottomCenter3DPortrait')
 		Game.ActiveStatus = status
 		UpdateGameCenterPortrait()
-		GetWidget('game_center_portrait_model'):SetVisible(status and GetCvarBool('optiui_BottomCenter3DPortrait'))
+		GetWidget('game_center_portrait_model'):SetVisible(status and portrait)
 	end
 	interface:RegisterWatch('ActiveStatus', ActiveStatus)
 
@@ -1683,8 +1701,9 @@ local function InitBottomCenterPanel()
 
 	-- Shop indicator (hanging sign thingy)
 	local function PlayerCanShop(sourceWidget, canShop)
-		local canShop = AtoB(canShop)
-		if ((canShop) and not GetCvarBool('optiui_BottomCenterHideItemShopSign')) then
+		local canShop  = AtoB(canShop)
+		local hideSign = GetCvarBool('optiui_BottomCenterHideItemShopSign')
+		if ((canShop) and (not hideSign)) then
 			GetWidget('item_shop_sign'):SetVisible(true)
 			GetWidget('item_shop_sign'):Sleep(1, function() GetWidget('item_shop_sign'):FadeIn(100) end)
 			-- do the above sleep to interrupt any existing sleeps to set the sign invisible
@@ -1759,6 +1778,7 @@ local function InitBottomSection()
 		end
 		-- OptiUI:end
 
+		local minimalStash = GetCvarBool('optiui_MinimalStash')
 		if (not GetCvarBool('ui_minimap_rightside')) then		
 			GetWidget('attack_modifiers_right'):SetVisible(false)
 			GetWidget('mini_map_right'):SetVisible(false)
@@ -1828,7 +1848,7 @@ local function InitBottomSection()
 			GetWidget('game_stash_icon'):SetX('0.3h')
 			GetWidget('game_stash_tip_stash'):SetAlign('right')
 			GetWidget('game_stash_tip_stash'):SetX('-0.3h')
-			if (not GetCvarBool('optiui_MinimalStash')) then
+			if (not minimalStash) then
 				GetWidget('stash_parent'):SetWidth('22.0h')
 				GetWidget('stash_parent'):SetX('0.0h')
 				GetWidget('stash_parent'):SetAlign('right')
@@ -1909,7 +1929,7 @@ local function InitBottomSection()
 			GetWidget('game_stash_tip_stash'):SetX('0.3h')
 			GetWidget('game_stash_icon'):SetAlign('right')
 			GetWidget('game_stash_icon'):SetX('-0.3h')
-			if (not GetCvarBool('optiui_MinimalStash')) then
+			if (not minimalStash) then
 				GetWidget('stash_parent'):SetWidth('22.0h')
 				GetWidget('stash_parent'):SetX('0.0h')
 				GetWidget('stash_parent'):SetAlign('left')

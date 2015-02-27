@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<effect>
+
+	<definitions>
+
+		<particlesystem name="system0" space="world">
+			
+			<simpleemitter
+				timenudge="10000"
+				spawnrate="20"
+				offsetsphere="50 140 25"
+				minparticlelife="8000"
+				maxparticlelife="12500"			
+				gravity=".3"
+				minspeed="-10"
+				maxspeed="10"
+				drag="0.015"
+				position="0 0 80"
+				material="/shared/effects/materials/leaf.material"
+				direction="0 0 -1"
+			>
+				<particle
+					minagle="-360" 
+					maxangle="360"
+					minanglespeed="-50"
+					maxanglespeed="50"
+					color="1 .4 0"
+					size="2.45"
+					minscale="1"
+					maxscale="3"
+					startalpha="0"
+					midalpha="1"
+					endalpha="0"
+					midalphapos="0.01"
+				/>
+			</simpleemitter>
+			
+		</particlesystem>
+
+	</definitions>
+
+	<thread>
+		<spawnparticlesystem instance="instance0" particlesystem="system0"/>
+		<waitfordeath instance="instance0"/>
+	</thread>
+
+</effect>

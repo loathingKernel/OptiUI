@@ -1,1 +1,5 @@
 *.kdev*
+ui/optiui_game_shop_v3_templates.package
+ui/optiui_options_shop.package
+ui/game_shop_v3.interface
+

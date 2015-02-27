@@ -34,6 +34,27 @@
 		tooltip="When ^gchecked^w the portrait of the hero is rendered as 3D instead of the icon."
 		tooltip_width="53h"
 	/>
+	<instance mod_id="optiui_options" name="mod_dropdown"
+		layout="default"
+		cvar="optiui_BottomCenter3DPortraitBackground"
+		label="Hero Portrait background:"
+		cvartype="bool"
+		onchange="If(_game_phase ge 5, Trigger(\\\'optiui_BottomCenterPosition\\\'));"
+		default="true"
+		maxlistlength="5"
+	/>
+	<instance mod_id="optiui_options" name="mod_dropdown_additem"
+		label="Landscape"
+		value="true"
+		texture=""
+		texture_width=""
+	/>
+	<instance mod_id="optiui_options" name="mod_dropdown_additem"
+		label="Gradient"
+		value="false"
+		texture=""
+		texture_width=""
+	/>
 	<instance mod_id="optiui_options" name="mod_checkbox"
 		cvar="optiui_BottomCenterAbilitiesBelowBars"
 		label="Display Hero Abilities below Health/Mana bars."

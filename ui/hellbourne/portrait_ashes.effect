@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<effect>
+
+	<definitions>
+
+		<particlesystem name="system0" space="world">
+
+			<simpleemitter
+				timenudge="20000"
+				spawnrate="100"
+				offsetsphere="300 240 25"
+				minparticlelife="10000"
+				maxparticlelife="25500"			
+				gravity=".45"
+				minspeed="10"
+				maxspeed="55"
+				drag="0.015"
+				position="0 0 270"
+				material="/shared/effects/materials/glow_01.material"
+				direction="0 0 -1"
+			>
+				<particle
+					minagle="-360" 
+					maxangle="360"
+					minanglespeed="-50"
+					maxanglespeed="250"
+					startcolor=".5 .2 0"
+					midcolor=".5 .2 0"
+					endcolor="0"
+					size=".75"
+					minscale="1"
+					maxscale="5"
+				/>
+				<particle
+					minagle="-360" 
+					maxangle="360"
+					minanglespeed="-50"
+					maxanglespeed="250"
+					startcolor=".3 .2 0"
+					midcolor=".3 .2 0"
+					endcolor="0"
+					size=".75"
+					minscale="1"
+					maxscale="4"
+				/>
+				<particle
+					minagle="-360" 
+					maxangle="360"
+					minanglespeed="-50"
+					maxanglespeed="250"
+					startcolor=".7 .3 0"
+					midcolor=".7 .3 0"
+					endcolor="0"
+					size=".5"
+					minscale="1"
+					maxscale="4"
+				/>
+			</simpleemitter>
+			
+		</particlesystem>
+
+	</definitions>
+
+	<thread>
+		<spawnparticlesystem instance="instance0" particlesystem="system0"/>
+		<waitfordeath instance="instance0"/>
+	</thread>
+
+</effect>

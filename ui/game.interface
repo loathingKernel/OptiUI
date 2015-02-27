@@ -22,7 +22,6 @@
 	<include file="optiui_stash.package"/>
 	<childinterface file="/ui/tooltips.interface" />
 	<childinterface file="/ui/confirmations.interface" />
-	<childinterface file="/ui/testpp/game_dev.interface" />
 	<include file="game_radialmenu.package" />
 		
 	<if condition="(releaseStage_dev or releaseStage_test) and !releaseStage_stable and !ui_disableQAChecklist" >
@@ -2187,7 +2186,7 @@
 
 	<!-- Status Bar Overlay -->
 	<template name="statusbar_overlay">
-		<image texture="/ui/legion/{barimage=optiui_behind_bar.tga}" rendermode="{rendermode=overlay}" color="{barcolor=1 1 1 1}"/>
+		<image texture="/ui/elements/{barimage=optiui_behind_bar.tga}" rendermode="{rendermode=overlay}" color="{barcolor=1 1 1 1}"/>
 		<image align="center" valign="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
 		<frame color="invisible" bordercolor="{bordercolor=gray}" borderthickness="1" noclick="1"/>
 	</template>
@@ -3717,7 +3716,7 @@
 					<panel color="0 0 0 .5"/>
 					<image texture="/ui/legion/behind_bar.tga" rendermode="additive" color="0 .9 0 .2"/>
 					<panel name="game_center_health_lerp">
-						<image texture="/ui/legion/optiui_behind_bar.tga" rendermode="normal" color="1 0 0 1"/>
+						<image texture="/ui/elements/optiui_behind_bar.tga" rendermode="normal" color="1 0 0 1"/>
 						<image align="center" valign="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
 						<!-- <instance name="statusbar_overlay" barimage="optiui_behind_bar.tga" rendermode="" barcolor="1 0 0 1"/> -->
 					</panel>
@@ -3746,7 +3745,7 @@
 					<panel color="0 0 0 .5"/>
 					<image texture="/ui/legion/behind_bar2.tga" rendermode="additive" color="0 .3 .9 .2"/>
 					<panel name="game_center_mana_lerp" >
-						<image texture="/ui/legion/optiui_behind_bar.tga" rendermode="normal" color="0.75 0.75 0.75 1"/>
+						<image texture="/ui/elements/optiui_behind_bar.tga" rendermode="normal" color="0.75 0.75 0.75 1"/>
 						<image align="center" valign="center" texture="/ui/elements/optiui_bar_highlight.tga"/>
 						<!-- <instance name="statusbar_overlay" barimage="optiui_behind_bar.tga" rendermode="" barcolor="0.75 0.75 0.75 1" /> -->
 					</panel>
@@ -3783,23 +3782,34 @@
 							onclick="SelectUnit(ActiveIndex);"
 							interactive="false"
 						/>
-						<panel name="game_center_portrait_model_bg" color="black" noclick="true" >
-							<panel color="0 0 0 .9" noclick="true" />
-						</panel>
 
-						<!-- OptiUI: Made levelup portrait glow a texture instead of a model -->
-						<modelpanel name="game_center_portrait_glow"
-							noclick="true"
-							model="effects/portrait_lvlup/portrait_emitter.mdf"
-							anim="idle"
-							effect="effects/portrait_lvlup/portrait_lvlup.effect"
-							camerapos="-1 0 0"
-							cameraangles="0 0 180"
-							camerafov="55"
-							depthclear="false"
-							depthcompress="true"
-							onshow="SetEffect('/ui/effects/portrait_lvlup/portrait_lvlup.effect');"
-						/>
+						<panel name="game_center_portrait_model_bg" color="black" noclick="true" >
+							<image texture="/ui/elements/optiui_gradient.tga" noclick="true" />
+							<image name="game_center_portrait_model_bg_image" noclick="true"
+								watch="Team"
+								ontriggerlua="
+									local background = { '/ui/legion/optiui_portrait_background.tga', '/ui/hellbourne/optiui_portrait_background.tga' }
+									self:SetTexture(background[tonumber(param)])
+								"
+							/>
+							<modelpanel name="game_center_portrait_model_bg_effect"
+								noclick="true"
+								model="effects/portrait_lvlup/portrait_emitter.mdf"
+								anim="idle"
+								camerapos="-1 10 0"
+								cameraangles="0 0 180"
+								camerafov="52"
+								cameranear="1"
+								camerafar="1000"
+								depthclear="true"
+								depthcompress="true"
+								watch="Team"
+								ontriggerlua="
+									local effect = { '/ui/legion/portrait_leaves.effect', '/ui/hellbourne/portrait_ashes.effect' }
+									self:SetEffect(effect[tonumber(param)])
+								"
+							/>
+						</panel>
 
 						<modelpanel name="game_center_portrait_model"
 							scenebuffer="true"
@@ -3821,6 +3831,20 @@
 							onshow="SetAnim('portrait');"
 							lookupresource="true"
 						/>
+
+						<modelpanel name="game_center_portrait_glow"
+							noclick="true"
+							model="effects/portrait_lvlup/portrait_emitter.mdf"
+							anim="idle"
+							effect="effects/portrait_lvlup/portrait_lvlup.effect"
+							camerapos="-1 0 0"
+							cameraangles="0 0 180"
+							camerafov="55"
+							depthclear="false"
+							depthcompress="true"
+							onshow="SetEffect('/ui/effects/portrait_lvlup/portrait_lvlup.effect');"
+						/>
+						<image texture="/ui/elements/optiui_vignette.tga" noclick="true" />
 						<frame color="invisible" bordercolor="black" borderthickness="1" noclick="true" />
 					</panel>
 
@@ -4781,20 +4805,22 @@
 
 					<!-- Ward Slot -->
 					<!-- <panel width="12.0h" height="7.7h" align="right" valign="bottom" color="invisible" noclick="1" > -->
-						<panel name="game_selected_info_unit_inventory_ward" height="3.1h" width="3.1h" y="-8.1h" valign="bottom" noclick="1" >
+						<panel name="game_selected_info_unit_inventory_ward" height="3.1h" width="3.1h" y="-8.2h" valign="bottom" noclick="1" >
 							<image texture="/ui/legion/empty_pack.tga"/>
 							<frame color="invisible" bordercolor=".3 .3 .3 1" borderthickness="1" noclick="1" />
 							<instance name="inventory_info_ward" slot="63" bordercolor=".3 .3 .3 1" />
+							<frame texture="/ui/frames/rounded_bg_white.tga" color=".1 .1 .1 .9" borderthickness="0" bordercolor="gray"
+								watch="SelectedHasInventory"
+								ontriggerlua="self:SetVisible(not AtoB(param))"
+							/>
 						</panel>
 					<!-- </panel> -->
 
 					<!-- Inventory Cover -->
-					<panel name="game_selected_info_unit_inventory_cover" color="invisible" passivechildren="true"
+					<frame texture="/ui/frames/rounded_bg_white.tga" color=".1 .1 .1 .9" borderthickness="0" bordercolor="gray"
 						watch="SelectedHasInventory"
 						ontriggerlua="self:SetVisible(not AtoB(param))"
-					>
-						<frame texture="/ui/frames/rounded_bg_white.tga" color=".1 .1 .1 .9" borderthickness="0" bordercolor="gray" noclick="true" />
-					</panel>
+					/>
 				</panel>
 			</panel>
 
@@ -5728,6 +5754,8 @@
 
 	<!-- Report a player stuff -->
 	<include file="rap_templates.package" />
+	
+	<childinterface file="/ui/testpp/game_dev.interface" />
 
 	<!-- Confirmations -->
 	<instance name="disband_confirm" interactive="false" visible="0"/>
